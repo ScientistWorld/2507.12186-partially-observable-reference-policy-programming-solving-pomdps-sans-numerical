@@ -13,25 +13,20 @@ artifacts.
 ## Results
 
 Paper reference numbers are recorded in `scoring/reference.json` for the two
-original benchmark tables. A completed CPU job on the accessible scaled maze
-with 32 episodes produced:
+original benchmark tables. The final revised CPU job on the accessible scaled
+maze with 32 episodes produced:
 
-- PORPP: success rate 0.875, mean total reward 1270.4.
-- RefPol: success rate 0.8125, mean total reward 1155.1.
+- PORPP: success rate 0.875, mean total reward 1135.4.
+- RefPol: success rate 0.6875, mean total reward 495.2.
+- PORPP gaps: +0.1875 success rate and +640.2 mean total reward vs RefPol.
 
-After adding explicit gap metrics and increasing the scaled task's danger
-penalty to make unsafe direct heuristic routes meaningfully costly, a local
-16-episode validation run produced:
-
-- PORPP: success rate 0.9375, mean total reward 1341.6, reward gap vs RefPol 431.1.
-- RefPol: success rate 0.8125, mean total reward 910.5.
-
-The next submitted job regenerates final scores for the revised benchmark.
+The job ran `scripts/run.sh`, wrote `scoring/scores.json`, and passed
+`python validate.py --compare`.
 
 ## Remaining
 
-- Run the submitted reproduction job for the revised benchmark and inspect the full generated scores.
-- If budget allows, add a second scaled setting or implement a POMCP macro-action baseline.
+- Higher milestones would require implementing additional original-paper settings or more baselines, such as macro-action POMCP or RefSolver.
+- The exact 3D maze and HEMS simulators remain unavailable, so this environment stops at the accessible scaled core-claim reproduction.
 
 ## Issues
 
