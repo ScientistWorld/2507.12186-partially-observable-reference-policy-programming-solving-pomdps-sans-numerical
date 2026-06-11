@@ -177,19 +177,21 @@ def build_scores(paths: Dict[str, Path], method_names: Optional[List[str]]) -> d
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--porpp", type=Path, default=Path("checkpoints/porpp_episodes.jsonl"))
-    parser.add_argument("--refpol", type=Path, default=Path("checkpoints/refpol_episodes.jsonl"))
-    parser.add_argument("--pomcp", type=Path, default=Path("checkpoints/pomcp_episodes.jsonl"))
-    parser.add_argument("--porpp-low", type=Path, default=Path("checkpoints/porpp_low_episodes.jsonl"))
-    parser.add_argument("--porpp-high", type=Path, default=Path("checkpoints/porpp_high_episodes.jsonl"))
+    parser.add_argument("checkpoints_dir", nargs="?", type=Path, default=Path("checkpoints"))
+    parser.add_argument("--porpp", type=Path)
+    parser.add_argument("--refpol", type=Path)
+    parser.add_argument("--pomcp", type=Path)
+    parser.add_argument("--porpp-low", type=Path)
+    parser.add_argument("--porpp-high", type=Path)
     parser.add_argument("--include-anytime", action="store_true")
     parser.add_argument("--out", type=Path, default=Path("scoring/scores_test.json"))
     args = parser.parse_args()
 
-    paths = discover_episode_paths(Path("checkpoints"))
-    add_named_path(paths, "porpp", args.porpp)
-    add_named_path(paths, "refpol", args.refpol)
-    add_named_path(paths, "pomcp", args.pomcp)
+    checkpoints_dir = args.checkpoints_dir
+    paths = discover_episode_paths(checkpoints_dir)
+    add_named_path(paths, "porpp", args.porpp or checkpoints_dir / "porpp_episodes.jsonl")
+    add_named_path(paths, "refpol", args.refpol or checkpoints_dir / "refpol_episodes.jsonl")
+    add_named_path(paths, "pomcp", args.pomcp or checkpoints_dir / "pomcp_episodes.jsonl")
 
     scores = build_scores(paths, train_method_names(Path("scoring/scores_train.json")))
     args.out.parent.mkdir(parents=True, exist_ok=True)

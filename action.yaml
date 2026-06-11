@@ -1,9 +1,6 @@
-# This iteration writes files only — do NOT submit compute jobs.
-# Once you set action to 'done', STOP immediately.
-# Do NOT sleep, poll, or wait. The system reads this file
-# only after your turn ends.
-action: done
+# This iteration submits the train/test evaluation job.
+action: submit
 gpus: 0
 test: false
 milestone: core_claim
-notes: "Improvements: seed-hash train/test split, artifact validity and unique-seed constraints, complete metric descriptions. Notes: see DESIGN_NOTES.md for runner concerns."
+notes: "Run evaluate_train.sh and evaluate_test.sh against /home/user/checkpoints; populate scores_train.json and scores_test.json."
