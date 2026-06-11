@@ -212,6 +212,42 @@ The 3D maze evaluation should include the poor-localisation initial belief, land
 
 </details>
 
+### Iteration 4: gpt-5.5 (designer_stage_1)
+- **Milestone**: `core_claim` | **Status**: done
+- **Working time**: 4m | **GPU**: 0.0h
+- **Jobs**: 7 total (7 completed, 0 failed)
+
+<details>
+<summary>Progress Log</summary>
+
+### [2026-06-11 22:12] - core_claim
+- Reviewed the corrected CPU job `2c2a8d2f-ba9`. It exited successfully, wrote
+  `scoring/scores.json`, and passed `python validate.py --compare`.
+- Final scaled-maze scores: PORPP reached 0.875 success and 1135.4 mean reward,
+  RefPol reached 0.6875 success and 495.2 mean reward, and corrected
+  directional POMCP reached 0.28125 success and 239.7 mean reward.
+- Fixed the scoring contract so the substitute environment's primary metric is
+  the artifact-computed core-claim relation rather than a false direct
+  comparison to original-simulator baseline success rates.
+- The workspace is packaged as a reusable `core_claim` reproduction.
+
+### [2026-06-11 22:25] - core_claim
+- Audited the existing reproduction after milestone reset. The PORPP implementation is an actual particle-history-tree implementation of the paper's asynchronous preference programming algorithm, not a surrogate.
+- Fixed scoring hygiene by replacing circular scaled-maze reference rows with paper Table 1-derived scale anchors while keeping the scaled experiment documented as a substitute because the original simulator is unavailable.
+- Prepared a CPU job to regenerate `scores.json` with RefPol, POMCP, and PORPP artifacts.
+
+### [2026-06-11 22:45] - core_claim
+- Reviewed the completed CPU job. It validated successfully, but POMCP reached 100% success because it had been given the same target macro actions used by the domain heuristic.
+- Corrected POMCP to enumerate fixed directional macro actions, matching the paper's POMCP baseline protocol more closely.
+- Prepared a follow-up CPU job to regenerate scores with the corrected POMCP baseline.
+
+### [2026-06-11 22:03] - core_claim
+- Implemented the paper's PORPP asynchronous online preference-update algorithm on an accessible scaled maze POMDP preserving poor localization, macro actions, landmark observations, delayed goal reward, and unsafe direct routes.
+- Ran PORPP and the RefPol heuristic-only baseline through the artifact evaluator; PORPP achieved 0.875 success and 1135.4 mean discounted reward versus RefPol's 0.6875 success and 495.2 mean discounted reward on 32 episodes.
+- Added a POMCP-style particle tree-search baseline for the same scaled maze and submitted a follow-up job to score it alongside PORPP and RefPol.
+
+</details>
+
 
 ---
 
