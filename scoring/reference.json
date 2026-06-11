@@ -5,8 +5,16 @@
       "weight": 0.62,
       "primary_metric": "success_rate",
       "metrics": {
-        "success_rate": {"higher_is_better": true, "coefficient": 1.0},
-        "mean_total_reward": {"higher_is_better": true, "coefficient": 0.5}
+        "success_rate": {
+          "higher_is_better": true,
+          "coefficient": 1.0,
+          "description": "Fraction of evaluation episodes that reached the goal."
+        },
+        "mean_total_reward": {
+          "higher_is_better": true,
+          "coefficient": 0.5,
+          "description": "Average discounted return across evaluation episodes."
+        }
       },
       "results": {
         "porpp_15s": {"type": "proposed", "success_rate": 0.94, "mean_total_reward": 983.1},
@@ -21,8 +29,16 @@
       "weight": 0.37,
       "primary_metric": "success_rate",
       "metrics": {
-        "success_rate": {"higher_is_better": true, "coefficient": 1.0},
-        "mean_total_reward": {"higher_is_better": true, "coefficient": 0.5}
+        "success_rate": {
+          "higher_is_better": true,
+          "coefficient": 1.0,
+          "description": "Fraction of evaluation missions that completed successfully."
+        },
+        "mean_total_reward": {
+          "higher_is_better": true,
+          "coefficient": 0.5,
+          "description": "Average discounted mission return across evaluation episodes."
+        }
       },
       "results": {
         "porpp_10s": {"type": "proposed", "success_rate": 0.90, "mean_total_reward": 19393.5},
@@ -36,18 +52,56 @@
       "weight": 0.01,
       "primary_metric": "core_claim_supported",
       "metrics": {
-        "core_claim_supported": {"higher_is_better": true, "coefficient": 1.0},
-        "success_rate": {"higher_is_better": true, "coefficient": 1.0},
-        "mean_total_reward": {"higher_is_better": true, "coefficient": 0.5},
-        "episodes": {"higher_is_better": true, "coefficient": 0.0},
-        "stderr_total_reward": {"higher_is_better": false, "coefficient": -0.05},
-        "success_gap_vs_refpol": {"higher_is_better": true, "coefficient": 0.6},
-        "reward_gap_vs_refpol": {"higher_is_better": true, "coefficient": 0.3}
+        "core_claim_supported": {
+          "higher_is_better": true,
+          "coefficient": 1.0,
+          "description": "Relational claim check: 1 only when the candidate beats every available baseline on both success rate and reward."
+        },
+        "success_rate": {
+          "higher_is_better": true,
+          "coefficient": 1.0,
+          "description": "Fraction of scaled-maze episodes that reached the goal."
+        },
+        "mean_total_reward": {
+          "higher_is_better": true,
+          "coefficient": 0.5,
+          "description": "Average discounted return across scaled-maze episodes."
+        },
+        "episodes": {
+          "higher_is_better": true,
+          "coefficient": 0.0,
+          "description": "Number of valid episode artifacts scored for this method and slice."
+        },
+        "valid_episode_rate": {
+          "higher_is_better": true,
+          "coefficient": 0.2,
+          "description": "Fraction of selected artifact rows that contain the required episode fields with valid types."
+        },
+        "unique_seed_rate": {
+          "higher_is_better": true,
+          "coefficient": 0.2,
+          "description": "Fraction of selected valid episodes with distinct seeds, discouraging replayed or duplicated rows."
+        },
+        "stderr_total_reward": {
+          "higher_is_better": false,
+          "coefficient": -0.05,
+          "description": "Standard error of discounted return, used to expose noisy or brittle improvements."
+        },
+        "success_gap_vs_refpol": {
+          "higher_is_better": true,
+          "coefficient": 0.6,
+          "description": "Success-rate improvement over the heuristic-only reference policy."
+        },
+        "reward_gap_vs_refpol": {
+          "higher_is_better": true,
+          "coefficient": 0.3,
+          "description": "Mean-return improvement over the heuristic-only reference policy."
+        }
       },
       "results": {
-        "porpp": {"type": "proposed", "core_claim_supported": 1.0, "success_rate": 0.94, "mean_total_reward": 983.1, "episodes": 100, "stderr_total_reward": 168.0, "success_gap_vs_refpol": 0.65, "reward_gap_vs_refpol": 1555.3},
-        "refpol": {"type": "baseline", "success_rate": 0.29, "mean_total_reward": -572.2, "episodes": 100, "stderr_total_reward": 231.1, "success_gap_vs_refpol": 0.0, "reward_gap_vs_refpol": 0.0},
-        "pomcp": {"type": "baseline", "success_rate": 0.13, "mean_total_reward": -1897.5, "episodes": 100, "stderr_total_reward": 240.1, "success_gap_vs_refpol": -0.16, "reward_gap_vs_refpol": -1325.3}
+        "porpp": {"type": "proposed", "core_claim_supported": 1.0, "success_rate": 0.94, "mean_total_reward": 983.1, "episodes": 100, "valid_episode_rate": 1.0, "unique_seed_rate": 1.0, "stderr_total_reward": 168.0, "success_gap_vs_refpol": 0.65, "reward_gap_vs_refpol": 1555.3},
+        "refpol": {"type": "baseline", "success_rate": 0.29, "mean_total_reward": -572.2, "episodes": 100, "valid_episode_rate": 1.0, "unique_seed_rate": 1.0, "stderr_total_reward": 231.1, "success_gap_vs_refpol": 0.0, "reward_gap_vs_refpol": 0.0},
+        "pomcp": {"type": "baseline", "success_rate": 0.13, "mean_total_reward": -1897.5, "episodes": 100, "valid_episode_rate": 1.0, "unique_seed_rate": 1.0, "stderr_total_reward": 240.1, "success_gap_vs_refpol": -0.16, "reward_gap_vs_refpol": -1325.3}
       }
     }
   }
