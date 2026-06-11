@@ -18,5 +18,25 @@
         "reward_gap_vs_refpol": 0.0
       }
     }
+  },
+  "scaled_maze_anytime_planning": {
+    "results": {
+      "porpp_low_budget": {
+        "episodes": 24,
+        "success_rate": 0.9166666666666666,
+        "mean_total_reward": 1270.9242743426514,
+        "stderr_total_reward": 190.02062657439404,
+        "success_gap_vs_low_budget": 0.0,
+        "reward_gap_vs_low_budget": 0.0
+      },
+      "porpp_high_budget": {
+        "episodes": 24,
+        "success_rate": 0.875,
+        "mean_total_reward": 1123.30204399903,
+        "stderr_total_reward": 225.4444137916269,
+        "success_gap_vs_low_budget": -0.04166666666666663,
+        "reward_gap_vs_low_budget": -147.62223034362137
+      }
+    }
   }
 }
