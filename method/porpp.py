@@ -170,6 +170,8 @@ def run_episode(seed: int, simulations: int, particle_count: int, max_steps: int
     return {
         "seed": seed,
         "method": "porpp",
+        "simulations": simulations,
+        "particles": particle_count,
         "success": bool(true_state.success),
         "total_reward": total_reward,
         "steps": steps,

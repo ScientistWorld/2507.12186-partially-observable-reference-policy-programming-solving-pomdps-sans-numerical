@@ -48,7 +48,7 @@ SEED="${SEED:-7}" \
 RUN_EVAL=0 \
 python -m method.porpp \
   --episodes "${ANYTIME_EPISODES:-24}" \
-  --simulations "${LOW_SIMULATIONS:-150}" \
+  --simulations "${LOW_SIMULATIONS:-25}" \
   --particles "${PARTICLES:-100}" \
   --max-steps "${MAX_STEPS:-40}" \
   --seed "${SEED:-7}" \

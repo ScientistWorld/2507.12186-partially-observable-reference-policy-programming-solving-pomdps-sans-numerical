@@ -39,6 +39,12 @@ This does not support `core_claim_plus`; the low-budget setting has been
 reduced to 25 simulations so the next run tests a more meaningful planning
 budget contrast.
 
+The immediate rerun still produced the same low-budget numbers because the
+script's command-line `--simulations` default remained at 150 even though the
+inline environment assignment had been reduced. This has been fixed, and PORPP
+episode artifacts now include the `simulations` field so future logs expose the
+actual planning budget used.
+
 ## Remaining
 
 - Await the submitted CPU job to refresh the core benchmark and determine
