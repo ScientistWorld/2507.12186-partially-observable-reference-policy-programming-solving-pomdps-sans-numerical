@@ -58,6 +58,7 @@ class MacroAction:
     target: Point
     avoid_danger: bool = False
     length: int = 5
+    is_direction: bool = False
 
 
 def distance(a: Point, b: Point) -> float:
@@ -119,6 +120,28 @@ class MazePOMDP:
             MacroAction("to_goal_safe", cfg.goal, True, cfg.max_macro_len),
         ]
 
+    def directional_actions(self, count: int = 16) -> List[MacroAction]:
+        """Fixed macro-action set for POMCP-style exhaustive expansion.
+
+        The paper's POMCP baseline does not use the domain-specific PRM
+        candidate sampler; it expands equally spaced directional macro actions.
+        This 2D analogue keeps that separation from the PORPP/RefPol sampler.
+        """
+        cfg = self.config
+        actions: List[MacroAction] = []
+        for i in range(count):
+            theta = 2.0 * math.pi * i / count
+            actions.append(
+                MacroAction(
+                    name=f"dir_{i:02d}",
+                    target=(math.cos(theta), math.sin(theta)),
+                    avoid_danger=False,
+                    length=cfg.max_macro_len,
+                    is_direction=True,
+                )
+            )
+        return actions
+
     def macro_step(
         self, state: MazeState, action: MacroAction, rng: random.Random
     ) -> Tuple[MazeState, Observation, float, bool]:
@@ -135,8 +158,8 @@ class MazePOMDP:
         for _ in range(max(1, action.length)):
             if s.terminal:
                 break
-            waypoint = target
-            if action.avoid_danger and distance(s.point(), cfg.danger) < 6.0 and s.y > cfg.goal[1]:
+            waypoint = (s.x + target[0], s.y + target[1]) if action.is_direction else target
+            if (not action.is_direction) and action.avoid_danger and distance(s.point(), cfg.danger) < 6.0 and s.y > cfg.goal[1]:
                 waypoint = (cfg.danger[0] - 1.5, cfg.goal[1] - 2.5)
             dx, dy = waypoint[0] - s.x, waypoint[1] - s.y
             norm = max(math.hypot(dx, dy), 1e-9)

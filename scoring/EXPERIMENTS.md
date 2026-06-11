@@ -10,5 +10,6 @@ candidate actions into a stronger policy than executing those candidates
 directly.
 
 The official reproduction script also records a POMCP-style tree-search
-baseline on the same episode format. This gives future agents a second
-comparison point in addition to the heuristic-only reference policy.
+baseline with fixed directional macro actions on the same episode format. This
+gives future agents a second comparison point in addition to the heuristic-only
+reference policy.

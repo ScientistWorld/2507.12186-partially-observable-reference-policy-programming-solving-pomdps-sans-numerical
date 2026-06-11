@@ -5,4 +5,4 @@ action: submit
 gpus: 0
 test: false
 milestone: core_claim
-notes: "After audit fixes, regenerate scaled-maze scores with RefPol, POMCP, and PORPP, then run validate.py --compare."
+notes: "Regenerate scaled-maze scores after correcting POMCP to use fixed directional macro actions instead of heuristic target macros."

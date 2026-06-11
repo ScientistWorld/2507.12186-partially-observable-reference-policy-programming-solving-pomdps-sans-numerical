@@ -9,6 +9,11 @@
 - Fixed scoring hygiene by replacing circular scaled-maze reference rows with paper Table 1-derived scale anchors while keeping the scaled experiment documented as a substitute because the original simulator is unavailable.
 - Prepared a CPU job to regenerate `scores.json` with RefPol, POMCP, and PORPP artifacts.
 
+### [2026-06-11 22:45] - core_claim
+- Reviewed the completed CPU job. It validated successfully, but POMCP reached 100% success because it had been given the same target macro actions used by the domain heuristic.
+- Corrected POMCP to enumerate fixed directional macro actions, matching the paper's POMCP baseline protocol more closely.
+- Prepared a follow-up CPU job to regenerate scores with the corrected POMCP baseline.
+
 ### [2026-06-11 22:03] - core_claim
 - Implemented the paper's PORPP asynchronous online preference-update algorithm on an accessible scaled maze POMDP preserving poor localization, macro actions, landmark observations, delayed goal reward, and unsafe direct routes.
 - Ran PORPP and the RefPol heuristic-only baseline through the artifact evaluator; PORPP achieved 0.875 success and 1135.4 mean discounted reward versus RefPol's 0.6875 success and 495.2 mean discounted reward on 32 episodes.

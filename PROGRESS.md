@@ -10,10 +10,10 @@ selection, and sampled log-sum-exp preference backups. Implemented RefPol as
 the heuristic-only baseline and an evaluator that reads saved episode JSONL
 artifacts.
 
-Added a POMCP-style baseline in `baseline/pomcp.py` that enumerates the scaled
-maze macro actions at each history node, uses particle Monte Carlo tree search
-with UCB selection, and writes the same episode JSONL artifact format as the
-other methods.
+Added a POMCP-style baseline in `baseline/pomcp.py` that enumerates fixed
+directional macro actions at each history node, uses particle Monte Carlo tree
+search with UCB selection, and writes the same episode JSONL artifact format as
+the other methods.
 
 ## Results
 
@@ -76,6 +76,9 @@ Current turn update:
 - Audit fix: replaced the circular scaled-maze reference rows with paper
   Table 1-derived scale anchors. This keeps `reference.json` from copying the
   reproduced `scores.json` values.
+- Post-job fix: the first POMCP run used the domain-specific target macro
+  actions, which made it an unfairly strong baseline relative to the paper's
+  POMCP protocol. POMCP now enumerates fixed directional macro actions instead.
 
 ## Remaining
 

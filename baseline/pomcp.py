@@ -97,7 +97,7 @@ class POMCPPlanner:
     def _ensure_actions(self, node: POMCPNode) -> None:
         if node.actions:
             return
-        for action in self.env.representative_actions():
+        for action in self.env.directional_actions(16):
             node.actions[self.env.action_key(action)] = POMCPAction(action)
 
     def _select_ucb(self, node: POMCPNode) -> POMCPAction:
