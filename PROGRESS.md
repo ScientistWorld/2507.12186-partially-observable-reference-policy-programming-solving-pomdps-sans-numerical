@@ -27,10 +27,17 @@ scaled maze with 32 episodes produced:
 
 - PORPP: success rate 0.875, mean total reward 1135.4.
 - RefPol: success rate 0.6875, mean total reward 495.2.
+- Directional POMCP: success rate 0.28125, mean total reward 239.7.
 - PORPP gaps: +0.1875 success rate and +640.2 mean total reward vs RefPol.
 
 The job ran `scripts/run.sh`, wrote `scoring/scores.json`, and passed
 `python validate.py --compare`.
+
+The corrected POMCP follow-up job (`2c2a8d2f-ba9`) completed successfully
+after replacing the unfair heuristic-target macro actions with fixed
+directional macro actions. Its `validate.py --compare` output passed all
+scoring and structure checks, including method/eval import separation,
+artifact-based evaluation, and no committed `shared/` references.
 
 The job also tested an anytime-budget extension on the same scaled maze. The
 first CPU run completed successfully, but the 150-simulation "low" budget was
@@ -79,6 +86,9 @@ Current turn update:
 - Post-job fix: the first POMCP run used the domain-specific target macro
   actions, which made it an unfairly strong baseline relative to the paper's
   POMCP protocol. POMCP now enumerates fixed directional macro actions instead.
+- Final job review: the corrected POMCP run passed validation and supports the
+  packaged `core_claim` milestone. PORPP outperformed both RefPol and the
+  corrected directional POMCP baseline on the official scaled-maze score.
 
 ## Remaining
 

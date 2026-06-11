@@ -1,8 +1,8 @@
 # IMPORTANT: Once you set action to 'submit' or 'done', STOP immediately.
 # Do NOT sleep, poll, or wait for jobs. The system reads this file
 # only after your turn ends. Sleeping blocks the entire pipeline.
-action: submit
+action: done
 gpus: 0
 test: false
 milestone: core_claim
-notes: "Regenerate scaled-maze scores after correcting POMCP to use fixed directional macro actions instead of heuristic target macros."
+notes: "Reproduced the core PORPP claim on the accessible scaled maze. Corrected directional POMCP, RefPol, and PORPP scores validate successfully; original simulators are unavailable, so stopping at core_claim."

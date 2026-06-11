@@ -4,6 +4,14 @@
 
 ## Progress Log
 
+### [2026-06-11 22:12] - core_claim
+- Reviewed the corrected CPU job `2c2a8d2f-ba9`. It exited successfully, wrote
+  `scoring/scores.json`, and passed `python validate.py --compare`.
+- Final scaled-maze scores: PORPP reached 0.875 success and 1135.4 mean reward,
+  RefPol reached 0.6875 success and 495.2 mean reward, and corrected
+  directional POMCP reached 0.28125 success and 239.7 mean reward.
+- The workspace is packaged as a reusable `core_claim` reproduction.
+
 ### [2026-06-11 22:25] - core_claim
 - Audited the existing reproduction after milestone reset. The PORPP implementation is an actual particle-history-tree implementation of the paper's asynchronous preference programming algorithm, not a surrogate.
 - Fixed scoring hygiene by replacing circular scaled-maze reference rows with paper Table 1-derived scale anchors while keeping the scaled experiment documented as a substitute because the original simulator is unavailable.
@@ -20,4 +28,8 @@
 - Added a POMCP-style particle tree-search baseline for the same scaled maze and submitted a follow-up job to score it alongside PORPP and RefPol.
 
 ## Stop Justification
-- Current packaged milestone is `core_claim`; higher milestones would require additional original-paper environments or validated extensions beyond the accessible scaled maze.
+- Current packaged milestone is `core_claim`; the corrected artifact-based
+  scaled-maze experiment demonstrates the paper's central claim against both
+  RefPol and directional POMCP. Higher milestones would require additional
+  original-paper environments or validated extensions beyond the accessible
+  scaled maze.
