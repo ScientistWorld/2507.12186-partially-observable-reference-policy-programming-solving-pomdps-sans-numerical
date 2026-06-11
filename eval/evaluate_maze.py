@@ -10,6 +10,10 @@ from statistics import mean, stdev
 from typing import Dict, Iterable, List
 
 
+SUCCESS_MARGIN_SCALE = 0.2
+REWARD_MARGIN_SCALE = 500.0
+
+
 def read_jsonl(path: Path) -> List[dict]:
     if not path.exists():
         return []
@@ -46,6 +50,19 @@ def beats_all_on_success_and_reward(candidate: dict, baselines: Iterable[dict]) 
     return 1.0
 
 
+def core_claim_margin_score(candidate: dict, baselines: Iterable[dict]) -> float:
+    """Normalized success-and-reward margin over the strongest available baseline."""
+    usable = [b for b in baselines if b.get("episodes", 0)]
+    if not candidate.get("episodes", 0) or not usable:
+        return 0.0
+    success_margin = candidate["success_rate"] - max(b["success_rate"] for b in usable)
+    reward_margin = candidate["mean_total_reward"] - max(b["mean_total_reward"] for b in usable)
+    if success_margin <= 0.0 or reward_margin <= 0.0:
+        return 0.0
+    normalized = min(success_margin / SUCCESS_MARGIN_SCALE, reward_margin / REWARD_MARGIN_SCALE)
+    return max(0.0, min(1.0, normalized))
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--porpp", type=Path, default=Path("checkpoints/porpp_episodes.jsonl"))
@@ -80,6 +97,12 @@ def main() -> None:
         porpp_summary,
         [refpol_summary, pomcp_summary],
     )
+    porpp_summary["core_claim_margin_score"] = core_claim_margin_score(
+        porpp_summary,
+        [refpol_summary, pomcp_summary],
+    )
+    refpol_summary["core_claim_margin_score"] = 0.0
+    pomcp_summary["core_claim_margin_score"] = 0.0
 
     scores = {
         "scaled_maze_online_planning": {

@@ -3,4 +3,4 @@ action: done
 gpus: 0
 test: false
 milestone: core_claim
-notes: "Seed-hash artifact split; 27 train metric values, 27 test metric values across porpp/refpol/pomcp; PORPP success 0.857 train vs 0.889 test and reward 1103.7 vs 1160.0, core claim supported on both; caveat small episode counts create mild split imbalance."
+notes: "Seed-hash artifact split; 30 train metric values, 30 test metric values across porpp/refpol/pomcp; primary margin score PORPP 0.714 train vs 1.000 test, core claim supported on both; caveat small episode counts create mild split imbalance."

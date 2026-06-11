@@ -10,7 +10,8 @@
         "stderr_total_reward": 144.81306034297734,
         "success_gap_vs_refpol": -0.4142857142857143,
         "reward_gap_vs_refpol": -344.07534470168423,
-        "core_claim_supported": 0.0
+        "core_claim_supported": 0.0,
+        "core_claim_margin_score": 0.0
       },
       "porpp": {
         "episodes": 14,
@@ -21,7 +22,8 @@
         "stderr_total_reward": 320.5277991916583,
         "success_gap_vs_refpol": 0.1428571428571428,
         "reward_gap_vs_refpol": 511.9415821977526,
-        "core_claim_supported": 1.0
+        "core_claim_supported": 1.0,
+        "core_claim_margin_score": 0.714285714285714
       },
       "refpol": {
         "episodes": 14,
@@ -32,7 +34,8 @@
         "stderr_total_reward": 407.46046298786496,
         "success_gap_vs_refpol": 0.0,
         "reward_gap_vs_refpol": 0.0,
-        "core_claim_supported": 0.0
+        "core_claim_supported": 0.0,
+        "core_claim_margin_score": 0.0
       }
     }
   }

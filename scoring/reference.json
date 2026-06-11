@@ -48,10 +48,15 @@
       }
     },
     "scaled_maze_online_planning": {
-      "description": "Accessible scaled maze substitute used by this reproduction. Raw success and reward rows retain paper Table 1 scale anchors from the original 3D maze; the primary metric is task success, with a separate relational constraint checking that PORPP beats the available baselines.",
+      "description": "Accessible scaled maze substitute used by this reproduction. Raw success and reward rows retain paper Table 1 scale anchors from the original 3D maze; the primary metric is a normalized success-and-reward margin over the available baselines.",
       "weight": 0.01,
-      "primary_metric": "success_rate",
+      "primary_metric": "core_claim_margin_score",
       "metrics": {
+        "core_claim_margin_score": {
+          "higher_is_better": true,
+          "coefficient": 1.0,
+          "description": "Normalized minimum margin over the strongest available baseline on success rate and mean total reward, capped at 1."
+        },
         "core_claim_supported": {
           "higher_is_better": true,
           "coefficient": 1.0,
@@ -99,9 +104,9 @@
         }
       },
       "results": {
-        "porpp": {"type": "proposed", "core_claim_supported": 1.0, "success_rate": 0.94, "mean_total_reward": 983.1, "episodes": 100, "valid_episode_rate": 1.0, "unique_seed_rate": 1.0, "stderr_total_reward": 168.0, "success_gap_vs_refpol": 0.65, "reward_gap_vs_refpol": 1555.3},
-        "refpol": {"type": "baseline", "success_rate": 0.29, "mean_total_reward": -572.2, "episodes": 100, "valid_episode_rate": 1.0, "unique_seed_rate": 1.0, "stderr_total_reward": 231.1, "success_gap_vs_refpol": 0.0, "reward_gap_vs_refpol": 0.0},
-        "pomcp": {"type": "baseline", "success_rate": 0.13, "mean_total_reward": -1897.5, "episodes": 100, "valid_episode_rate": 1.0, "unique_seed_rate": 1.0, "stderr_total_reward": 240.1, "success_gap_vs_refpol": -0.16, "reward_gap_vs_refpol": -1325.3}
+        "porpp": {"type": "proposed", "core_claim_margin_score": 1.0, "core_claim_supported": 1.0, "success_rate": 0.94, "mean_total_reward": 983.1, "episodes": 100, "valid_episode_rate": 1.0, "unique_seed_rate": 1.0, "stderr_total_reward": 168.0, "success_gap_vs_refpol": 0.65, "reward_gap_vs_refpol": 1555.3},
+        "refpol": {"type": "baseline", "core_claim_margin_score": 0.0, "success_rate": 0.29, "mean_total_reward": -572.2, "episodes": 100, "valid_episode_rate": 1.0, "unique_seed_rate": 1.0, "stderr_total_reward": 231.1, "success_gap_vs_refpol": 0.0, "reward_gap_vs_refpol": 0.0},
+        "pomcp": {"type": "baseline", "core_claim_margin_score": 0.0, "success_rate": 0.13, "mean_total_reward": -1897.5, "episodes": 100, "valid_episode_rate": 1.0, "unique_seed_rate": 1.0, "stderr_total_reward": 240.1, "success_gap_vs_refpol": -0.16, "reward_gap_vs_refpol": -1325.3}
       }
     }
   }

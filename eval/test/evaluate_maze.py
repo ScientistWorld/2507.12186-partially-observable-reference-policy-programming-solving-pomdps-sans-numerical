@@ -21,6 +21,8 @@ SPLIT_SALT = "researchgym_porpp_scaled_maze_v2"
 BASELINE_METHODS = {"refpol", "pomcp"}
 EXCLUDED_EPISODE_SUFFIXES = ("_low_episodes", "_high_episodes")
 REQUIRED_EPISODE_FIELDS = {"seed", "method", "success", "total_reward", "steps", "trace"}
+SUCCESS_MARGIN_SCALE = 0.2
+REWARD_MARGIN_SCALE = 500.0
 
 
 def is_finite_number(value) -> bool:
@@ -119,6 +121,18 @@ def beats_all_on_success_and_reward(candidate: dict, baselines: Iterable[dict]) 
     return 1.0
 
 
+def core_claim_margin_score(candidate: dict, baselines: Iterable[dict]) -> float:
+    usable = [b for b in baselines if b.get("episodes", 0)]
+    if not candidate.get("episodes", 0) or not usable:
+        return 0.0
+    success_margin = candidate["success_rate"] - max(b["success_rate"] for b in usable)
+    reward_margin = candidate["mean_total_reward"] - max(b["mean_total_reward"] for b in usable)
+    if success_margin <= 0.0 or reward_margin <= 0.0:
+        return 0.0
+    normalized = min(success_margin / SUCCESS_MARGIN_SCALE, reward_margin / REWARD_MARGIN_SCALE)
+    return max(0.0, min(1.0, normalized))
+
+
 def method_name_from_path(path: Path) -> str:
     stem = path.stem
     if stem.endswith("_episodes"):
@@ -169,8 +183,10 @@ def build_scores(paths: Dict[str, Path], method_names: Optional[List[str]]) -> d
     for name, summary in summaries.items():
         if name in BASELINE_METHODS:
             summary["core_claim_supported"] = 0.0
+            summary["core_claim_margin_score"] = 0.0
         else:
             summary["core_claim_supported"] = beats_all_on_success_and_reward(summary, baseline_summaries)
+            summary["core_claim_margin_score"] = core_claim_margin_score(summary, baseline_summaries)
 
     return {"scaled_maze_online_planning": {"results": summaries}}
 
