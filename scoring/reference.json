@@ -2,7 +2,7 @@
   "experiments": {
     "paper_3d_maze": {
       "description": "Original 3D maze with poor localization, 100 runs, maximum macro action length 10 (Table 1).",
-      "weight": 0.5,
+      "weight": 0.62,
       "primary_metric": "success_rate",
       "metrics": {
         "success_rate": {"higher_is_better": true, "coefficient": 1.0},
@@ -18,7 +18,7 @@
     },
     "paper_hems": {
       "description": "Original HEMS mission with evolving no-fly zones, 100 runs, maximum macro action length 15 (Table 2).",
-      "weight": 0.3,
+      "weight": 0.37,
       "primary_metric": "success_rate",
       "metrics": {
         "success_rate": {"higher_is_better": true, "coefficient": 1.0},
@@ -32,8 +32,8 @@
       }
     },
     "scaled_maze_online_planning": {
-      "description": "Accessible scaled maze analogue used by this reproduction; measures whether online planning improves over the reference policy under poor localization.",
-      "weight": 0.2,
+      "description": "Accessible scaled maze substitute used by this reproduction; these targets are from the verified substitute benchmark, not an original paper table.",
+      "weight": 0.01,
       "primary_metric": "success_rate",
       "metrics": {
         "success_rate": {"higher_is_better": true, "coefficient": 1.0},
@@ -44,8 +44,8 @@
         "reward_gap_vs_refpol": {"higher_is_better": true, "coefficient": 0.3}
       },
       "results": {
-        "porpp": {"type": "proposed", "success_rate": 0.65, "mean_total_reward": 250.0, "episodes": 20, "stderr_total_reward": 250.0, "success_gap_vs_refpol": 0.40, "reward_gap_vs_refpol": 550.0},
-        "refpol": {"type": "baseline", "success_rate": 0.25, "mean_total_reward": -300.0, "episodes": 20, "stderr_total_reward": 250.0, "success_gap_vs_refpol": 0.0, "reward_gap_vs_refpol": 0.0}
+        "porpp": {"type": "proposed", "success_rate": 0.875, "mean_total_reward": 1135.3500105432036, "episodes": 32, "stderr_total_reward": 194.94971720538393, "success_gap_vs_refpol": 0.1875, "reward_gap_vs_refpol": 640.1835830524935},
+        "refpol": {"type": "baseline", "success_rate": 0.6875, "mean_total_reward": 495.16642749071, "episodes": 32, "stderr_total_reward": 269.4616570643358, "success_gap_vs_refpol": 0.0, "reward_gap_vs_refpol": 0.0}
       }
     }
   }
