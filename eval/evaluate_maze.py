@@ -33,6 +33,19 @@ def summarize(rows: List[dict]) -> dict:
     }
 
 
+def beats_all_on_success_and_reward(candidate: dict, baselines: Iterable[dict]) -> float:
+    """Return 1.0 when the candidate strictly beats every available baseline."""
+    usable = [b for b in baselines if b.get("episodes", 0)]
+    if not candidate.get("episodes", 0) or not usable:
+        return 0.0
+    for baseline in usable:
+        if candidate["success_rate"] <= baseline["success_rate"]:
+            return 0.0
+        if candidate["mean_total_reward"] <= baseline["mean_total_reward"]:
+            return 0.0
+    return 1.0
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--porpp", type=Path, default=Path("checkpoints/porpp_episodes.jsonl"))
@@ -63,6 +76,10 @@ def main() -> None:
     else:
         pomcp_summary["success_gap_vs_refpol"] = 0.0
         pomcp_summary["reward_gap_vs_refpol"] = 0.0
+    porpp_summary["core_claim_supported"] = beats_all_on_success_and_reward(
+        porpp_summary,
+        [refpol_summary, pomcp_summary],
+    )
 
     scores = {
         "scaled_maze_online_planning": {

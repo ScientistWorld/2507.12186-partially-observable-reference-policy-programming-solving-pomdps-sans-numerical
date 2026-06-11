@@ -13,3 +13,8 @@ The official reproduction script also records a POMCP-style tree-search
 baseline with fixed directional macro actions on the same episode format. This
 gives future agents a second comparison point in addition to the heuristic-only
 reference policy.
+
+The primary metric is a relational claim check: a run scores 1 only if the
+planner beats every available baseline on both success rate and mean total
+reward. Raw success, reward, standard error, and baseline-gap metrics remain in
+`scores.json` for diagnosis and optimization.

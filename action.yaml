@@ -5,4 +5,4 @@ action: done
 gpus: 0
 test: false
 milestone: core_claim
-notes: "Reproduced the core PORPP claim on the accessible scaled maze. Corrected directional POMCP, RefPol, and PORPP scores validate successfully; original simulators are unavailable, so stopping at core_claim."
+notes: "Reproduced the core PORPP claim on the accessible scaled maze. Scores use an artifact-computed core_claim_supported primary metric and validate successfully; original simulators are unavailable, so stopping at core_claim."

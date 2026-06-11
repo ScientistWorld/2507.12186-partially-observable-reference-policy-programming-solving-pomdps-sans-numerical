@@ -10,6 +10,9 @@
 - Final scaled-maze scores: PORPP reached 0.875 success and 1135.4 mean reward,
   RefPol reached 0.6875 success and 495.2 mean reward, and corrected
   directional POMCP reached 0.28125 success and 239.7 mean reward.
+- Fixed the scoring contract so the substitute environment's primary metric is
+  the artifact-computed core-claim relation rather than a false direct
+  comparison to original-simulator baseline success rates.
 - The workspace is packaged as a reusable `core_claim` reproduction.
 
 ### [2026-06-11 22:25] - core_claim

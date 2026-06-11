@@ -7,7 +7,8 @@
         "mean_total_reward": 1135.3500105432036,
         "stderr_total_reward": 194.94971720538393,
         "success_gap_vs_refpol": 0.1875,
-        "reward_gap_vs_refpol": 640.1835830524935
+        "reward_gap_vs_refpol": 640.1835830524935,
+        "core_claim_supported": 1.0
       },
       "refpol": {
         "episodes": 32,

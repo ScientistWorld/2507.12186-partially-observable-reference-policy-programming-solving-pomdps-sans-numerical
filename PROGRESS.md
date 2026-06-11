@@ -89,6 +89,11 @@ Current turn update:
 - Final job review: the corrected POMCP run passed validation and supports the
   packaged `core_claim` milestone. PORPP outperformed both RefPol and the
   corrected directional POMCP baseline on the official scaled-maze score.
+- Validation fix: the supplemental scaled-maze experiment now uses
+  `core_claim_supported` as its primary metric. This is computed from
+  evaluation artifacts and checks the paper's relational claim directly,
+  avoiding an invalid numerical comparison between substitute-environment
+  baseline success rates and the unreleased original 3D-maze simulator.
 
 ## Remaining
 
