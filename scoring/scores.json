@@ -2,18 +2,18 @@
   "scaled_maze_online_planning": {
     "results": {
       "porpp": {
-        "episodes": 16,
-        "success_rate": 0.9375,
-        "mean_total_reward": 1341.5543289741897,
-        "stderr_total_reward": 205.56682649948428,
-        "success_gap_vs_refpol": 0.125,
-        "reward_gap_vs_refpol": 431.07480559971884
+        "episodes": 32,
+        "success_rate": 0.875,
+        "mean_total_reward": 1135.3500105432036,
+        "stderr_total_reward": 194.94971720538393,
+        "success_gap_vs_refpol": 0.1875,
+        "reward_gap_vs_refpol": 640.1835830524935
       },
       "refpol": {
-        "episodes": 16,
-        "success_rate": 0.8125,
-        "mean_total_reward": 910.4795233744709,
-        "stderr_total_reward": 327.30688805236247,
+        "episodes": 32,
+        "success_rate": 0.6875,
+        "mean_total_reward": 495.16642749071,
+        "stderr_total_reward": 269.4616570643358,
         "success_gap_vs_refpol": 0.0,
         "reward_gap_vs_refpol": 0.0
       }

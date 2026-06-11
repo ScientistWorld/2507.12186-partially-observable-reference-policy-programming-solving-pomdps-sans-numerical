@@ -30,5 +30,5 @@
 action: submit
 gpus: 0
 test: true
-milestone: method_runs
-notes: "Run the scaled maze PORPP reproduction: RefPol baseline, PORPP planner, artifact evaluation, and validate.py --compare. Expect this to verify the core-claim gap on a CPU test node."
+milestone: core_claim
+notes: "Regenerate revised scaled-maze scores after adding explicit RefPol gap metrics and stronger unsafe-route penalty. Runs RefPol, PORPP, artifact evaluation, and validate.py --compare on a CPU test node."
