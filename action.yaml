@@ -27,8 +27,8 @@
 #   milestone: core_claim
 #   notes: "Reproduced the core claim. Environment packaged."
 
-action: submit
+action: done
 gpus: 0
 test: true
 milestone: core_claim
-notes: "Regenerate revised scaled-maze scores after adding explicit RefPol gap metrics and stronger unsafe-route penalty. Runs RefPol, PORPP, artifact evaluation, and validate.py --compare on a CPU test node."
+notes: "Reproduced the core PORPP claim on an accessible scaled POMDP. Final CPU job passed validation: PORPP success 0.875 and reward 1135.35 vs RefPol success 0.6875 and reward 495.17."

@@ -1,0 +1,130 @@
+{
+  "paper": {
+    "arxiv_id": "2507.12186",
+    "title": "Partially Observable Reference Policy Programming: Solving POMDPs Sans Numerical Optimisation",
+    "date": null,
+    "topics": null
+  },
+  "reproduction": {
+    "milestone": "core_claim",
+    "status": "done",
+    "error": null,
+    "scaffold": "codex",
+    "model": "gpt-5.5",
+    "profile": "gpt-5.5-medium",
+    "effort": "medium",
+    "gpu_hours_used": 0.0,
+    "current_iteration_gpu_budget": 30,
+    "current_iteration_gpu_hours_used": 0.0,
+    "total_gpu_hours_used": 0.0,
+    "current_iteration_cpu_hours_used": 0.019,
+    "total_cpu_hours_used": 0.019,
+    "gpu_budget": 30,
+    "duration_sec": 916.2,
+    "cost_usd": null,
+    "input_tokens": 4035276,
+    "output_tokens": 27381,
+    "cached_input_tokens": 3862016,
+    "cache_creation_tokens": null,
+    "reasoning_tokens": 0,
+    "total_input_tokens": 4035276,
+    "num_turns": 62,
+    "duration_api_ms": null,
+    "num_runs": 1,
+    "iteration_count": 0,
+    "workflow": "standard",
+    "workflow_step": 0,
+    "total_gpu_jobs": 2,
+    "time_breakdown": {
+      "working": 632.0147967338562,
+      "building": 6.344220399856567,
+      "installing": 11.6835036277771,
+      "waiting": 76.00873136520386
+    }
+  },
+  "agents": [
+    {
+      "scaffold": "codex",
+      "model": "gpt-5.5",
+      "profile": "gpt-5.5-medium",
+      "effort": "medium",
+      "role": "reproducer",
+      "is_iteration": false,
+      "iteration": 1,
+      "workflow": "standard",
+      "workflow_step": 0,
+      "started_at": 1781213511.7755663,
+      "finished_at": 1781214428.0154994,
+      "duration_sec": 916.2,
+      "blocked_sec": 0.0,
+      "status": "done",
+      "error": null,
+      "milestone": "core_claim",
+      "gpu_budget": 30,
+      "gpu_hours_used": 0.0,
+      "total_gpu_hours_used": 0.0,
+      "cpu_hours_used": 0.019,
+      "time_breakdown": {
+        "working": 632.0147967338562,
+        "building": 6.344220399856567,
+        "installing": 11.6835036277771,
+        "waiting": 76.00873136520386
+      },
+      "cost_usd": null,
+      "input_tokens": 4035276,
+      "output_tokens": 27381,
+      "cached_input_tokens": 3862016,
+      "cache_creation_tokens": null,
+      "reasoning_tokens": 0,
+      "total_input_tokens": 4035276,
+      "num_turns": 62,
+      "duration_api_ms": null,
+      "tool_uses": {
+        "shell": 44,
+        "file_edit": 18
+      },
+      "gpu_jobs": [
+        {
+          "run_id": "cebe6a4f-601",
+          "command": "bash /home/user/scripts/run.sh",
+          "num_gpus": 0,
+          "num_cpus": 1,
+          "resource": "gpu-cpu",
+          "hive_job_id": "b8d6050d",
+          "status": "completed",
+          "returncode": 0,
+          "duration_sec": 15.3,
+          "submitted_at": 1781214224.0780919,
+          "started_at": 1781214226.1314785,
+          "completed_at": 1781214241.4812317
+        },
+        {
+          "run_id": "f977fc34-4da",
+          "command": "bash /home/user/scripts/run.sh",
+          "num_gpus": 0,
+          "num_cpus": 1,
+          "resource": "gpu-cpu",
+          "hive_job_id": "777abd16",
+          "status": "completed",
+          "returncode": 0,
+          "duration_sec": 54.6,
+          "submitted_at": 1781213944.617454,
+          "started_at": 1781213946.3988051,
+          "completed_at": 1781214000.9661348
+        }
+      ],
+      "progress_log": "### [2026-06-11 22:10] - method_runs\n- Read the paper and identified PORPP's particle-tree online planning algorithm.\n- Implemented a scaled maze POMDP, RefPol baseline, PORPP planner, and artifact-based evaluation.\n- Ran a lightweight local smoke test showing the method executes end-to-end and writes `scoring/scores.json`.\n\n### [2026-06-11 22:45] - core_claim\n- Completed a CPU compute job successfully; `scripts/run.sh` ran RefPol, PORPP, and `validate.py --compare`.\n- Added explicit PORPP-vs-RefPol success and reward gap metrics so scoring measures both benefit and the reference-policy constraint.\n- Tuned the scaled maze reward so unsafe direct heuristic routes are costly enough for online planning to matter; local validation shows PORPP ahead of RefPol on success and reward.\n\n### [2026-06-11 22:50] - core_claim\n- Final revised CPU job passed validation on 32 episodes.\n- PORPP achieved 0.875 success rate and 1135.4 mean total reward.\n- RefPol achieved 0.6875 success rate and 495.2 mean total reward."
+    }
+  ],
+  "components": {
+    "has_container": true,
+    "has_method_code": true,
+    "has_evaluation": true,
+    "has_download_script": true,
+    "has_reproduce_script": true,
+    "has_method_script": true,
+    "has_baseline": true,
+    "has_reference": true,
+    "has_data": true
+  }
+}

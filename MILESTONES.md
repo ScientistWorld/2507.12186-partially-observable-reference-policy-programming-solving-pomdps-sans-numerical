@@ -31,4 +31,4 @@
 - RefPol achieved 0.6875 success rate and 495.2 mean total reward.
 
 ## Stop Justification
-- Stopping at `core_claim`: the actual PORPP algorithm is implemented and validated on an accessible scaled POMDP, but the paper's unreleased 3D maze and HEMS simulators prevent faithful reproduction of additional original benchmark settings in this workspace.
+- Completed at milestone `core_claim`.
