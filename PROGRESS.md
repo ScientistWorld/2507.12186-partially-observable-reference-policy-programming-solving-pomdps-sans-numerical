@@ -23,33 +23,40 @@ maze with 32 episodes produced:
 The job ran `scripts/run.sh`, wrote `scoring/scores.json`, and passed
 `python validate.py --compare`.
 
-Current iteration adds an anytime-budget check on the same scaled maze:
-`checkpoints/porpp_low_episodes.jsonl` and
-`checkpoints/porpp_high_episodes.jsonl` are produced by `scripts/reproduce.sh`
-and summarized by `scripts/evaluate.sh` when present. This tests the paper's
-claim that increased online planning generally improves PORPP behavior.
-
-The first anytime CPU run completed successfully, but the 150-simulation
-"low" budget was already strong on the selected seeds:
+The job also tested an anytime-budget extension on the same scaled maze. The
+first CPU run completed successfully, but the 150-simulation "low" budget was
+already strong on the selected seeds:
 
 - PORPP low budget: success rate 0.9167, mean total reward 1270.9.
 - PORPP high budget: success rate 0.8750, mean total reward 1123.3.
 
-This does not support `core_claim_plus`; the low-budget setting has been
-reduced to 25 simulations so the next run tests a more meaningful planning
-budget contrast.
-
-The immediate rerun still produced the same low-budget numbers because the
-script's command-line `--simulations` default remained at 150 even though the
-inline environment assignment had been reduced. This has been fixed, and PORPP
+This did not support `core_claim_plus`; the low-budget setting was reduced to
+25 simulations. The immediate rerun still used 150 simulations because the
+script's command-line `--simulations` default remained stale even though the
+inline environment assignment had been reduced. That bug was fixed, and PORPP
 episode artifacts now include the `simulations` field so future logs expose the
 actual planning budget used.
 
+The corrected low/high run completed with 25 vs 700 simulations:
+
+- PORPP low budget: success rate 0.875, mean total reward 1121.6.
+- PORPP high budget: success rate 0.875, mean total reward 1123.3.
+
+The high-budget reward gain was only +1.7 with reward standard errors around
+225 and no success-rate improvement, so this axis is documented as an
+inconclusive extension attempt rather than included as an official scoring
+target.
+
+Final validation after cleaning the scoring contract:
+
+- `scripts/evaluate.sh` writes `scoring/scores.json` for
+  `scaled_maze_online_planning`.
+- `python validate.py --compare` passes with reference/scores structure,
+  method/eval import separation, artifact-based evaluation, and no committed
+  `shared/` references.
+
 ## Remaining
 
-- Await the submitted CPU job to refresh the core benchmark and determine
-  whether the added low/high planning-budget comparison supports
-  `core_claim_plus`.
 - Higher milestones would require implementing additional original-paper settings or more baselines, such as macro-action POMCP or RefSolver.
 - The exact 3D maze and HEMS simulators remain unavailable, so this environment stops at the accessible scaled core-claim reproduction.
 

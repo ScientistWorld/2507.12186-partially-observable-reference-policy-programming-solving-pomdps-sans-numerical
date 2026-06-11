@@ -1,8 +1,8 @@
 # IMPORTANT: Once you set action to 'submit' or 'done', STOP immediately.
 # Do NOT sleep, poll, or wait for jobs. The system reads this file
 # only after your turn ends. Sleeping blocks the entire pipeline.
-action: submit
+action: done
 gpus: 0
 test: false
 milestone: core_claim
-notes: "CPU rerun after fixing stale LOW_SIMULATIONS command argument; episode artifacts now record the actual simulation budget."
+notes: "Verified PORPP core claim on the scaled maze benchmark; official scoring now covers the validated PORPP-vs-RefPol result. The low/high simulation-budget extension was attempted but inconclusive."

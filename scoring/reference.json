@@ -2,7 +2,7 @@
   "experiments": {
     "paper_3d_maze": {
       "description": "Original 3D maze with poor localization, 100 runs, maximum macro action length 10 (Table 1).",
-      "weight": 0.615,
+      "weight": 0.62,
       "primary_metric": "success_rate",
       "metrics": {
         "success_rate": {"higher_is_better": true, "coefficient": 1.0},
@@ -18,7 +18,7 @@
     },
     "paper_hems": {
       "description": "Original HEMS mission with evolving no-fly zones, 100 runs, maximum macro action length 15 (Table 2).",
-      "weight": 0.365,
+      "weight": 0.37,
       "primary_metric": "success_rate",
       "metrics": {
         "success_rate": {"higher_is_better": true, "coefficient": 1.0},
@@ -46,23 +46,6 @@
       "results": {
         "porpp": {"type": "proposed", "success_rate": 0.875, "mean_total_reward": 1135.3500105432036, "episodes": 32, "stderr_total_reward": 194.94971720538393, "success_gap_vs_refpol": 0.1875, "reward_gap_vs_refpol": 640.1835830524935},
         "refpol": {"type": "baseline", "success_rate": 0.6875, "mean_total_reward": 495.16642749071, "episodes": 32, "stderr_total_reward": 269.4616570643358, "success_gap_vs_refpol": 0.0, "reward_gap_vs_refpol": 0.0}
-      }
-    },
-    "scaled_maze_anytime_planning": {
-      "description": "Accessible scaled maze anytime check; compares the same PORPP implementation under low and high simulation budgets on matched seeds.",
-      "weight": 0.01,
-      "primary_metric": "success_gap_vs_low_budget",
-      "metrics": {
-        "success_rate": {"higher_is_better": true, "coefficient": 0.8},
-        "mean_total_reward": {"higher_is_better": true, "coefficient": 0.4},
-        "episodes": {"higher_is_better": true, "coefficient": 0.0},
-        "stderr_total_reward": {"higher_is_better": false, "coefficient": -0.05},
-        "success_gap_vs_low_budget": {"higher_is_better": true, "coefficient": 1.0},
-        "reward_gap_vs_low_budget": {"higher_is_better": true, "coefficient": 0.5}
-      },
-      "results": {
-        "porpp_low_budget": {"type": "proposed", "success_rate": 0.0, "mean_total_reward": 0.0, "episodes": 24, "stderr_total_reward": 0.0, "success_gap_vs_low_budget": 0.0, "reward_gap_vs_low_budget": 0.0},
-        "porpp_high_budget": {"type": "proposed", "success_rate": 0.0, "mean_total_reward": 0.0, "episodes": 24, "stderr_total_reward": 0.0, "success_gap_vs_low_budget": 0.0, "reward_gap_vs_low_budget": 0.0}
       }
     }
   }

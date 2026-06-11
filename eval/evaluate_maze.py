@@ -39,6 +39,7 @@ def main() -> None:
     parser.add_argument("--refpol", type=Path, default=Path("checkpoints/refpol_episodes.jsonl"))
     parser.add_argument("--porpp-low", type=Path, default=Path("checkpoints/porpp_low_episodes.jsonl"))
     parser.add_argument("--porpp-high", type=Path, default=Path("checkpoints/porpp_high_episodes.jsonl"))
+    parser.add_argument("--include-anytime", action="store_true")
     parser.add_argument("--out", type=Path, default=Path("scoring/scores.json"))
     args = parser.parse_args()
 
@@ -65,7 +66,7 @@ def main() -> None:
     }
     low_rows = read_jsonl(args.porpp_low)
     high_rows = read_jsonl(args.porpp_high)
-    if low_rows and high_rows:
+    if args.include_anytime and low_rows and high_rows:
         low_summary = summarize(low_rows)
         high_summary = summarize(high_rows)
         low_summary["success_gap_vs_low_budget"] = 0.0

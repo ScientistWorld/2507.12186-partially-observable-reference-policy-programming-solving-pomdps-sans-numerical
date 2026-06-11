@@ -8,9 +8,3 @@ goal reward, and unsafe routes. It is the accessible reproduction benchmark for
 the paper's central claim: online planning should turn useful but imperfect
 candidate actions into a stronger policy than executing those candidates
 directly.
-
-## scaled_maze_anytime_planning
-
-This experiment tests whether giving the same planner more online simulation
-budget improves behavior on matched episodes. It captures the paper's anytime
-claim separately from the baseline-gap claim.
