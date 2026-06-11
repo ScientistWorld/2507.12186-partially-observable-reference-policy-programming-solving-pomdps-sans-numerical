@@ -4,6 +4,15 @@
 
 ## Progress Log
 
+### [2026-06-11 22:41] - core_claim
+- Completed final verification of folder structure, scoring, method/eval
+  separation, train/test wiring, and method-agnostic documentation.
+- Fixed the default evaluator so future candidate artifacts are discovered and
+  scored automatically from `checkpoints/*_episodes.jsonl`.
+- Wrote `VERIFICATION.md`; final judgment is ready for gym use at
+  `core_claim`, with the documented limitation that the original simulators
+  were unavailable and a scaled maze substitute is used.
+
 ### [2026-06-11 22:36] - core_claim
 - Fixed the job entrypoint so `scripts/run.sh` regenerates all official
   episode artifacts through `scripts/reproduce.sh` before scoring full,

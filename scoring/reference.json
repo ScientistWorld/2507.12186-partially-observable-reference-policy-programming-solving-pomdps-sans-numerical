@@ -49,6 +49,7 @@
     },
     "scaled_maze_online_planning": {
       "description": "Accessible scaled maze substitute used by this reproduction. Raw success and reward rows retain paper Table 1 scale anchors from the original 3D maze; the primary metric is a normalized success-and-reward margin over the available baselines.",
+      "notes": "This experiment is the reproduced gym benchmark because the original 3D maze and HEMS simulators were not released. The reference rows use Table 1 values as scale anchors and should not be read as results from the scaled substitute.",
       "weight": 0.01,
       "primary_metric": "core_claim_margin_score",
       "metrics": {

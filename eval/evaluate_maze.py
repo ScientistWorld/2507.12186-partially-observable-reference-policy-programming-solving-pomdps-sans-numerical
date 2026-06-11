@@ -1,4 +1,8 @@
-"""Evaluate episode artifacts for the PORPP benchmark."""
+"""Evaluate episode artifacts for the scaled maze benchmark.
+
+This evaluator is method-agnostic: methods write episode JSONL artifacts under
+checkpoints/, and the evaluator scores whatever method artifacts are present.
+"""
 
 from __future__ import annotations
 
@@ -11,6 +15,8 @@ from typing import Dict, Iterable, List
 
 
 REQUIRED_EPISODE_FIELDS = {"seed", "method", "success", "total_reward", "steps", "trace"}
+BASELINE_METHODS = {"refpol", "pomcp"}
+EXCLUDED_EPISODE_SUFFIXES = ("_low_episodes", "_high_episodes")
 SUCCESS_MARGIN_SCALE = 0.2
 REWARD_MARGIN_SCALE = 500.0
 
@@ -107,57 +113,72 @@ def core_claim_margin_score(candidate: dict, baselines: Iterable[dict]) -> float
     return max(0.0, min(1.0, normalized))
 
 
+def method_name_from_path(path: Path) -> str:
+    stem = path.stem
+    if stem.endswith("_episodes"):
+        return stem[: -len("_episodes")]
+    return stem
+
+
+def discover_episode_paths(checkpoints_dir: Path) -> Dict[str, Path]:
+    paths: Dict[str, Path] = {}
+    for path in sorted(checkpoints_dir.glob("*_episodes.jsonl")):
+        stem = path.stem
+        if any(stem.endswith(suffix) for suffix in EXCLUDED_EPISODE_SUFFIXES):
+            continue
+        paths[method_name_from_path(path)] = path
+    return paths
+
+
+def add_named_path(paths: Dict[str, Path], name: str, path: Path | None) -> None:
+    if path is not None and path.exists():
+        paths[name] = path
+
+
+def build_scores(paths: Dict[str, Path]) -> dict:
+    summaries = {
+        name: summarize(read_jsonl(path))
+        for name, path in sorted(paths.items())
+    }
+    refpol = summaries.get("refpol", summarize([]))
+    for summary in summaries.values():
+        if summary.get("episodes", 0) and refpol.get("episodes", 0):
+            summary["success_gap_vs_refpol"] = summary["success_rate"] - refpol["success_rate"]
+            summary["reward_gap_vs_refpol"] = summary["mean_total_reward"] - refpol["mean_total_reward"]
+        else:
+            summary["success_gap_vs_refpol"] = 0.0
+            summary["reward_gap_vs_refpol"] = 0.0
+
+    baseline_summaries = [summaries[name] for name in sorted(BASELINE_METHODS) if name in summaries]
+    for name, summary in summaries.items():
+        if name in BASELINE_METHODS:
+            summary["core_claim_supported"] = 0.0
+            summary["core_claim_margin_score"] = 0.0
+        else:
+            summary["core_claim_supported"] = beats_all_on_success_and_reward(summary, baseline_summaries)
+            summary["core_claim_margin_score"] = core_claim_margin_score(summary, baseline_summaries)
+
+    return {"scaled_maze_online_planning": {"results": summaries}}
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--porpp", type=Path, default=Path("checkpoints/porpp_episodes.jsonl"))
-    parser.add_argument("--refpol", type=Path, default=Path("checkpoints/refpol_episodes.jsonl"))
-    parser.add_argument("--pomcp", type=Path, default=Path("checkpoints/pomcp_episodes.jsonl"))
+    parser.add_argument("checkpoints_dir", nargs="?", type=Path, default=Path("checkpoints"))
+    parser.add_argument("--porpp", type=Path)
+    parser.add_argument("--refpol", type=Path)
+    parser.add_argument("--pomcp", type=Path)
     parser.add_argument("--porpp-low", type=Path, default=Path("checkpoints/porpp_low_episodes.jsonl"))
     parser.add_argument("--porpp-high", type=Path, default=Path("checkpoints/porpp_high_episodes.jsonl"))
     parser.add_argument("--include-anytime", action="store_true")
     parser.add_argument("--out", type=Path, default=Path("scoring/scores.json"))
     args = parser.parse_args()
 
-    porpp_summary = summarize(read_jsonl(args.porpp))
-    refpol_summary = summarize(read_jsonl(args.refpol))
-    pomcp_summary = summarize(read_jsonl(args.pomcp))
-    if porpp_summary["episodes"] and refpol_summary["episodes"]:
-        porpp_summary["success_gap_vs_refpol"] = porpp_summary["success_rate"] - refpol_summary["success_rate"]
-        porpp_summary["reward_gap_vs_refpol"] = porpp_summary["mean_total_reward"] - refpol_summary["mean_total_reward"]
-        refpol_summary["success_gap_vs_refpol"] = 0.0
-        refpol_summary["reward_gap_vs_refpol"] = 0.0
-    else:
-        porpp_summary["success_gap_vs_refpol"] = 0.0
-        porpp_summary["reward_gap_vs_refpol"] = 0.0
-        refpol_summary["success_gap_vs_refpol"] = 0.0
-        refpol_summary["reward_gap_vs_refpol"] = 0.0
-    if pomcp_summary["episodes"] and refpol_summary["episodes"]:
-        pomcp_summary["success_gap_vs_refpol"] = pomcp_summary["success_rate"] - refpol_summary["success_rate"]
-        pomcp_summary["reward_gap_vs_refpol"] = pomcp_summary["mean_total_reward"] - refpol_summary["mean_total_reward"]
-    else:
-        pomcp_summary["success_gap_vs_refpol"] = 0.0
-        pomcp_summary["reward_gap_vs_refpol"] = 0.0
-    porpp_summary["core_claim_supported"] = beats_all_on_success_and_reward(
-        porpp_summary,
-        [refpol_summary, pomcp_summary],
-    )
-    porpp_summary["core_claim_margin_score"] = core_claim_margin_score(
-        porpp_summary,
-        [refpol_summary, pomcp_summary],
-    )
-    refpol_summary["core_claim_margin_score"] = 0.0
-    pomcp_summary["core_claim_margin_score"] = 0.0
+    paths = discover_episode_paths(args.checkpoints_dir)
+    add_named_path(paths, "porpp", args.porpp or args.checkpoints_dir / "porpp_episodes.jsonl")
+    add_named_path(paths, "refpol", args.refpol or args.checkpoints_dir / "refpol_episodes.jsonl")
+    add_named_path(paths, "pomcp", args.pomcp or args.checkpoints_dir / "pomcp_episodes.jsonl")
 
-    scores = {
-        "scaled_maze_online_planning": {
-            "results": {
-                "porpp": porpp_summary,
-                "refpol": refpol_summary,
-            }
-        }
-    }
-    if pomcp_summary["episodes"]:
-        scores["scaled_maze_online_planning"]["results"]["pomcp"] = pomcp_summary
+    scores = build_scores(paths)
     low_rows = read_jsonl(args.porpp_low)
     high_rows = read_jsonl(args.porpp_high)
     if args.include_anytime and low_rows and high_rows:

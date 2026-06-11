@@ -5,9 +5,11 @@
 Tests whether an online planner can solve a poor-localization navigation POMDP
 where a feasible-action heuristic alone is not reliable.
 
-- **Primary metric:** `core_claim_supported` (higher is better) is 1 only
-  when the proposed planner beats every available baseline on both success
-  rate and mean total reward.
+- **Primary metric:** `core_claim_margin_score` (higher is better) is a
+  normalized margin over the strongest available baseline on both success rate
+  and mean total reward.
+- **Claim check:** `core_claim_supported` is 1 only when the planner beats
+  every available baseline on both success rate and mean total reward.
 - **Metric:** `success_rate` (higher is better)
 - **Metric:** `mean_total_reward` (higher is better)
 - **Constraint metric:** `success_gap_vs_refpol` (higher is better) measures improvement over the heuristic-only policy.

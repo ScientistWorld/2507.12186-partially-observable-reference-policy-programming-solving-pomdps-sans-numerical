@@ -15,8 +15,9 @@
 # This file is read by the system for automated comparison.
 #
 # Example usage:
-#   ./evaluate.sh <method_and_run_name>                             # evaluate with defaults
-#   ./evaluate.sh <method_and_run_name> checkpoints/epoch_10.pt     # evaluate a specific checkpoint
+#   bash scripts/evaluate.sh                         # score checkpoints/*.jsonl
+#   bash scripts/evaluate.sh checkpoints_alt         # score a different artifact directory
+#   bash scripts/evaluate.sh --porpp path/to/run.jsonl
 #
 # Called from run.sh after training, or independently.
 
