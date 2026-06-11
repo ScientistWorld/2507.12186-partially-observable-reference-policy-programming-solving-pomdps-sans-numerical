@@ -4,6 +4,14 @@
 
 ## Progress Log
 
+### [2026-06-11 22:51] - core_claim
+- Completed final verification after the optional mirrored-setting setup.
+- Removed the unverified mirrored setting from official scoring targets and
+  from the default reproduction script because no completed scored job existed
+  for it.
+- Kept the milestone at `core_claim`; the validated gym benchmark is the
+  completed scaled-maze online-planning experiment.
+
 ### [2026-06-11 22:46] - core_claim
 - Added a mirrored-danger scaled maze setting to test the core PORPP claim on
   a second layout without changing the algorithm or evaluation procedure.

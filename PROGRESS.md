@@ -106,27 +106,23 @@ Current turn update:
 - Lightweight local validation passed after these changes:
   `python -m compileall -q method baseline data eval`, `bash scripts/evaluate.sh`,
   and `python validate.py --compare`.
-- Extension setup: added `mirrored_danger`, a second scaled-maze layout that
-  mirrors the unsafe direct route to the lower possible start while preserving
-  the same partial observability, sparse landmarks, macro-action interface,
-  and reward structure.
-- `scripts/reproduce.sh` now runs RefPol, directional POMCP, and PORPP on both
-  the default setting and the mirrored setting. Mirrored artifacts are written
-  under `checkpoints/mirrored_danger/`.
-- `eval/evaluate_maze.py` now recursively discovers episode artifacts and
-  groups them by the artifact `scenario` field, emitting both
-  `scaled_maze_online_planning` and
-  `scaled_maze_mirrored_danger_planning` when both are present.
-- Lightweight smoke validation passed with one low-budget mirrored episode per
-  method, and `python validate.py --reference-only` passed after adding the
-  mirrored experiment to `reference.json`.
+- Final verification: the optional `mirrored_danger` extension had only smoke
+  artifacts and no completed scored job, so it was removed from the official
+  scoring targets and from the default reproduction path. The implementation
+  can still carry scenario metadata, but the validated gym benchmark remains
+  the completed `scaled_maze_online_planning` experiment.
+- Final verification also softened method-specific wording in the
+  method-safe research-direction document and rechecked that the official
+  method-agnostic files describe the problem and evaluation without exposing
+  implementation details.
 
 ## Remaining
 
-- A CPU submission is pending to verify the revised `scripts/run.sh` path from
-  scratch inside the compute container and determine whether the mirrored
-  setting supports `core_claim_plus`.
-- Higher milestones would require implementing additional original-paper settings or another paper baseline such as RefSolver, or reproducing the original 3D/Corsica environments if they become available.
+- No job is pending. The validated package stops at `core_claim`.
+- Higher milestones would require completing and scoring an additional setting,
+  implementing additional original-paper settings or another paper baseline
+  such as RefSolver, or reproducing the original 3D/Corsica environments if
+  they become available.
 - The exact 3D maze and HEMS simulators remain unavailable, so this environment stops at the accessible scaled core-claim reproduction.
 
 ## Issues

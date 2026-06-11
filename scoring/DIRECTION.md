@@ -8,17 +8,17 @@ limited planning computation per executed action.
 
 ## Core Contribution
 
-Work should improve online belief-space planning that uses sampled candidate
-macro actions and updates action values or preferences from simulated futures.
-The point is to make imperfect domain heuristics useful without simply
-executing them directly.
+Work should improve online belief-space planning that evaluates candidate
+macro actions with simulated futures before each executed action. The point is
+to make imperfect domain heuristics useful without simply executing them
+directly.
 
 ## Approach Scope
 
-In-bounds changes include better preference updates, tree search rules,
-particle-belief management, candidate-action sampling, value heuristics, and
-planning-time allocation, provided the planner remains an online POMDP planner
-using the same environment and evaluation artifacts.
+In-bounds changes include better tree search rules, belief-state management,
+candidate-action generation, rollout/value estimation, and planning-time
+allocation, provided the planner remains an online POMDP planner using the same
+environment and evaluation artifacts.
 
 ## Out of Bounds
 

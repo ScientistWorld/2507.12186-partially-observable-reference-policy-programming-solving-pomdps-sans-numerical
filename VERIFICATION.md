@@ -4,40 +4,34 @@
 
 The workspace started at `core_claim` with a working scaled-maze reproduction
 of the paper's central online POMDP-planning claim. The claimed milestone was
-justified: PORPP artifacts beat both RefPol and directional POMCP on success
-rate and mean return, and `python validate.py --compare` passed.
+justified: the proposed planner artifacts beat both RefPol and directional
+POMCP on success rate and mean return, and `python validate.py --compare`
+passed.
 
 ## Issues Found
 
-- **Minor:** The default evaluator only scored the current named artifacts
-  (`porpp`, `refpol`, `pomcp`) unless explicit paths were passed, which made
-  `scripts/evaluate.sh` less reusable for future method artifacts.
-- **Minor:** `scoring/TARGETS.md` named `core_claim_supported` as the primary
-  metric, while `scoring/reference.json` correctly used the more graded
-  `core_claim_margin_score`.
-- **Minor:** The scaled substitute reference rows needed an explicit note that
-  they are paper Table 1 scale anchors, not direct results from the substitute
-  environment.
-- **Cosmetic:** `scripts/evaluate.sh` still documented an obsolete
-  method-name/checkpoint argument pattern.
-- **Cosmetic:** Generated trajectory files were still tracked even though
-  trajectory artifacts are ignored.
+- **Minor:** An optional mirrored scaled-maze setting had been added to
+  `reference.json`, `TARGETS.md`, `EXPERIMENTS.md`, and `scripts/reproduce.sh`
+  before a completed scored job existed. That made the scoring contract point
+  at an unverified target and left `action.yaml` in a stale submit state.
+- **Minor:** `scoring/DIRECTION.md` used paper-specific wording around
+  preferences. The document is high-level/method-safe, so this was softened to
+  describe the allowed problem family without exposing implementation details.
+- **Cosmetic:** `README.md`, `manifest.json`, and deleted generated
+  `trajectory/` files were already dirty when verification began. The system
+  files were left untouched; generated trajectory removals are safe cleanup.
 
 ## Fixes Applied
 
-- Updated `eval/evaluate_maze.py` to discover and score every
-  `*_episodes.jsonl` artifact under the checkpoint directory, excluding the
-  old low/high budget exploratory artifacts. Baselines remain identified by
-  method key (`refpol`, `pomcp`); any other artifact is scored as a candidate
-  planner.
-- Regenerated `scoring/scores.json` from existing episode artifacts so baseline
-  rows include `core_claim_supported: 0.0`.
-- Aligned `scoring/TARGETS.md` with the actual primary metric
-  `core_claim_margin_score`.
-- Added a `notes` field to `scoring/reference.json` documenting the scaled
-  substitute reference rows.
-- Corrected `scripts/evaluate.sh` usage comments.
-- Staged removal of generated tracked `trajectory/` JSONL files.
+- Removed the unverified mirrored setting from `scoring/reference.json`,
+  `scoring/TARGETS.md`, and `scoring/EXPERIMENTS.md`.
+- Restored `scripts/reproduce.sh` to run only the completed official
+  scaled-maze benchmark: RefPol, directional POMCP, the proposed planner, and
+  `scripts/evaluate.sh`.
+- Revised `scoring/DIRECTION.md` to stay method-safe while preserving the
+  intended online POMDP-planning research direction.
+- Updated `PROGRESS.md`, `MILESTONES.md`, and `action.yaml` so they agree that
+  there is no pending job and the final milestone remains `core_claim`.
 
 ## Final Judgment
 
