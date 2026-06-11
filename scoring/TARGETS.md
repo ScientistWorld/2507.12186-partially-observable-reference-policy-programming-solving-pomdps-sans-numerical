@@ -12,3 +12,14 @@ where a feasible-action heuristic alone is not reliable.
 - **Constraint metric:** `episodes` records the number of evaluated episodes and must remain comparable across methods.
 - **Constraint metric:** `stderr_total_reward` should be reported so improvements are judged against run variability.
 - **Run:** execute `scripts/reproduce.sh`, which writes episode artifacts for RefPol and the submitted planner, then run `scripts/evaluate.sh`.
+
+## Additional: scaled_maze_anytime_planning
+
+Tests whether the same planner benefits from a larger online simulation budget
+on matched seeds.
+
+- **Metric:** `success_gap_vs_low_budget` (higher is better)
+- **Metric:** `reward_gap_vs_low_budget` (higher is better)
+- **Constraint metric:** `episodes` records the matched evaluation count.
+- **Run:** execute `scripts/reproduce.sh`; the evaluator includes this target
+  when both low- and high-budget PORPP artifacts are present.

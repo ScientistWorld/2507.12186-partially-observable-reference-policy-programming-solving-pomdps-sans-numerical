@@ -18,7 +18,12 @@ set -e
 
 cd /home/user
 
-rm -f checkpoints/porpp_episodes.jsonl checkpoints/refpol_episodes.jsonl scoring/scores.json
+rm -f \
+  checkpoints/porpp_episodes.jsonl \
+  checkpoints/porpp_low_episodes.jsonl \
+  checkpoints/porpp_high_episodes.jsonl \
+  checkpoints/refpol_episodes.jsonl \
+  scoring/scores.json
 
 EPISODES="${EPISODES:-24}" \
 PARTICLES="${PARTICLES:-100}" \
@@ -34,5 +39,27 @@ MAX_STEPS="${MAX_STEPS:-40}" \
 SEED="${SEED:-7}" \
 RUN_EVAL=0 \
 bash scripts/method.sh
+
+EPISODES="${ANYTIME_EPISODES:-24}" \
+SIMULATIONS="${LOW_SIMULATIONS:-150}" \
+PARTICLES="${PARTICLES:-100}" \
+MAX_STEPS="${MAX_STEPS:-40}" \
+SEED="${SEED:-7}" \
+RUN_EVAL=0 \
+python -m method.porpp \
+  --episodes "${ANYTIME_EPISODES:-24}" \
+  --simulations "${LOW_SIMULATIONS:-150}" \
+  --particles "${PARTICLES:-100}" \
+  --max-steps "${MAX_STEPS:-40}" \
+  --seed "${SEED:-7}" \
+  --out checkpoints/porpp_low_episodes.jsonl
+
+python -m method.porpp \
+  --episodes "${ANYTIME_EPISODES:-24}" \
+  --simulations "${HIGH_SIMULATIONS:-700}" \
+  --particles "${PARTICLES:-100}" \
+  --max-steps "${MAX_STEPS:-40}" \
+  --seed "${SEED:-7}" \
+  --out checkpoints/porpp_high_episodes.jsonl
 
 bash scripts/evaluate.sh

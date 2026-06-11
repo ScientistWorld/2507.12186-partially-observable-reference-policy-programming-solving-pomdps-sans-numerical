@@ -37,6 +37,8 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--porpp", type=Path, default=Path("checkpoints/porpp_episodes.jsonl"))
     parser.add_argument("--refpol", type=Path, default=Path("checkpoints/refpol_episodes.jsonl"))
+    parser.add_argument("--porpp-low", type=Path, default=Path("checkpoints/porpp_low_episodes.jsonl"))
+    parser.add_argument("--porpp-high", type=Path, default=Path("checkpoints/porpp_high_episodes.jsonl"))
     parser.add_argument("--out", type=Path, default=Path("scoring/scores.json"))
     args = parser.parse_args()
 
@@ -61,6 +63,21 @@ def main() -> None:
             }
         }
     }
+    low_rows = read_jsonl(args.porpp_low)
+    high_rows = read_jsonl(args.porpp_high)
+    if low_rows and high_rows:
+        low_summary = summarize(low_rows)
+        high_summary = summarize(high_rows)
+        low_summary["success_gap_vs_low_budget"] = 0.0
+        low_summary["reward_gap_vs_low_budget"] = 0.0
+        high_summary["success_gap_vs_low_budget"] = high_summary["success_rate"] - low_summary["success_rate"]
+        high_summary["reward_gap_vs_low_budget"] = high_summary["mean_total_reward"] - low_summary["mean_total_reward"]
+        scores["scaled_maze_anytime_planning"] = {
+            "results": {
+                "porpp_low_budget": low_summary,
+                "porpp_high_budget": high_summary,
+            }
+        }
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(scores, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(scores, indent=2))

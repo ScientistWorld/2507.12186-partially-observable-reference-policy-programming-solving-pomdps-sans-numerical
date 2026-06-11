@@ -23,8 +23,17 @@ maze with 32 episodes produced:
 The job ran `scripts/run.sh`, wrote `scoring/scores.json`, and passed
 `python validate.py --compare`.
 
+Current iteration adds an anytime-budget check on the same scaled maze:
+`checkpoints/porpp_low_episodes.jsonl` and
+`checkpoints/porpp_high_episodes.jsonl` are produced by `scripts/reproduce.sh`
+and summarized by `scripts/evaluate.sh` when present. This tests the paper's
+claim that increased online planning generally improves PORPP behavior.
+
 ## Remaining
 
+- Await the submitted CPU job to refresh the core benchmark and determine
+  whether the added low/high planning-budget comparison supports
+  `core_claim_plus`.
 - Higher milestones would require implementing additional original-paper settings or more baselines, such as macro-action POMCP or RefSolver.
 - The exact 3D maze and HEMS simulators remain unavailable, so this environment stops at the accessible scaled core-claim reproduction.
 
