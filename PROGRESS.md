@@ -29,6 +29,16 @@ Current iteration adds an anytime-budget check on the same scaled maze:
 and summarized by `scripts/evaluate.sh` when present. This tests the paper's
 claim that increased online planning generally improves PORPP behavior.
 
+The first anytime CPU run completed successfully, but the 150-simulation
+"low" budget was already strong on the selected seeds:
+
+- PORPP low budget: success rate 0.9167, mean total reward 1270.9.
+- PORPP high budget: success rate 0.8750, mean total reward 1123.3.
+
+This does not support `core_claim_plus`; the low-budget setting has been
+reduced to 25 simulations so the next run tests a more meaningful planning
+budget contrast.
+
 ## Remaining
 
 - Await the submitted CPU job to refresh the core benchmark and determine

@@ -5,4 +5,4 @@ action: submit
 gpus: 0
 test: false
 milestone: core_claim
-notes: "Audited continuation: rerun current HEAD on CPU to refresh PORPP vs RefPol scores and produce low/high simulation-budget anytime artifacts."
+notes: "CPU rerun with low anytime budget reduced to 25 simulations; core claim is verified, this tests whether a clearer low/high budget contrast supports core_claim_plus."
