@@ -19,11 +19,11 @@
       },
       "pomcp": {
         "episodes": 32,
-        "success_rate": 1.0,
-        "mean_total_reward": 1606.5685762059513,
-        "stderr_total_reward": 4.025187369661435,
-        "success_gap_vs_refpol": 0.3125,
-        "reward_gap_vs_refpol": 1111.4021487152413
+        "success_rate": 0.28125,
+        "mean_total_reward": 239.72433704492394,
+        "stderr_total_reward": 116.707611961744,
+        "success_gap_vs_refpol": -0.40625,
+        "reward_gap_vs_refpol": -255.44209044578608
       }
     }
   }
