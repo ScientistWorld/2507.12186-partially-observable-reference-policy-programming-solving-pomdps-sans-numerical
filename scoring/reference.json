@@ -32,7 +32,7 @@
       }
     },
     "scaled_maze_online_planning": {
-      "description": "Accessible scaled maze substitute used by this reproduction; these targets are from the verified substitute benchmark, not an original paper table.",
+      "description": "Accessible scaled maze substitute used by this reproduction. The numeric reference rows are paper Table 1 values from the original 3D maze, included only as scale anchors because the original simulator is unavailable.",
       "weight": 0.01,
       "primary_metric": "success_rate",
       "metrics": {
@@ -44,9 +44,9 @@
         "reward_gap_vs_refpol": {"higher_is_better": true, "coefficient": 0.3}
       },
       "results": {
-        "porpp": {"type": "proposed", "success_rate": 0.875, "mean_total_reward": 1135.3500105432036, "episodes": 32, "stderr_total_reward": 194.94971720538393, "success_gap_vs_refpol": 0.1875, "reward_gap_vs_refpol": 640.1835830524935},
-        "refpol": {"type": "baseline", "success_rate": 0.6875, "mean_total_reward": 495.16642749071, "episodes": 32, "stderr_total_reward": 269.4616570643358, "success_gap_vs_refpol": 0.0, "reward_gap_vs_refpol": 0.0},
-        "pomcp": {"type": "baseline"}
+        "porpp": {"type": "proposed", "success_rate": 0.94, "mean_total_reward": 983.1, "episodes": 100, "stderr_total_reward": 168.0, "success_gap_vs_refpol": 0.65, "reward_gap_vs_refpol": 1555.3},
+        "refpol": {"type": "baseline", "success_rate": 0.29, "mean_total_reward": -572.2, "episodes": 100, "stderr_total_reward": 231.1, "success_gap_vs_refpol": 0.0, "reward_gap_vs_refpol": 0.0},
+        "pomcp": {"type": "baseline", "success_rate": 0.13, "mean_total_reward": -1897.5, "episodes": 100, "stderr_total_reward": 240.1, "success_gap_vs_refpol": -0.16, "reward_gap_vs_refpol": -1325.3}
       }
     }
   }

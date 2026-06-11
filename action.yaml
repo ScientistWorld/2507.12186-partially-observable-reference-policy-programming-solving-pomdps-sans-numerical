@@ -5,4 +5,4 @@ action: submit
 gpus: 0
 test: false
 milestone: core_claim
-notes: "Rerun the packaged scaled-maze reproduction with RefPol, the new POMCP baseline, and PORPP; then validate scores."
+notes: "After audit fixes, regenerate scaled-maze scores with RefPol, POMCP, and PORPP, then run validate.py --compare."

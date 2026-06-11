@@ -12,4 +12,4 @@ where a feasible-action heuristic alone is not reliable.
 - **Constraint metric:** `episodes` records the number of evaluated episodes and must remain comparable across methods.
 - **Constraint metric:** `stderr_total_reward` should be reported so improvements are judged against run variability.
 - **Baseline:** `pomcp` is a particle Monte Carlo tree-search baseline that enumerates the scaled maze macro actions.
-- **Run:** execute `scripts/reproduce.sh`, which writes episode artifacts for RefPol and the submitted planner, then run `scripts/evaluate.sh`.
+- **Run:** execute `scripts/reproduce.sh`, which writes episode artifacts for RefPol, POMCP, and the submitted planner, then run `scripts/evaluate.sh`.
