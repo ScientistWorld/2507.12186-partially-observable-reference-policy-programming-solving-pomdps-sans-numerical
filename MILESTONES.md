@@ -4,6 +4,15 @@
 
 ## Progress Log
 
+### [2026-06-11 22:36] - core_claim
+- Fixed the job entrypoint so `scripts/run.sh` regenerates all official
+  episode artifacts through `scripts/reproduce.sh` before scoring full,
+  visible-train, and held-out-test views.
+- Added default evaluator checks for valid episode format and unique seeds,
+  bringing `scoring/scores.json` in line with the reference scoring contract.
+- Removed generated job logs from the git index and prepared a CPU validation
+  submission for the revised end-to-end job path.
+
 ### [2026-06-11 22:12] - core_claim
 - Reviewed the corrected CPU job `2c2a8d2f-ba9`. It exited successfully, wrote
   `scoring/scores.json`, and passed `python validate.py --compare`.

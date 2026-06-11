@@ -94,9 +94,23 @@ Current turn update:
   evaluation artifacts and checks the paper's relational claim directly,
   avoiding an invalid numerical comparison between substitute-environment
   baseline success rates and the unreleased original 3D-maze simulator.
+- Packaging fix: `scripts/run.sh` now regenerates RefPol, POMCP, and PORPP
+  artifacts via `scripts/reproduce.sh` before writing full, train-slice, and
+  held-out test scores. This avoids relying on gitignored checkpoint artifacts
+  from earlier jobs.
+- Scoring hygiene: `eval/evaluate_maze.py` now reports `valid_episode_rate`
+  and `unique_seed_rate` in the default `scores.json`, matching the scoring
+  contract used by `reference.json` and the train/test evaluators.
+- Repository hygiene: generated `jobs/` outputs were removed from the git
+  index; future job outputs remain ignored.
+- Lightweight local validation passed after these changes:
+  `python -m compileall -q method baseline data eval`, `bash scripts/evaluate.sh`,
+  and `python validate.py --compare`.
 
 ## Remaining
 
+- A CPU submission is pending to verify the revised `scripts/run.sh` path from
+  scratch inside the compute container.
 - Higher milestones would require implementing additional original-paper settings or another paper baseline such as RefSolver, or reproducing the original 3D/Corsica environments if they become available.
 - The exact 3D maze and HEMS simulators remain unavailable, so this environment stops at the accessible scaled core-claim reproduction.
 

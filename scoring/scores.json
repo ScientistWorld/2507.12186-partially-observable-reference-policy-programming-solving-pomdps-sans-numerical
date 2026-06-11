@@ -3,6 +3,8 @@
     "results": {
       "porpp": {
         "episodes": 32,
+        "valid_episode_rate": 1.0,
+        "unique_seed_rate": 1.0,
         "success_rate": 0.875,
         "mean_total_reward": 1135.3500105432036,
         "stderr_total_reward": 194.94971720538393,
@@ -13,6 +15,8 @@
       },
       "refpol": {
         "episodes": 32,
+        "valid_episode_rate": 1.0,
+        "unique_seed_rate": 1.0,
         "success_rate": 0.6875,
         "mean_total_reward": 495.16642749071,
         "stderr_total_reward": 269.4616570643358,
@@ -22,6 +26,8 @@
       },
       "pomcp": {
         "episodes": 32,
+        "valid_episode_rate": 1.0,
+        "unique_seed_rate": 1.0,
         "success_rate": 0.28125,
         "mean_total_reward": 239.72433704492394,
         "stderr_total_reward": 116.707611961744,

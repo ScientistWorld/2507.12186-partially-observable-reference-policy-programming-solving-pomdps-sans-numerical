@@ -1,6 +1,5 @@
-# This iteration completed the train/test evaluation job.
-action: done
+action: submit
 gpus: 0
-test: false
+test: true
 milestone: core_claim
-notes: "Audited fresh-clone packaging; no external artifacts required, no shared paths found, and data/downloads placeholder is now tracked while fetched contents stay ignored."
+notes: "CPU smoke submission for the revised run.sh: regenerate RefPol, POMCP, and PORPP artifacts via reproduce.sh, then write full/train/test scores and validate the packaged core-claim path."

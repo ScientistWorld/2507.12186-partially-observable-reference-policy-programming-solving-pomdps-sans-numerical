@@ -10,8 +10,27 @@ from statistics import mean, stdev
 from typing import Dict, Iterable, List
 
 
+REQUIRED_EPISODE_FIELDS = {"seed", "method", "success", "total_reward", "steps", "trace"}
 SUCCESS_MARGIN_SCALE = 0.2
 REWARD_MARGIN_SCALE = 500.0
+
+
+def is_finite_number(value) -> bool:
+    return isinstance(value, (int, float)) and math.isfinite(float(value))
+
+
+def is_valid_episode(row: dict) -> bool:
+    if not isinstance(row, dict) or not REQUIRED_EPISODE_FIELDS.issubset(row):
+        return False
+    return (
+        isinstance(row["seed"], int)
+        and isinstance(row["method"], str)
+        and isinstance(row["success"], bool)
+        and is_finite_number(row["total_reward"])
+        and isinstance(row["steps"], int)
+        and row["steps"] >= 0
+        and isinstance(row["trace"], list)
+    )
 
 
 def read_jsonl(path: Path) -> List[dict]:
@@ -21,17 +40,42 @@ def read_jsonl(path: Path) -> List[dict]:
     with path.open("r", encoding="utf-8") as f:
         for line in f:
             if line.strip():
-                rows.append(json.loads(line))
+                try:
+                    row = json.loads(line)
+                except json.JSONDecodeError:
+                    row = {}
+                row["_valid_episode"] = is_valid_episode(row)
+                rows.append(row)
     return rows
 
 
 def summarize(rows: List[dict]) -> dict:
+    valid_rows = [row for row in rows if row.get("_valid_episode")]
     if not rows:
-        return {"episodes": 0, "success_rate": 0.0, "mean_total_reward": 0.0, "stderr_total_reward": 0.0}
-    rewards = [float(r["total_reward"]) for r in rows]
+        return {
+            "episodes": 0,
+            "valid_episode_rate": 0.0,
+            "unique_seed_rate": 0.0,
+            "success_rate": 0.0,
+            "mean_total_reward": 0.0,
+            "stderr_total_reward": 0.0,
+        }
+    if not valid_rows:
+        return {
+            "episodes": 0,
+            "valid_episode_rate": 0.0,
+            "unique_seed_rate": 0.0,
+            "success_rate": 0.0,
+            "mean_total_reward": 0.0,
+            "stderr_total_reward": 0.0,
+        }
+    rewards = [float(r["total_reward"]) for r in valid_rows]
+    seeds = [r["seed"] for r in valid_rows]
     return {
-        "episodes": len(rows),
-        "success_rate": sum(1.0 for r in rows if r.get("success")) / len(rows),
+        "episodes": len(valid_rows),
+        "valid_episode_rate": len(valid_rows) / len(rows),
+        "unique_seed_rate": len(set(seeds)) / len(seeds),
+        "success_rate": sum(1.0 for r in valid_rows if r.get("success")) / len(valid_rows),
         "mean_total_reward": mean(rewards),
         "stderr_total_reward": (stdev(rewards) / math.sqrt(len(rewards))) if len(rewards) > 1 else 0.0,
     }
