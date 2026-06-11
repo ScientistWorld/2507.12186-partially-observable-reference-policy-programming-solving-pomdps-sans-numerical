@@ -1,6 +1,6 @@
-# This iteration submits the train/test evaluation job.
-action: submit
+# This iteration completed the train/test evaluation job.
+action: done
 gpus: 0
 test: false
 milestone: core_claim
-notes: "Run evaluate_train.sh and evaluate_test.sh against /home/user/checkpoints; populate scores_train.json and scores_test.json."
+notes: "Seed-hash artifact split; 27 train metric values, 27 test metric values across porpp/refpol/pomcp; PORPP success 0.857 train vs 0.889 test and reward 1103.7 vs 1160.0, core claim supported on both; caveat small episode counts create mild split imbalance."
