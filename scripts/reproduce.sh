@@ -20,8 +20,7 @@ cd /home/user
 
 rm -f \
   checkpoints/porpp_episodes.jsonl \
-  checkpoints/porpp_low_episodes.jsonl \
-  checkpoints/porpp_high_episodes.jsonl \
+  checkpoints/pomcp_episodes.jsonl \
   checkpoints/refpol_episodes.jsonl \
   scoring/scores.json
 
@@ -30,7 +29,14 @@ PARTICLES="${PARTICLES:-100}" \
 MAX_STEPS="${MAX_STEPS:-40}" \
 SEED="${SEED:-7}" \
 RUN_EVAL=0 \
-bash scripts/baseline.sh
+bash scripts/baseline.sh refpol
+
+EPISODES="${EPISODES:-24}" \
+SIMULATIONS="${POMCP_SIMULATIONS:-350}" \
+PARTICLES="${PARTICLES:-100}" \
+MAX_STEPS="${MAX_STEPS:-40}" \
+RUN_EVAL=0 \
+bash scripts/baseline.sh pomcp
 
 EPISODES="${EPISODES:-24}" \
 SIMULATIONS="${SIMULATIONS:-350}" \
@@ -39,27 +45,5 @@ MAX_STEPS="${MAX_STEPS:-40}" \
 SEED="${SEED:-7}" \
 RUN_EVAL=0 \
 bash scripts/method.sh
-
-EPISODES="${ANYTIME_EPISODES:-24}" \
-SIMULATIONS="${LOW_SIMULATIONS:-25}" \
-PARTICLES="${PARTICLES:-100}" \
-MAX_STEPS="${MAX_STEPS:-40}" \
-SEED="${SEED:-7}" \
-RUN_EVAL=0 \
-python -m method.porpp \
-  --episodes "${ANYTIME_EPISODES:-24}" \
-  --simulations "${LOW_SIMULATIONS:-25}" \
-  --particles "${PARTICLES:-100}" \
-  --max-steps "${MAX_STEPS:-40}" \
-  --seed "${SEED:-7}" \
-  --out checkpoints/porpp_low_episodes.jsonl
-
-python -m method.porpp \
-  --episodes "${ANYTIME_EPISODES:-24}" \
-  --simulations "${HIGH_SIMULATIONS:-700}" \
-  --particles "${PARTICLES:-100}" \
-  --max-steps "${MAX_STEPS:-40}" \
-  --seed "${SEED:-7}" \
-  --out checkpoints/porpp_high_episodes.jsonl
 
 bash scripts/evaluate.sh

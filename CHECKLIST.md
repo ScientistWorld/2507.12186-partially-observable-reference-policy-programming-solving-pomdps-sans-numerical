@@ -23,7 +23,7 @@ Check off items as you complete them. Order does not matter; work however makes 
 
 - [x] Evaluation code in `eval/`
 - [x] Method implementation in `method/`
-- [x] Baseline implementation in `baseline/` (if applicable)
+- [x] Baseline implementations in `baseline/` (RefPol and POMCP)
 
 ## Scripts
 

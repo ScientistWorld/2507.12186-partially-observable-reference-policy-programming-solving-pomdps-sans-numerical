@@ -45,7 +45,8 @@
       },
       "results": {
         "porpp": {"type": "proposed", "success_rate": 0.875, "mean_total_reward": 1135.3500105432036, "episodes": 32, "stderr_total_reward": 194.94971720538393, "success_gap_vs_refpol": 0.1875, "reward_gap_vs_refpol": 640.1835830524935},
-        "refpol": {"type": "baseline", "success_rate": 0.6875, "mean_total_reward": 495.16642749071, "episodes": 32, "stderr_total_reward": 269.4616570643358, "success_gap_vs_refpol": 0.0, "reward_gap_vs_refpol": 0.0}
+        "refpol": {"type": "baseline", "success_rate": 0.6875, "mean_total_reward": 495.16642749071, "episodes": 32, "stderr_total_reward": 269.4616570643358, "success_gap_vs_refpol": 0.0, "reward_gap_vs_refpol": 0.0},
+        "pomcp": {"type": "baseline"}
       }
     }
   }

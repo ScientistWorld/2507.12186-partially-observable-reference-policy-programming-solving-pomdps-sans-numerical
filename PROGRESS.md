@@ -10,6 +10,11 @@ selection, and sampled log-sum-exp preference backups. Implemented RefPol as
 the heuristic-only baseline and an evaluator that reads saved episode JSONL
 artifacts.
 
+Added a POMCP-style baseline in `baseline/pomcp.py` that enumerates the scaled
+maze macro actions at each history node, uses particle Monte Carlo tree search
+with UCB selection, and writes the same episode JSONL artifact format as the
+other methods.
+
 ## Results
 
 Paper reference numbers are recorded in `scoring/reference.json` for the two
@@ -55,9 +60,19 @@ Final validation after cleaning the scoring contract:
   method/eval import separation, artifact-based evaluation, and no committed
   `shared/` references.
 
+Current turn update:
+
+- Added optional POMCP artifact support to `eval/evaluate_maze.py`.
+- Updated `scripts/reproduce.sh` to run RefPol, POMCP, PORPP, and then the
+  evaluator. The previous low/high anytime artifacts were removed from the
+  official reproduction path because that extension was inconclusive and is not
+  an official scoring target.
+- Lightweight checks passed: Python bytecode compilation, a one-episode POMCP
+  smoke run, a smoke evaluator run, and `python validate.py --compare`.
+
 ## Remaining
 
-- Higher milestones would require implementing additional original-paper settings or more baselines, such as macro-action POMCP or RefSolver.
+- Higher milestones would require implementing additional original-paper settings or another paper baseline such as RefSolver, or reproducing the original 3D/Corsica environments if they become available.
 - The exact 3D maze and HEMS simulators remain unavailable, so this environment stops at the accessible scaled core-claim reproduction.
 
 ## Issues

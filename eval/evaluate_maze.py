@@ -37,6 +37,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--porpp", type=Path, default=Path("checkpoints/porpp_episodes.jsonl"))
     parser.add_argument("--refpol", type=Path, default=Path("checkpoints/refpol_episodes.jsonl"))
+    parser.add_argument("--pomcp", type=Path, default=Path("checkpoints/pomcp_episodes.jsonl"))
     parser.add_argument("--porpp-low", type=Path, default=Path("checkpoints/porpp_low_episodes.jsonl"))
     parser.add_argument("--porpp-high", type=Path, default=Path("checkpoints/porpp_high_episodes.jsonl"))
     parser.add_argument("--include-anytime", action="store_true")
@@ -45,6 +46,7 @@ def main() -> None:
 
     porpp_summary = summarize(read_jsonl(args.porpp))
     refpol_summary = summarize(read_jsonl(args.refpol))
+    pomcp_summary = summarize(read_jsonl(args.pomcp))
     if porpp_summary["episodes"] and refpol_summary["episodes"]:
         porpp_summary["success_gap_vs_refpol"] = porpp_summary["success_rate"] - refpol_summary["success_rate"]
         porpp_summary["reward_gap_vs_refpol"] = porpp_summary["mean_total_reward"] - refpol_summary["mean_total_reward"]
@@ -55,6 +57,12 @@ def main() -> None:
         porpp_summary["reward_gap_vs_refpol"] = 0.0
         refpol_summary["success_gap_vs_refpol"] = 0.0
         refpol_summary["reward_gap_vs_refpol"] = 0.0
+    if pomcp_summary["episodes"] and refpol_summary["episodes"]:
+        pomcp_summary["success_gap_vs_refpol"] = pomcp_summary["success_rate"] - refpol_summary["success_rate"]
+        pomcp_summary["reward_gap_vs_refpol"] = pomcp_summary["mean_total_reward"] - refpol_summary["mean_total_reward"]
+    else:
+        pomcp_summary["success_gap_vs_refpol"] = 0.0
+        pomcp_summary["reward_gap_vs_refpol"] = 0.0
 
     scores = {
         "scaled_maze_online_planning": {
@@ -64,6 +72,8 @@ def main() -> None:
             }
         }
     }
+    if pomcp_summary["episodes"]:
+        scores["scaled_maze_online_planning"]["results"]["pomcp"] = pomcp_summary
     low_rows = read_jsonl(args.porpp_low)
     high_rows = read_jsonl(args.porpp_high)
     if args.include_anytime and low_rows and high_rows:

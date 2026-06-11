@@ -11,24 +11,44 @@
 # You can decide what this baseline script should do yourself.
 #
 # Usage:
-#   bash scripts/baseline.sh <name>
+#   bash scripts/baseline.sh [refpol|pomcp]
 
 set -e
 
 cd /home/user
 
 EPISODES="${EPISODES:-24}"
+SIMULATIONS="${SIMULATIONS:-350}"
 PARTICLES="${PARTICLES:-100}"
 MAX_STEPS="${MAX_STEPS:-40}"
-SEED="${SEED:-1007}"
+NAME="${1:-refpol}"
 
 mkdir -p checkpoints
-python -m baseline.refpol \
-  --episodes "$EPISODES" \
-  --particles "$PARTICLES" \
-  --max-steps "$MAX_STEPS" \
-  --seed "$SEED" \
-  --out checkpoints/refpol_episodes.jsonl
+case "$NAME" in
+  refpol)
+    SEED="${SEED:-1007}"
+    python -m baseline.refpol \
+      --episodes "$EPISODES" \
+      --particles "$PARTICLES" \
+      --max-steps "$MAX_STEPS" \
+      --seed "$SEED" \
+      --out checkpoints/refpol_episodes.jsonl
+    ;;
+  pomcp)
+    SEED="${SEED:-2007}"
+    python -m baseline.pomcp \
+      --episodes "$EPISODES" \
+      --simulations "$SIMULATIONS" \
+      --particles "$PARTICLES" \
+      --max-steps "$MAX_STEPS" \
+      --seed "$SEED" \
+      --out checkpoints/pomcp_episodes.jsonl
+    ;;
+  *)
+    echo "Unknown baseline: $NAME" >&2
+    exit 2
+    ;;
+esac
 
 if [ "${RUN_EVAL:-1}" = "1" ]; then
   bash scripts/evaluate.sh
