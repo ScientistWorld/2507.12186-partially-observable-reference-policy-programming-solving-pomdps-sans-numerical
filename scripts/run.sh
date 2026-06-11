@@ -13,8 +13,10 @@ set -e
 
 cd /home/user
 
-# Example: train a model
-python method/train.py --epochs 10 --lr 0.001
+export EPISODES="${EPISODES:-32}"
+export PARTICLES="${PARTICLES:-120}"
+export MAX_STEPS="${MAX_STEPS:-40}"
+export SIMULATIONS="${SIMULATIONS:-500}"
 
-# Example: evaluate
-bash scripts/evaluate.sh checkpoints/best.pt
+bash scripts/reproduce.sh
+python validate.py --compare

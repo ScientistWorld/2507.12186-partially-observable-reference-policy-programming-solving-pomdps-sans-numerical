@@ -18,7 +18,15 @@ set -e
 
 cd /home/user
 
-# TODO: implement full reproduction pipeline
-# e.g.:
-#   bash scripts/baseline.sh
-#   bash scripts/method.sh
+EPISODES="${EPISODES:-24}" \
+PARTICLES="${PARTICLES:-100}" \
+MAX_STEPS="${MAX_STEPS:-40}" \
+bash scripts/baseline.sh
+
+EPISODES="${EPISODES:-24}" \
+SIMULATIONS="${SIMULATIONS:-350}" \
+PARTICLES="${PARTICLES:-100}" \
+MAX_STEPS="${MAX_STEPS:-40}" \
+bash scripts/method.sh
+
+bash scripts/evaluate.sh

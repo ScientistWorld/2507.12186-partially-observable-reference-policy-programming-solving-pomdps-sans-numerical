@@ -17,4 +17,17 @@ set -e
 
 cd /home/user
 
-# TODO: run baseline
+EPISODES="${EPISODES:-24}"
+PARTICLES="${PARTICLES:-100}"
+MAX_STEPS="${MAX_STEPS:-40}"
+SEED="${SEED:-1007}"
+
+mkdir -p checkpoints
+python -m baseline.refpol \
+  --episodes "$EPISODES" \
+  --particles "$PARTICLES" \
+  --max-steps "$MAX_STEPS" \
+  --seed "$SEED" \
+  --out checkpoints/refpol_episodes.jsonl
+
+bash scripts/evaluate.sh

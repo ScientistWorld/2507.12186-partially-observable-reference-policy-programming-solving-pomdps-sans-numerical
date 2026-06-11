@@ -1,6 +1,6 @@
 # Reproduction Milestones
 
-**Current: none**
+**Current: method_runs**
 
 <!-- Milestone levels (update "Current" above as you progress):
   none             — just started, no meaningful progress yet
@@ -15,7 +15,10 @@
 
 ## Progress Log
 
-<!-- Write your progress here -->
+### [2026-06-11 22:10] - method_runs
+- Read the paper and identified PORPP's particle-tree online planning algorithm.
+- Implemented a scaled maze POMDP, RefPol baseline, PORPP planner, and artifact-based evaluation.
+- Ran a lightweight local smoke test showing the method executes end-to-end and writes `scoring/scores.json`.
 
 ## Stop Justification
-- Completed at milestone `none`.
+- Not stopped. A larger CPU reproduction job is being submitted to verify the core claim.
