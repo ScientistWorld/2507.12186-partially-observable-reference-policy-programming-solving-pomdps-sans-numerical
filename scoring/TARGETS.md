@@ -18,3 +18,16 @@ where a feasible-action heuristic alone is not reliable.
 - **Constraint metric:** `stderr_total_reward` should be reported so improvements are judged against run variability.
 - **Baseline:** `pomcp` is a particle Monte Carlo tree-search baseline that enumerates fixed directional macro actions, matching the paper's POMCP protocol more closely than the domain-specific candidate sampler.
 - **Run:** execute `scripts/reproduce.sh`, which writes episode artifacts for RefPol, POMCP, and the submitted planner, then run `scripts/evaluate.sh`.
+
+## Extension: scaled_maze_mirrored_danger_planning
+
+This target repeats the same online-planning comparison after mirroring the
+danger region so the unsafe direct route affects the other possible start.
+
+- **Primary metric:** `core_claim_margin_score` (higher is better)
+- **Claim check:** `core_claim_supported` is 1 only when the planner beats
+  every available baseline on both success rate and mean total reward.
+- **Constraint metric:** `episodes` should remain comparable across methods.
+- **Constraint metric:** `stderr_total_reward` exposes run variability.
+- **Run:** execute `scripts/reproduce.sh`; the mirrored artifacts are written
+  under `checkpoints/mirrored_danger/` and scored by the same evaluator.

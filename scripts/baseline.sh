@@ -21,6 +21,7 @@ EPISODES="${EPISODES:-24}"
 SIMULATIONS="${SIMULATIONS:-350}"
 PARTICLES="${PARTICLES:-100}"
 MAX_STEPS="${MAX_STEPS:-40}"
+SCENARIO="${SCENARIO:-default}"
 NAME="${1:-refpol}"
 
 mkdir -p checkpoints
@@ -32,7 +33,8 @@ case "$NAME" in
       --particles "$PARTICLES" \
       --max-steps "$MAX_STEPS" \
       --seed "$SEED" \
-      --out checkpoints/refpol_episodes.jsonl
+      --scenario "$SCENARIO" \
+      --out "${OUT:-checkpoints/refpol_episodes.jsonl}"
     ;;
   pomcp)
     SEED="${SEED:-2007}"
@@ -42,7 +44,8 @@ case "$NAME" in
       --particles "$PARTICLES" \
       --max-steps "$MAX_STEPS" \
       --seed "$SEED" \
-      --out checkpoints/pomcp_episodes.jsonl
+      --scenario "$SCENARIO" \
+      --out "${OUT:-checkpoints/pomcp_episodes.jsonl}"
     ;;
   *)
     echo "Unknown baseline: $NAME" >&2

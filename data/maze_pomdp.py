@@ -40,6 +40,20 @@ class MazeConfig:
     danger_radius: float = 2.4
 
 
+def maze_config(name: str = "default") -> MazeConfig:
+    """Return a named scaled-maze setting.
+
+    The mirrored setting is an additional core-claim check: the unsafe direct
+    route is mirrored to the lower start while the observation and action
+    structure stays the same.
+    """
+    if name in {"default", "scaled_maze"}:
+        return MazeConfig()
+    if name == "mirrored_danger":
+        return replace(MazeConfig(), danger=(10.0, 3.5))
+    raise ValueError(f"unknown maze scenario: {name}")
+
+
 @dataclass(frozen=True)
 class MazeState:
     x: float
@@ -159,8 +173,9 @@ class MazePOMDP:
             if s.terminal:
                 break
             waypoint = (s.x + target[0], s.y + target[1]) if action.is_direction else target
-            if (not action.is_direction) and action.avoid_danger and distance(s.point(), cfg.danger) < 6.0 and s.y > cfg.goal[1]:
-                waypoint = (cfg.danger[0] - 1.5, cfg.goal[1] - 2.5)
+            if (not action.is_direction) and action.avoid_danger and distance(s.point(), cfg.danger) < 6.0:
+                bypass_y = cfg.goal[1] - 2.5 if cfg.danger[1] > cfg.goal[1] else cfg.goal[1] + 2.5
+                waypoint = (cfg.danger[0] - 1.5, bypass_y)
             dx, dy = waypoint[0] - s.x, waypoint[1] - s.y
             norm = max(math.hypot(dx, dy), 1e-9)
             nx = s.x + cfg.step_size * dx / norm + rng.gauss(0.0, cfg.process_noise)

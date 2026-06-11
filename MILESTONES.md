@@ -4,6 +4,15 @@
 
 ## Progress Log
 
+### [2026-06-11 22:46] - core_claim
+- Added a mirrored-danger scaled maze setting to test the core PORPP claim on
+  a second layout without changing the algorithm or evaluation procedure.
+- Updated method, RefPol, POMCP, and the artifact evaluator to carry a
+  `scenario` field and score separate experiments from recursively discovered
+  episode files.
+- Prepared a CPU job to regenerate default and mirrored setting artifacts; the
+  milestone remains `core_claim` until those results complete.
+
 ### [2026-06-11 22:41] - core_claim
 - Completed final verification of folder structure, scoring, method/eval
   separation, train/test wiring, and method-agnostic documentation.

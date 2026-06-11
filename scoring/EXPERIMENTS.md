@@ -18,3 +18,11 @@ The primary metric is a relational claim check: a run scores 1 only if the
 planner beats every available baseline on both success rate and mean total
 reward. Raw success, reward, standard error, and baseline-gap metrics remain in
 `scores.json` for diagnosis and optimization.
+
+## scaled_maze_mirrored_danger_planning
+
+This experiment is an additional layout check for the same claim. The unsafe
+direct route is mirrored to the lower start, so a method cannot rely on the
+exact geometry of the first scaled maze. It uses the same artifact format,
+baselines, success metric, return metric, and relational claim check as the
+primary scaled-maze experiment.

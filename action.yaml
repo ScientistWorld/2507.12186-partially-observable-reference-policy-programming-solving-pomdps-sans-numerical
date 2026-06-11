@@ -1,3 +1,5 @@
-action: done
+action: submit
+gpus: 0
+test: false
 milestone: core_claim
-notes: "Final verification passed. The gym is ready at core_claim with a documented scaled-maze substitute limitation."
+notes: "CPU job to regenerate default and mirrored-danger scaled maze artifacts and test whether the second setting supports core_claim_plus."

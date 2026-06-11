@@ -7,12 +7,12 @@ import json
 import random
 from pathlib import Path
 
-from data.maze_pomdp import MazePOMDP, initial_particles
+from data.maze_pomdp import MazePOMDP, initial_particles, maze_config
 
 
-def run_episode(seed: int, particle_count: int, max_steps: int) -> dict:
+def run_episode(seed: int, particle_count: int, max_steps: int, scenario: str) -> dict:
     rng = random.Random(seed)
-    env = MazePOMDP()
+    env = MazePOMDP(maze_config(scenario))
     true_state = env.sample_initial_state(rng)
     particles = initial_particles(env.config, particle_count, rng)
     total_reward = 0.0
@@ -34,6 +34,7 @@ def run_episode(seed: int, particle_count: int, max_steps: int) -> dict:
     return {
         "seed": seed,
         "method": "refpol",
+        "scenario": scenario,
         "success": bool(true_state.success),
         "total_reward": total_reward,
         "steps": steps,
@@ -47,12 +48,13 @@ def main() -> None:
     parser.add_argument("--particles", type=int, default=80)
     parser.add_argument("--max-steps", type=int, default=40)
     parser.add_argument("--seed", type=int, default=7)
+    parser.add_argument("--scenario", default="default")
     parser.add_argument("--out", type=Path, default=Path("checkpoints/refpol_episodes.jsonl"))
     args = parser.parse_args()
     args.out.parent.mkdir(parents=True, exist_ok=True)
     with args.out.open("w", encoding="utf-8") as f:
         for i in range(args.episodes):
-            f.write(json.dumps(run_episode(args.seed + i, args.particles, args.max_steps)) + "\n")
+            f.write(json.dumps(run_episode(args.seed + i, args.particles, args.max_steps, args.scenario)) + "\n")
 
 
 if __name__ == "__main__":

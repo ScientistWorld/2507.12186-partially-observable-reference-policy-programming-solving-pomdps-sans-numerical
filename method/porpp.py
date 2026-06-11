@@ -16,7 +16,7 @@ import time
 from pathlib import Path
 from typing import Dict, List, Optional
 
-from data.maze_pomdp import MacroAction, MazePOMDP, MazeState, initial_particles
+from data.maze_pomdp import MacroAction, MazePOMDP, MazeState, initial_particles, maze_config
 
 
 @dataclass
@@ -147,9 +147,9 @@ class PORPPPlanner:
         return max_pref + math.log(sum(math.exp(self.eta * (p - max_pref)) for p in prefs)) / self.eta
 
 
-def run_episode(seed: int, simulations: int, particle_count: int, max_steps: int) -> dict:
+def run_episode(seed: int, simulations: int, particle_count: int, max_steps: int, scenario: str) -> dict:
     rng = random.Random(seed)
-    env = MazePOMDP()
+    env = MazePOMDP(maze_config(scenario))
     true_state = env.sample_initial_state(rng)
     planner = PORPPPlanner(env, initial_particles(env.config, particle_count, rng), rng, simulations_per_step=simulations)
     total_reward = 0.0
@@ -170,6 +170,7 @@ def run_episode(seed: int, simulations: int, particle_count: int, max_steps: int
     return {
         "seed": seed,
         "method": "porpp",
+        "scenario": scenario,
         "simulations": simulations,
         "particles": particle_count,
         "success": bool(true_state.success),
@@ -186,13 +187,14 @@ def main() -> None:
     parser.add_argument("--particles", type=int, default=80)
     parser.add_argument("--max-steps", type=int, default=40)
     parser.add_argument("--seed", type=int, default=7)
+    parser.add_argument("--scenario", default="default")
     parser.add_argument("--out", type=Path, default=Path("checkpoints/porpp_episodes.jsonl"))
     args = parser.parse_args()
 
     args.out.parent.mkdir(parents=True, exist_ok=True)
     with args.out.open("w", encoding="utf-8") as f:
         for i in range(args.episodes):
-            result = run_episode(args.seed + i, args.simulations, args.particles, args.max_steps)
+            result = run_episode(args.seed + i, args.simulations, args.particles, args.max_steps, args.scenario)
             f.write(json.dumps(result) + "\n")
             f.flush()
 

@@ -15,6 +15,8 @@ SIMULATIONS="${SIMULATIONS:-350}"
 PARTICLES="${PARTICLES:-100}"
 MAX_STEPS="${MAX_STEPS:-40}"
 SEED="${SEED:-7}"
+SCENARIO="${SCENARIO:-default}"
+OUT="${OUT:-checkpoints/porpp_episodes.jsonl}"
 
 mkdir -p checkpoints
 python -m method.porpp \
@@ -23,7 +25,8 @@ python -m method.porpp \
   --particles "$PARTICLES" \
   --max-steps "$MAX_STEPS" \
   --seed "$SEED" \
-  --out checkpoints/porpp_episodes.jsonl
+  --scenario "$SCENARIO" \
+  --out "$OUT"
 
 if [ "${RUN_EVAL:-1}" = "1" ]; then
   bash scripts/evaluate.sh

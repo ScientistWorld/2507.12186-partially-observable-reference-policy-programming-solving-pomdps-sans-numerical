@@ -17,6 +17,11 @@ from typing import Dict, Iterable, List
 REQUIRED_EPISODE_FIELDS = {"seed", "method", "success", "total_reward", "steps", "trace"}
 BASELINE_METHODS = {"refpol", "pomcp"}
 EXCLUDED_EPISODE_SUFFIXES = ("_low_episodes", "_high_episodes")
+SCENARIO_EXPERIMENTS = {
+    "default": "scaled_maze_online_planning",
+    "scaled_maze": "scaled_maze_online_planning",
+    "mirrored_danger": "scaled_maze_mirrored_danger_planning",
+}
 SUCCESS_MARGIN_SCALE = 0.2
 REWARD_MARGIN_SCALE = 500.0
 
@@ -120,25 +125,36 @@ def method_name_from_path(path: Path) -> str:
     return stem
 
 
-def discover_episode_paths(checkpoints_dir: Path) -> Dict[str, Path]:
-    paths: Dict[str, Path] = {}
-    for path in sorted(checkpoints_dir.glob("*_episodes.jsonl")):
+def discover_episode_paths(checkpoints_dir: Path) -> Dict[str, List[Path]]:
+    paths: Dict[str, List[Path]] = {}
+    for path in sorted(checkpoints_dir.rglob("*_episodes.jsonl")):
         stem = path.stem
         if any(stem.endswith(suffix) for suffix in EXCLUDED_EPISODE_SUFFIXES):
             continue
-        paths[method_name_from_path(path)] = path
+        paths.setdefault(method_name_from_path(path), []).append(path)
     return paths
 
 
-def add_named_path(paths: Dict[str, Path], name: str, path: Path | None) -> None:
+def add_named_path(paths: Dict[str, List[Path]], name: str, path: Path | None) -> None:
     if path is not None and path.exists():
-        paths[name] = path
+        current = paths.setdefault(name, [])
+        if path not in current:
+            current.append(path)
 
 
-def build_scores(paths: Dict[str, Path]) -> dict:
+def scenario_from_row(row: dict, path: Path) -> str:
+    scenario = row.get("scenario")
+    if isinstance(scenario, str) and scenario:
+        return scenario
+    if "mirrored_danger" in path.parts:
+        return "mirrored_danger"
+    return "default"
+
+
+def build_one_experiment(method_rows: Dict[str, List[dict]]) -> dict:
     summaries = {
-        name: summarize(read_jsonl(path))
-        for name, path in sorted(paths.items())
+        name: summarize(rows)
+        for name, rows in sorted(method_rows.items())
     }
     refpol = summaries.get("refpol", summarize([]))
     for summary in summaries.values():
@@ -157,8 +173,22 @@ def build_scores(paths: Dict[str, Path]) -> dict:
         else:
             summary["core_claim_supported"] = beats_all_on_success_and_reward(summary, baseline_summaries)
             summary["core_claim_margin_score"] = core_claim_margin_score(summary, baseline_summaries)
+    return {"results": summaries}
 
-    return {"scaled_maze_online_planning": {"results": summaries}}
+
+def build_scores(paths: Dict[str, List[Path]]) -> dict:
+    grouped: Dict[str, Dict[str, List[dict]]] = {}
+    for name, path_list in sorted(paths.items()):
+        for path in path_list:
+            for row in read_jsonl(path):
+                scenario = scenario_from_row(row, path)
+                grouped.setdefault(scenario, {}).setdefault(name, []).append(row)
+
+    scores = {}
+    for scenario, method_rows in sorted(grouped.items()):
+        exp_name = SCENARIO_EXPERIMENTS.get(scenario, f"scaled_maze_{scenario}_planning")
+        scores[exp_name] = build_one_experiment(method_rows)
+    return scores
 
 
 def main() -> None:
