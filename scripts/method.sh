@@ -25,4 +25,6 @@ python -m method.porpp \
   --seed "$SEED" \
   --out checkpoints/porpp_episodes.jsonl
 
-bash scripts/evaluate.sh
+if [ "${RUN_EVAL:-1}" = "1" ]; then
+  bash scripts/evaluate.sh
+fi

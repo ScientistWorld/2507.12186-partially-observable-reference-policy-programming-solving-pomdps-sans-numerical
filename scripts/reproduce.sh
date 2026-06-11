@@ -18,15 +18,21 @@ set -e
 
 cd /home/user
 
+rm -f checkpoints/porpp_episodes.jsonl checkpoints/refpol_episodes.jsonl scoring/scores.json
+
 EPISODES="${EPISODES:-24}" \
 PARTICLES="${PARTICLES:-100}" \
 MAX_STEPS="${MAX_STEPS:-40}" \
+SEED="${SEED:-7}" \
+RUN_EVAL=0 \
 bash scripts/baseline.sh
 
 EPISODES="${EPISODES:-24}" \
 SIMULATIONS="${SIMULATIONS:-350}" \
 PARTICLES="${PARTICLES:-100}" \
 MAX_STEPS="${MAX_STEPS:-40}" \
+SEED="${SEED:-7}" \
+RUN_EVAL=0 \
 bash scripts/method.sh
 
 bash scripts/evaluate.sh

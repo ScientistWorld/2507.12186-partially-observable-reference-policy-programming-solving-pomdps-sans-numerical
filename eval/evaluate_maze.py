@@ -40,11 +40,24 @@ def main() -> None:
     parser.add_argument("--out", type=Path, default=Path("scoring/scores.json"))
     args = parser.parse_args()
 
+    porpp_summary = summarize(read_jsonl(args.porpp))
+    refpol_summary = summarize(read_jsonl(args.refpol))
+    if porpp_summary["episodes"] and refpol_summary["episodes"]:
+        porpp_summary["success_gap_vs_refpol"] = porpp_summary["success_rate"] - refpol_summary["success_rate"]
+        porpp_summary["reward_gap_vs_refpol"] = porpp_summary["mean_total_reward"] - refpol_summary["mean_total_reward"]
+        refpol_summary["success_gap_vs_refpol"] = 0.0
+        refpol_summary["reward_gap_vs_refpol"] = 0.0
+    else:
+        porpp_summary["success_gap_vs_refpol"] = 0.0
+        porpp_summary["reward_gap_vs_refpol"] = 0.0
+        refpol_summary["success_gap_vs_refpol"] = 0.0
+        refpol_summary["reward_gap_vs_refpol"] = 0.0
+
     scores = {
         "scaled_maze_online_planning": {
             "results": {
-                "porpp": summarize(read_jsonl(args.porpp)),
-                "refpol": summarize(read_jsonl(args.refpol)),
+                "porpp": porpp_summary,
+                "refpol": refpol_summary,
             }
         }
     }
@@ -55,4 +68,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

@@ -29,7 +29,7 @@ class MazeConfig:
     max_macro_len: int = 5
     step_penalty: float = -5.0
     goal_reward: float = 2000.0
-    danger_penalty: float = -500.0
+    danger_penalty: float = -1800.0
     starts: Tuple[Point, Point] = ((2.0, 2.0), (2.0, 18.0))
     landmark_a: Point = (6.0, 10.0)
     landmark_b: Point = (13.0, 10.0)
@@ -105,7 +105,7 @@ class MazePOMDP:
         # suboptimal under poor localization: before landmark contact it often
         # proposes the direct route, which is dangerous for one possible start.
         if not state.localized:
-            primary = actions[2] if rng.random() < 0.65 else rng.choice(actions[:2])
+            primary = actions[2] if rng.random() < 0.85 else rng.choice(actions[:2])
         else:
             primary = actions[3] if rng.random() < 0.75 else rng.choice(actions)
         return [primary] + [a for a in actions if a.name != primary.name]

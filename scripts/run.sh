@@ -16,7 +16,7 @@ cd /home/user
 export EPISODES="${EPISODES:-32}"
 export PARTICLES="${PARTICLES:-120}"
 export MAX_STEPS="${MAX_STEPS:-40}"
-export SIMULATIONS="${SIMULATIONS:-500}"
+export SIMULATIONS="${SIMULATIONS:-700}"
 
 bash scripts/reproduce.sh
 python validate.py --compare

@@ -46,7 +46,7 @@ def main() -> None:
     parser.add_argument("--episodes", type=int, default=20)
     parser.add_argument("--particles", type=int, default=80)
     parser.add_argument("--max-steps", type=int, default=40)
-    parser.add_argument("--seed", type=int, default=1007)
+    parser.add_argument("--seed", type=int, default=7)
     parser.add_argument("--out", type=Path, default=Path("checkpoints/refpol_episodes.jsonl"))
     args = parser.parse_args()
     args.out.parent.mkdir(parents=True, exist_ok=True)
@@ -57,4 +57,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
