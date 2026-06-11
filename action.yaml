@@ -27,8 +27,8 @@
 #   milestone: core_claim
 #   notes: "Reproduced the core claim. Environment packaged."
 
-action: pending
-gpus: 1
-test: false
-milestone: none
-notes: ""
+action: submit
+gpus: 0
+test: true
+milestone: method_runs
+notes: "Run the scaled maze PORPP reproduction: RefPol baseline, PORPP planner, artifact evaluation, and validate.py --compare. Expect this to verify the core-claim gap on a CPU test node."

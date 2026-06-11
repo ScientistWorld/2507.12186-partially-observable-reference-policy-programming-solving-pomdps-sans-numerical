@@ -2,16 +2,16 @@
   "scaled_maze_online_planning": {
     "results": {
       "porpp": {
-        "episodes": 12,
-        "success_rate": 0.8333333333333334,
-        "mean_total_reward": 1152.3266092421795,
-        "stderr_total_reward": 225.81373108328205
+        "episodes": 32,
+        "success_rate": 0.875,
+        "mean_total_reward": 1270.3791238573924,
+        "stderr_total_reward": 115.94360661560083
       },
       "refpol": {
-        "episodes": 12,
-        "success_rate": 0.6666666666666666,
-        "mean_total_reward": 905.9943908370773,
-        "stderr_total_reward": 267.8912414438007
+        "episodes": 32,
+        "success_rate": 0.8125,
+        "mean_total_reward": 1155.0849240979828,
+        "stderr_total_reward": 135.0391454114801
       }
     }
   }
