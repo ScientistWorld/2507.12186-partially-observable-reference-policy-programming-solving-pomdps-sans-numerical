@@ -31,8 +31,4 @@
 - Added a POMCP-style particle tree-search baseline for the same scaled maze and submitted a follow-up job to score it alongside PORPP and RefPol.
 
 ## Stop Justification
-- Current packaged milestone is `core_claim`; the corrected artifact-based
-  scaled-maze experiment demonstrates the paper's central claim against both
-  RefPol and directional POMCP. Higher milestones would require additional
-  original-paper environments or validated extensions beyond the accessible
-  scaled maze.
+- Completed at milestone `core_claim`.
