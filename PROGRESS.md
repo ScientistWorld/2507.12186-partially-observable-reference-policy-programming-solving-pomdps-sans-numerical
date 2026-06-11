@@ -2,36 +2,27 @@
 
 ## What Works
 
-<!-- What has been successfully reproduced so far. -->
+Documentation has been drafted from `paper/2507.12186.md` for the problem statement, method summary, evaluation protocol, scoring targets, experiment descriptions, scientist constraints, and research direction.
 
 ## Results
 
-<!-- Reproduced numbers compared to the paper's reported numbers. -->
+No reproduction results have been generated yet. The documentation records the paper's reported target numbers for:
+
+- 3D maze with poor localisation: success rate and expected total reward over 100 runs across 1, 2, 3, 5, 10, and 15 second planning budgets.
+- HEMS mission with evolving no-fly zones: success rate and expected total reward over 100 runs across 1, 2, 3, 5, and 10 second planning budgets.
 
 ## Remaining
 
-<!-- What still needs to be done to reach higher milestones. -->
+- Implement or verify benchmark environments.
+- Implement the paper's online planning method and baselines.
+- Create `scoring/reference.json` and `scoring/scores.json` with structures matching the documented targets.
+- Run evaluation jobs for the paper method and baselines.
+- Validate the workspace.
 
 ## Issues
 
-<!-- Blockers, bugs, or difficulties encountered. -->
+The paper markdown appears to be OCR-derived in places, so some equations and pseudocode text are noisy. The high-level documentation is based on the readable sections and reported tables.
 
 ## Deviations from Paper
 
-<!-- Do not edit this section unless you deviated from the paper's original setup.
-     For each deviation, document: what the paper used, what you substituted, and why.
-
-     ACCEPTABLE deviations (data/resource/scale substitutions — milestones still valid):
-       - Replaced a proprietary dataset with a public one
-       - Used a smaller model of the same architecture
-       - Scaled down training (fewer epochs, smaller batch)
-       - Used a different library for the same algorithm
-
-     UNACCEPTABLE deviations (algorithm substitutions — milestones above 'none' are void):
-       - Replaced the paper's algorithm with a fundamentally different one
-       - Wrote a generic model trained to approximate the method's outputs
-         instead of implementing the method's computational steps
-
-     The test: could someone reading your code identify which algorithm from
-     the paper you implemented? If not, you replaced the method. -->
-
+None yet. No method implementation or experiment has been run.

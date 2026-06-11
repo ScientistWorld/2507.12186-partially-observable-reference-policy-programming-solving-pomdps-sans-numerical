@@ -1,59 +1,27 @@
 # Experiment Overview
 
-<!-- Do not edit this unless you decide to stop -->
+The experiment names below are the intended keys for `scores.json` once implementation results are produced. They describe what each experiment establishes without revealing any solver internals.
 
-<!--
-Describe, at a high level, what each experiment in `scores.json` is trying to
-establish.
+## maze_navigation_performance
 
-This file is for future scientist agents. They should be able to read it and
-understand what each experiment is about WITHOUT learning the paper's method.
+Evaluates overall task success in the poorly localized 3D maze. The experiment asks whether a planner can reason under ambiguous initial position, sparse localization feedback, danger-zone risk, and delayed goal reward within the paper's online planning-time limits.
 
-Rules:
-- This must correspond EXACTLY to the experiments in `scores.json`
-- The section heading for each experiment must be the exact experiment name from the keys in `scores.json`
-- Describe the experiment's scientific purpose, not the implementation
-- Do NOT describe the method, architecture, algorithm, loss, or training recipe
-- Do NOT include numerical results from the paper or your reproduction
-- If an experiment is not in `scores.json`, do not list it here
+## hems_navigation_performance
 
-Good examples (these should be fuller and more specific than a one-line label,
-but still stay method-agnostic):
+Evaluates overall task success in the Corsica helicopter mission. The experiment asks whether a planner can reach both unordered objectives while handling terrain constraints, noisy motion and observations, collision risk, and changing no-fly-zone penalties.
 
-## main_benchmark
-Tests whether the reproduced system succeeds on the paper's central evaluation
-task under the main benchmark setting used to support the headline claim. This
-should make clear that the experiment exists to measure overall task success in
-the paper's standard evaluation setup, not to describe the internal mechanism
-used to obtain that result.
+## baseline_improvement
 
-## robustness_shift
-Tests whether the main claimed effect still holds when the evaluation setting is
-made harder or shifted away from the paper's primary benchmark condition. This
-should explain what kind of robustness question is being asked at a high level:
-whether the paper's conclusion remains valid outside the narrow default
-evaluation case.
+Compares the evaluated planner with the standard reference and online-planning baselines under matched budgets and seeds. The purpose is to confirm that any improvement is meaningful relative to the baselines used to support the paper's central empirical claim.
 
-## wrong_key_security
-Tests whether the protected or hidden signal remains inaccessible under the
-incorrect-access condition used in the paper's evaluation. This should explain
-that the purpose is to validate the paper's security or privacy claim at a high
-level, without describing the concrete mechanism used to protect the signal.
+## heuristic_not_sufficient
 
-## component_ablation
-Tests whether the paper's reported improvement is actually attributable to the
-claimed source of benefit, rather than to unrelated aspects of the overall
-system or evaluation setup. This should explain that the experiment exists to
-separate the claimed causal contribution from generic confounders, without
-describing the implementation details of the component being varied.
+Checks whether the domain heuristic by itself is inadequate for solving the benchmark. This guards against treating the action-proposal mechanism or environment geometry alone as the full solution to the planning problem.
 
-Bad examples:
-- "Runs the 8-layer transformer with contrastive loss and cosine scheduler"
-- "Uses the paper's memory module to improve retrieval"
+## anytime_behavior
 
-Delete this comment block and fill in your actual experiments below.
--->
+Measures whether performance improves or remains stable as more online planning time is allowed before each executed action. This tests the practical anytime property expected from an online planner in these tasks.
 
-<!-- This is high-level only. Explain WHAT the experiment is trying to show, NOT HOW the method works. -->
+## long_horizon_robustness
 
-<!-- The experiment headings here should EXACTLY match the experiment-name keys in your scores.json. -->
+Measures whether the planner handles the full long-horizon versions of the tasks, including delayed objective rewards and costly failure modes. This prevents scores from being driven only by short-horizon local progress.

@@ -1,50 +1,51 @@
 # Evaluation Targets
 
-<!-- Do not edit this unless you decide to stop -->
+These targets define what future scores should measure. They are high-level benchmark targets, not paper-result values.
 
-<!--
-Describe what a scientist could optimize and how to measure it.
+## Primary: maze_navigation_performance
 
-If a paper claims "we get X without sacrificing Y." Your targets must
-capture BOTH sides. Without constraint targets, a scientist can trivially
-"improve" by breaking the property the paper was designed to satisfy.
+Tests whether a planner can solve the poor-localisation 3D maze under the paper's online planning conditions.
 
-Three kinds of targets:
+- **Metric:** `expected_total_reward` (higher is better)
+- **Metric:** `success_rate` (higher is better)
+- **Run:** evaluate the maze scenario over the fixed 100-episode seed set at each configured planning-time budget.
 
-  PRIMARY    — the main thing the paper optimizes (accuracy, PSNR, etc.)
-  CONSTRAINT — what the paper must maintain (security, fairness, param count,
-               baseline comparison). Constraint metrics guard against cheating:
-               a scientist who ignores the constraint should score WORSE.
-  ABLATION   — what breaks when the key idea is removed (wrong-key test,
-               no-module test). Proves the method actually does something. 
-               This can be ignored if truly not important.
+## Primary: hems_navigation_performance
 
-For each target, write:
-- What the experiment tests (one sentence)
-- The primary metric and direction (higher/lower is better)
-- How to run evaluation
+Tests whether a planner can complete the Corsica helicopter emergency mission while reacting to evolving no-fly-zone penalties.
 
-Every target here MUST appear in both reference.json and scores.json.
-Do not list targets you cannot measure — phantom targets are worse than
-missing targets.
+- **Metric:** `expected_total_reward` (higher is better)
+- **Metric:** `success_rate` (higher is better)
+- **Run:** evaluate the HEMS scenario over the fixed 100-episode seed set at each configured planning-time budget.
 
-Example for a steganography paper:
+## Constraint: baseline_improvement
 
-## Primary: reconstruction_quality
-Cover and hidden scene PSNR on Blender Synthetic.
-- **Metric**: psnr (higher is better)
+Tests whether gains exceed the matched online planning baselines and the reference-policy-only baseline, rather than only solving an easier version of the task.
 
-## Constraint: key_security
-Wrong-key rendering must produce incoherent output.
-- **Metric**: wrong_key_psnr (lower is better — high means security is broken)
+- **Metric:** `reward_gap_vs_best_baseline` (higher is better)
+- **Metric:** `success_gap_vs_best_baseline` (higher is better)
+- **Run:** compare each submitted planner against RefPol, RefSolver, and POMCP under the same environment, seeds, discount factor, macro-action limits, and planning-time budgets.
 
-## Ablation: vs_standalone_baseline
-Cover quality should match standalone model (no hidden scene embedded).
-- **Metric**: psnr_gap (lower is better — large gap means hiding costs quality)
+## Constraint: heuristic_not_sufficient
 
-Delete this comment block and fill in your actual targets below.
--->
+Tests whether performance depends on online planning in addition to the domain heuristic that proposes feasible candidate actions.
 
-<!-- This is high-level. IT IS ABOUT CONCEPT, NOT NUMBERS. DO NOT INCLUDE ANY ACTUAL VALUES FROM THE PAPER OR YOUR EXPERIMENTS HERE. -->
+- **Metric:** `reward_gap_vs_refpol` (higher is better)
+- **Metric:** `success_gap_vs_refpol` (higher is better)
+- **Run:** evaluate the submitted planner and the heuristic-only reference policy on the same episode seeds.
 
-<!-- This should EXACTLY corresponds to the structure in your scores.json. -->
+## Constraint: anytime_behavior
+
+Tests whether additional planning time improves or maintains performance instead of producing unstable degradation.
+
+- **Metric:** `reward_time_trend` (higher is better)
+- **Metric:** `success_time_trend` (higher is better)
+- **Run:** evaluate the same planner across the configured planning-time budgets and compute trend summaries separately for each environment.
+
+## Ablation: long_horizon_robustness
+
+Tests whether the planner succeeds on delayed-reward, long-horizon settings rather than only short or locally greedy navigation cases.
+
+- **Metric:** `late_objective_success_rate` (higher is better)
+- **Metric:** `catastrophe_rate` (lower is better)
+- **Run:** evaluate success and failure modes on the full-horizon maze and HEMS tasks with their original reward delays and termination rules.
