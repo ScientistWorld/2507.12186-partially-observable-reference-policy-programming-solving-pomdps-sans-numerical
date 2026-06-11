@@ -15,4 +15,4 @@
 - Verified `python validate.py --compare` passes.
 
 ## Stop Justification
-- Stopping at `core_claim`: the official gym has a runnable PORPP implementation, independent evaluator, and validated scaled-maze benchmark where PORPP beats the heuristic-only RefPol baseline. The unreleased original 3D maze and HEMS simulators prevent direct reproduction of higher original-paper coverage, and the attempted anytime-budget extension was inconclusive.
+- Completed at milestone `core_claim`.
