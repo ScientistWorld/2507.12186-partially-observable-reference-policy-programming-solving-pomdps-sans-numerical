@@ -1,6 +1,7 @@
 {
   "metrics": {},
   "rank_audit_cohort": 0.0,
+  "candidate_key": "porpp",
   "rank_honest_calibration": 0.0,
   "contributions_audit_cohort": {},
   "contributions_honest_calibration": {},

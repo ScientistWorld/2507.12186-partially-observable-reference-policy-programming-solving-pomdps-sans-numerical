@@ -1,0 +1,9 @@
+{
+  "name": "shortcut_public_split_filter",
+  "test_arguments": [],
+  "status": "complete",
+  "generation_seconds": 0.03988690599362599,
+  "train_exit_code": 0,
+  "test_exit_code": 0,
+  "total_seconds": 0.3577172959994641
+}

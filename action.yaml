@@ -1,4 +1,4 @@
 action: submit
 gpus: 0
 test: false
-notes: "Bundled CPU audit: three reference seeds, honest stronger/weaker variants, exhaustive candidate search, and artifact/comparison/degenerate shortcuts; exact no-argument hidden tests."
+notes: "Focused scoring audit follow-up: visible split filters only held-out failures; verify omitted method artifact/key; recompute cohort-normalized audit report data."
