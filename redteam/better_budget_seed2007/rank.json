@@ -1,0 +1,44 @@
+{
+  "metrics": {
+    "episodes": 12,
+    "valid_episode_rate": 1.0,
+    "unique_seed_rate": 1.0,
+    "success_rate": 0.9166666666666666,
+    "mean_total_reward": 1267.5151636461646,
+    "stderr_total_reward": 272.3678446098317,
+    "success_gap_vs_refpol": 0.25,
+    "reward_gap_vs_refpol": 847.4478375785538,
+    "core_claim_supported": 1.0,
+    "core_claim_margin_score": 1.0
+  },
+  "rank_audit_cohort": 0.0012139204183461117,
+  "rank_honest_calibration": 0.008045036417252776,
+  "contributions_audit_cohort": {
+    "scaled_maze_online_planning.core_claim_margin_score": 0.0,
+    "scaled_maze_online_planning.core_claim_supported": 0.0,
+    "scaled_maze_online_planning.success_rate": 0.0007729063639830934,
+    "scaled_maze_online_planning.mean_total_reward": 2.636195893001307e-12,
+    "scaled_maze_online_planning.episodes": -0.0,
+    "scaled_maze_online_planning.valid_episode_rate": 0.0,
+    "scaled_maze_online_planning.unique_seed_rate": 0.0,
+    "scaled_maze_online_planning.stderr_total_reward": -8.43889651307719e-05,
+    "scaled_maze_online_planning.success_gap_vs_refpol": 0.0005254030152758766,
+    "scaled_maze_online_planning.reward_gap_vs_refpol": 1.5817176077566524e-12
+  },
+  "contributions_honest_calibration": {
+    "scaled_maze_online_planning.core_claim_margin_score": 0.0,
+    "scaled_maze_online_planning.core_claim_supported": 0.0,
+    "scaled_maze_online_planning.success_rate": 0.0033057039546723955,
+    "scaled_maze_online_planning.mean_total_reward": 0.0017912043736808818,
+    "scaled_maze_online_planning.episodes": -0.0,
+    "scaled_maze_online_planning.stderr_total_reward": -0.00011001690811246875,
+    "scaled_maze_online_planning.success_gap_vs_refpol": 0.0019834223728034377,
+    "scaled_maze_online_planning.reward_gap_vs_refpol": 0.001074722624208529
+  },
+  "pareto_dominates_reference": false,
+  "scored_methods": [
+    "pomcp",
+    "porpp",
+    "refpol"
+  ]
+}

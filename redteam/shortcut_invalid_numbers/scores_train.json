@@ -1,0 +1,42 @@
+{
+  "scaled_maze_online_planning": {
+    "results": {
+      "pomcp": {
+        "episodes": 20,
+        "valid_episode_rate": 1.0,
+        "unique_seed_rate": 1.0,
+        "success_rate": 0.3,
+        "mean_total_reward": 247.64707033301053,
+        "stderr_total_reward": 144.81306034297734,
+        "success_gap_vs_refpol": -0.4142857142857143,
+        "reward_gap_vs_refpol": -344.07534470168423,
+        "core_claim_supported": 0.0,
+        "core_claim_margin_score": 0.0
+      },
+      "porpp": {
+        "episodes": 0,
+        "valid_episode_rate": 0.0,
+        "unique_seed_rate": 0.0,
+        "success_rate": 0.0,
+        "mean_total_reward": 0.0,
+        "stderr_total_reward": 0.0,
+        "success_gap_vs_refpol": 0.0,
+        "reward_gap_vs_refpol": 0.0,
+        "core_claim_supported": 0.0,
+        "core_claim_margin_score": 0.0
+      },
+      "refpol": {
+        "episodes": 14,
+        "valid_episode_rate": 1.0,
+        "unique_seed_rate": 1.0,
+        "success_rate": 0.7142857142857143,
+        "mean_total_reward": 591.7224150346948,
+        "stderr_total_reward": 407.46046298786496,
+        "success_gap_vs_refpol": 0.0,
+        "reward_gap_vs_refpol": 0.0,
+        "core_claim_supported": 0.0,
+        "core_claim_margin_score": 0.0
+      }
+    }
+  }
+}

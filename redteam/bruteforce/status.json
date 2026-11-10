@@ -1,0 +1,9 @@
+{
+  "name": "bruteforce",
+  "test_arguments": [],
+  "status": "complete",
+  "generation_seconds": 19.544713153001794,
+  "train_exit_code": 0,
+  "test_exit_code": 0,
+  "total_seconds": 19.857207353998092
+}

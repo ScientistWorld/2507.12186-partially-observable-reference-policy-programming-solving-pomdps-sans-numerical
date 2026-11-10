@@ -1,0 +1,9 @@
+{
+  "name": "baseline_refpol",
+  "test_arguments": [],
+  "status": "complete",
+  "generation_seconds": 0.3278685640034382,
+  "train_exit_code": 0,
+  "test_exit_code": 0,
+  "total_seconds": 0.6607498619996477
+}

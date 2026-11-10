@@ -1,0 +1,9 @@
+{
+  "name": "weaker_one_sim",
+  "test_arguments": [],
+  "status": "complete",
+  "generation_seconds": 0.3637903120034025,
+  "train_exit_code": 0,
+  "test_exit_code": 0,
+  "total_seconds": 0.6863426519994391
+}

@@ -1,0 +1,9 @@
+{
+  "name": "shortcut_empty",
+  "test_arguments": [],
+  "status": "complete",
+  "generation_seconds": 0.0013770349978585728,
+  "train_exit_code": 0,
+  "test_exit_code": 0,
+  "total_seconds": 0.32526307600346627
+}

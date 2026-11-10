@@ -1,0 +1,9 @@
+{
+  "name": "shortcut_relabel_replay",
+  "test_arguments": [],
+  "status": "complete",
+  "generation_seconds": 0.13917425299587194,
+  "train_exit_code": 0,
+  "test_exit_code": 0,
+  "total_seconds": 0.43825708399526775
+}

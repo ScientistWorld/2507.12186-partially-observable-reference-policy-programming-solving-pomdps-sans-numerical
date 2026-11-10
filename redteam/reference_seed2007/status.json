@@ -1,0 +1,9 @@
+{
+  "name": "reference_seed2007",
+  "test_arguments": [],
+  "status": "complete",
+  "generation_seconds": 5.389495581999654,
+  "train_exit_code": 0,
+  "test_exit_code": 0,
+  "total_seconds": 5.692735830001766
+}

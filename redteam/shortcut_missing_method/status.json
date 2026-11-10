@@ -1,0 +1,9 @@
+{
+  "name": "shortcut_missing_method",
+  "test_arguments": [],
+  "status": "complete",
+  "generation_seconds": 0.11094232100003865,
+  "train_exit_code": 0,
+  "test_exit_code": 0,
+  "total_seconds": 0.45282579799823
+}

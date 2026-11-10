@@ -1,0 +1,9 @@
+{
+  "name": "shortcut_failed_huge_reward",
+  "test_arguments": [],
+  "status": "complete",
+  "generation_seconds": 0.08001862100354629,
+  "train_exit_code": 0,
+  "test_exit_code": 0,
+  "total_seconds": 0.3863196950042038
+}

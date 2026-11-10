@@ -1,0 +1,9 @@
+{
+  "metrics": {},
+  "rank_audit_cohort": 0.0,
+  "rank_honest_calibration": 0.0,
+  "contributions_audit_cohort": {},
+  "contributions_honest_calibration": {},
+  "pareto_dominates_reference": false,
+  "scored_methods": []
+}
