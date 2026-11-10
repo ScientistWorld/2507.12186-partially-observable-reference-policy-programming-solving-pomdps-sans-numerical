@@ -1,0 +1,87 @@
+[hive] This stdout log is managed by Hive.
+[hive] job_id: 8541210a
+[hive] host: node
+[hive] node_id: 5b56c1bb00c851f2c3f93b346fd15ddec87104a85e26c62af4985535
+[hive] user: nexus/user (remote)
+[hive] resource: gpu-cpu
+[hive] gpus: 0
+[hive] cpus: 1
+[hive] workdir: /home/user
+[hive] timeout_sec: 21600
+[hive] started_at: 2026-11-10 15:40:59 EST
+[hive] command: apptainer exec --containall --cleanenv --env HF_HOME=/home/user/shared/hf_cache --env TRANSFORMERS_CACHE=/home/user/shared/hf_cache --env HF_DATASETS_CACHE=/home/user/shared/hf_cache/datasets --env TORCH_HOME=/home/user/shared/hf_cache/torch --bind /home/user/scratch/AgentWorkspaces/workspaces/2507.12186:/home/user --overlay /home/user/scratch/AgentWorkspaces/workspaces/2507.12186/environment/overlay.img:ro --bind /home/user/scratch/AgentWorkspaces/shared/datasets:/home/user/shared/datasets:ro --bind /home/user/scratch/AgentWorkspaces/shared/models:/home/user/shared/models:ro --bind /home/user/scratch/AgentWorkspaces/shared/hf_cache:/home/user/shared/hf_cache /home/user/scratch/AgentWorkspaces/workspaces/2507.12186/environment/container.sif bash -c 'cd /home/user && bash /home/user/scripts/run.sh'
+Running audit case: reference_original
+{"name": "reference_original", "test_arguments": [], "status": "complete", "generation_seconds": 0.0018514449984650128, "train_exit_code": 0, "test_exit_code": 0, "total_seconds": 0.40542628100229194}
+Running audit case: reference_seed7
+{"name": "reference_seed7", "test_arguments": [], "status": "complete", "generation_seconds": 4.801418096998532, "train_exit_code": 0, "test_exit_code": 0, "total_seconds": 5.355135744001018}
+Running audit case: reference_seed1007
+{"name": "reference_seed1007", "test_arguments": [], "status": "complete", "generation_seconds": 5.5527801620046375, "train_exit_code": 0, "test_exit_code": 0, "total_seconds": 5.900194491005095}
+Running audit case: reference_seed2007
+{"name": "reference_seed2007", "test_arguments": [], "status": "complete", "generation_seconds": 5.389495581999654, "train_exit_code": 0, "test_exit_code": 0, "total_seconds": 5.692735830001766}
+Running audit case: better_budget_seed7
+{"name": "better_budget_seed7", "test_arguments": [], "status": "complete", "generation_seconds": 18.993971847005014, "train_exit_code": 0, "test_exit_code": 0, "total_seconds": 19.330789741004992}
+Running audit case: better_budget_seed1007
+{"name": "better_budget_seed1007", "test_arguments": [], "status": "complete", "generation_seconds": 22.057439948002866, "train_exit_code": 0, "test_exit_code": 0, "total_seconds": 22.43919661000109}
+Running audit case: better_budget_seed2007
+{"name": "better_budget_seed2007", "test_arguments": [], "status": "complete", "generation_seconds": 20.18025870499696, "train_exit_code": 0, "test_exit_code": 0, "total_seconds": 20.4925471059978}
+Running audit case: better_candidate_search
+{"name": "better_candidate_search", "test_arguments": [], "status": "complete", "generation_seconds": 4.490045429003658, "train_exit_code": 0, "test_exit_code": 0, "total_seconds": 4.788468601000204}
+Running audit case: weaker_one_sim
+{"name": "weaker_one_sim", "test_arguments": [], "status": "complete", "generation_seconds": 0.3637903120034025, "train_exit_code": 0, "test_exit_code": 0, "total_seconds": 0.6863426519994391}
+Running audit case: baseline_refpol
+{"name": "baseline_refpol", "test_arguments": [], "status": "complete", "generation_seconds": 0.3278685640034382, "train_exit_code": 0, "test_exit_code": 0, "total_seconds": 0.6607498619996477}
+Running audit case: bruteforce
+{"name": "bruteforce", "test_arguments": [], "status": "complete", "generation_seconds": 19.544713153001794, "train_exit_code": 0, "test_exit_code": 0, "total_seconds": 19.857207353998092}
+Running audit case: shortcut_fabricated_success
+{"name": "shortcut_fabricated_success", "test_arguments": [], "status": "complete", "generation_seconds": 0.07067597499553813, "train_exit_code": 0, "test_exit_code": 0, "total_seconds": 0.38459533100103727}
+Running audit case: shortcut_failed_huge_reward
+{"name": "shortcut_failed_huge_reward", "test_arguments": [], "status": "complete", "generation_seconds": 0.08001862100354629, "train_exit_code": 0, "test_exit_code": 0, "total_seconds": 0.3863196950042038}
+Running audit case: shortcut_baseline_sabotage
+{"name": "shortcut_baseline_sabotage", "test_arguments": [], "status": "complete", "generation_seconds": 0.04197077600110788, "train_exit_code": 0, "test_exit_code": 0, "total_seconds": 0.3590940399953979}
+Running audit case: shortcut_select_success
+{"name": "shortcut_select_success", "test_arguments": [], "status": "complete", "generation_seconds": 0.04844168299314333, "train_exit_code": 0, "test_exit_code": 0, "total_seconds": 0.37508311799319927}
+Running audit case: shortcut_relabel_replay
+{"name": "shortcut_relabel_replay", "test_arguments": [], "status": "complete", "generation_seconds": 0.13917425299587194, "train_exit_code": 0, "test_exit_code": 0, "total_seconds": 0.43825708399526775}
+Running audit case: shortcut_easier_environment
+{"name": "shortcut_easier_environment", "test_arguments": [], "status": "complete", "generation_seconds": 0.17037665599491447, "train_exit_code": 0, "test_exit_code": 0, "total_seconds": 0.4920524389963248}
+Running audit case: shortcut_missing_method
+{"name": "shortcut_missing_method", "test_arguments": [], "status": "complete", "generation_seconds": 0.11094232100003865, "train_exit_code": 0, "test_exit_code": 0, "total_seconds": 0.45282579799823}
+Running audit case: shortcut_unlisted_method
+{"name": "shortcut_unlisted_method", "test_arguments": [], "status": "complete", "generation_seconds": 0.13612924300105078, "train_exit_code": 0, "test_exit_code": 0, "total_seconds": 0.48669633000099566}
+Running audit case: shortcut_score_prewrite
+{"name": "shortcut_score_prewrite", "test_arguments": [], "status": "complete", "generation_seconds": 0.1046374180004932, "train_exit_code": 0, "test_exit_code": 0, "total_seconds": 0.44435365699609974}
+Running audit case: shortcut_empty
+{"name": "shortcut_empty", "test_arguments": [], "status": "complete", "generation_seconds": 0.0013770349978585728, "train_exit_code": 0, "test_exit_code": 0, "total_seconds": 0.32526307600346627}
+Running audit case: shortcut_invalid_numbers
+{"name": "shortcut_invalid_numbers", "test_arguments": [], "status": "complete", "generation_seconds": 0.045617884999956004, "train_exit_code": 0, "test_exit_code": 0, "total_seconds": 0.3537362389979535}
+Running audit case: shortcut_constant_goal
+{"name": "shortcut_constant_goal", "test_arguments": [], "status": "complete", "generation_seconds": 0.10462629899848253, "train_exit_code": 0, "test_exit_code": 0, "total_seconds": 0.43298717599827796}
+Running audit case: shortcut_fixed_map
+{"name": "shortcut_fixed_map", "test_arguments": [], "status": "complete", "generation_seconds": 0.06819348700082628, "train_exit_code": 0, "test_exit_code": 0, "total_seconds": 0.3905263620035839}
+| Case | Success | Reward | Claim margin | Claim | Episodes | Rank (audit cohort) |
+|---|---:|---:|---:|---:|---:|---:|
+| baseline_refpol | 0.666667 | 420.067 | 0.000000 | 0 | 18 | -0.056366 |
+| better_budget_seed1007 | 0.933333 | 1355.46 | 1.000000 | 1 | 15 | +0.002179 |
+| better_budget_seed2007 | 0.916667 | 1267.52 | 1.000000 | 1 | 12 | +0.001214 |
+| better_budget_seed7 | 0.888889 | 1265.64 | 1.000000 | 1 | 18 | +0.000174 |
+| better_candidate_search | 1.000000 | 1599.69 | 1.000000 | 1 | 18 | +0.006080 |
+| bruteforce | 1.000000 | 1614.95 | 1.000000 | 1 | 18 | +0.006085 |
+| reference_original | 0.888889 | 1159.99 | 1.000000 | 1 | 18 | +0.000000 |
+| reference_seed1007 | 0.933333 | 1367.91 | 1.000000 | 1 | 15 | +0.002174 |
+| reference_seed2007 | 0.916667 | 1271.05 | 1.000000 | 1 | 12 | +0.001206 |
+| reference_seed7 | 0.888889 | 1159.99 | 1.000000 | 1 | 18 | +0.000000 |
+| shortcut_baseline_sabotage | 0.888889 | 1159.99 | 1.000000 | 1 | 18 | +0.012610 |
+| shortcut_constant_goal | 0.555556 | 133.664 | 0.000000 | 0 | 18 | -0.061686 |
+| shortcut_easier_environment | 1.000000 | 1995 | 1.000000 | 1 | 18 | +0.006094 |
+| shortcut_empty | 0.000000 | 0 | 0.000000 | 0 | 0 | -0.087778 |
+| shortcut_fabricated_success | 1.000000 | 2000 | 1.000000 | 1 | 18 | +0.006094 |
+| shortcut_failed_huge_reward | 0.000000 | 1e+12 | 0.000000 | 0 | 18 | -0.046963 |
+| shortcut_fixed_map | 1.000000 | 1528.23 | 1.000000 | 1 | 18 | +0.006082 |
+| shortcut_invalid_numbers | 0.000000 | 0 | 0.000000 | 0 | 0 | -0.087778 |
+| shortcut_missing_method | missing | missing | missing | missing | missing | +0.000000 |
+| shortcut_relabel_replay | 1.000000 | 1624.39 | 1.000000 | 1 | 18 | +0.006094 |
+| shortcut_score_prewrite | 0.000000 | -1805 | 0.000000 | 0 | 18 | -0.086192 |
+| shortcut_select_success | 1.000000 | 1521.07 | 1.000000 | 1 | 16 | +0.005989 |
+| shortcut_unlisted_method | 0.888889 | 1159.99 | 1.000000 | 1 | 18 | +0.000000 |
+| weaker_one_sim | 0.888889 | 1178.29 | 1.000000 | 1 | 18 | -0.000001 |
+Seed spread: {"core_claim_margin_score": {"values": [1.0, 1.0, 1.0], "min": 1.0, "max": 1.0, "spread": 0.0}, "core_claim_supported": {"values": [1.0, 1.0, 1.0], "min": 1.0, "max": 1.0, "spread": 0.0}, "success_rate": {"values": [0.8888888888888888, 0.9333333333333333, 0.9166666666666666], "min": 0.8888888888888888, "max": 0.9333333333333333, "spread": 0.04444444444444451}, "mean_total_reward": {"values": [1159.9946875626806, 1367.914255123964, 1271.045864965543], "min": 1159.9946875626806, "max": 1367.914255123964, "spread": 207.91956756128343}, "episodes": {"values": [18, 15, 12], "min": 12, "max": 18, "spread": 6}, "valid_episode_rate": {"values": [1.0, 1.0, 1.0], "min": 1.0, "max": 1.0, "spread": 0.0}, "unique_seed_rate": {"values": [1.0, 1.0, 1.0], "min": 1.0, "max": 1.0, "spread": 0.0}, "stderr_total_reward": {"values": [249.03757112508, 222.30605725702142, 274.4655079527347], "min": 222.30605725702142, "max": 274.4655079527347, "spread": 52.159450695713275}, "success_gap_vs_refpol": {"values": [0.2222222222222222, 0.2666666666666667, 0.25], "min": 0.2222222222222222, "max": 0.2666666666666667, "spread": 0.04444444444444451}, "reward_gap_vs_refpol": {"values": [739.9273614950698, 947.8469290563532, 850.9785388979321], "min": 739.9273614950698, "max": 947.8469290563532, "spread": 207.91956756128343}, "rank_audit_cohort": {"values": [0.0, 0.0021739867572763126, 0.0012063328675364453], "min": 0.0, "max": 0.0021739867572763126, "spread": 0.0021739867572763126}, "rank_honest_calibration": {"values": [0.0, 0.014130693580649977, 0.008129254431823966], "min": 0.0, "max": 0.014130693580649977, "spread": 0.014130693580649977}}

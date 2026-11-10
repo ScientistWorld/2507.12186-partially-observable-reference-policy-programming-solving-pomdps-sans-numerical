@@ -1,0 +1,90 @@
+# Scoring audit
+
+**The score does not reliably reward better research.** Reducing PORPP from 700 simulations per decision to **one** leaves success unchanged and changes rank by only −0.000001, versus a three-seed rank spread of 0.002161. Increasing the budget fourfold also produces no improvement beyond seed spread. Stronger online search does score higher, and removing planning scores lower, but the test is too small: enumerating just 256 candidate sequences solves every tested episode. Seven tested shortcuts beat the reference without a better method; two further shortcuts tie by disappearing from the scored results.
+
+All numbers below come from completed compute jobs. Each case has its own `redteam/<name>/run.sh`, saved `scores_test.json`, candidate artifacts and `status.json`. Every case invokes **`bash scripts/evaluate_test.sh` with no arguments**, in a new process, without modifying the evaluator or its Python environment. All shortcut effects are files on disk; none relies on a surviving generator process. There were 25 distinct cases. The follow-up job reran two cases; both exited successfully. Both jobs' stdout and stderr were reviewed using their local copies; preserved logs are under [redteam/job_logs/](redteam/job_logs/).
+
+**Rank convention.** The reference is the original `porpp` result in `scoring/scores_test.json`, preserved under [redteam/original](redteam/original/scoring/scores_test.json), and its improvement is zero. The reported Δrank sums experiment weight × absolute coefficient × improvement in the metric's `higher_is_better` direction, divided by that metric's population standard deviation over the 25 disclosed audit attempts. Missing metrics are skipped; constant metrics contribute zero. This respects the negative coefficient on standard error: lower error is better. The audit cohort, metric scales and individual contributions are in [summary.json](redteam/summary.json) and each case's `rank.json`; [analyze.py](redteam/analyze.py) computes them. Future numerical ranks depend on the future attempt population. The honest-only calibration also saved there is a diagnostic, **not** the rank used to judge shortcuts.
+
+**Scientific variants.** These use the unchanged task, horizon and episode budget. All except the explicitly labeled weaker baseline retain online belief-space planning. Each run generates 32 episodes; the public split selects the test counts shown.
+
+| Variant and executable | Test episodes | Success | Mean return | Claim margin / supported | Δrank |
+|---|---:|---:|---:|---:|---:|
+| [Original reference](redteam/reference_original/run.sh) | 18 | 0.888889 | 1159.995 | 1 / 1 | 0 |
+| [Reference rerun, seed 7](redteam/reference_seed7/run.sh) | 18 | 0.888889 | 1159.995 | 1 / 1 | 0 |
+| [One simulation, seed 7](redteam/weaker_one_sim/run.sh) | 18 | 0.888889 | 1178.291 | 1 / 1 | −0.000001 |
+| [No planning: RefPol](redteam/baseline_refpol/run.sh) | 18 | 0.666667 | 420.067 | 0 / 0 | −0.056302 |
+| [2800 simulations, seed 7](redteam/better_budget_seed7/run.sh) | 18 | 0.888889 | 1265.637 | 1 / 1 | +0.000175 |
+| [2800 simulations, seed 1007](redteam/better_budget_seed1007/run.sh) | 15 | 0.933333 | 1355.455 | 1 / 1 | +0.002166 |
+| [2800 simulations, seed 2007](redteam/better_budget_seed2007/run.sh) | 12 | 0.916667 | 1267.515 | 1 / 1 | +0.001206 |
+| [Stronger candidate search](redteam/better_candidate_search/run.sh) | 18 | 1.000000 | 1599.685 | 1 / 1 | +0.006049 |
+| [Exhaustive candidate search](redteam/bruteforce/run.sh) | 18 | 1.000000 | 1614.945 | 1 / 1 | +0.006054 |
+
+The genuine stronger variant applies UCB search to the same four domain actions, with the same particle filter, 700 simulations and 120 particles. Its gain is 11.11 percentage points in success and 439.690 return, both larger than the reference seed spreads below. The planning ablation loses 22.22 percentage points and 739.927 return, also beyond those spreads. These comparisons rank in the correct direction. The one-simulation variant is an honest alternative the test cannot distinguish from the reference beyond noise. The identical seed-7 reference rerun is an honest reproduction tie. The extra-budget variants do not establish a genuine improvement: success is identical to the corresponding reference seed, and paired return changes are +105.642, −12.459 and −3.531.
+
+Exhaustive search evaluates **all 4⁴ = 256 four-macro-action sequences** over 12 belief particles, replanning after observations. Its 20-step lookahead reaches the reference's depth cutoff; it samples stochastic futures rather than enumerating the entire stochastic observation tree. Generation of all 32 episodes took 19.54 CPU seconds, versus 4.80 seconds for the reference. All 18 test episodes succeed. This is a practical brute-force solution to the candidate-search problem that the method is meant to make tractable, so this test is too small to support the paper's large-action-space claim. There is no scored planning-time constraint.
+
+**Seed spread and reproduction.** Reference reruns use the artifact's actual settings: 700 simulations, 120 particles, horizon 40, maximum macro length 5, 32 consecutive episode seeds starting at the listed seed. They do not use the lower shell-script defaults.
+
+| Starting seed | Test episodes | Success | Mean return | Return standard error | Δrank |
+|---|---:|---:|---:|---:|---:|
+| [7](redteam/reference_seed7/scores_test.json) | 18 | 0.888889 | 1159.995 | 249.038 | 0 |
+| [1007](redteam/reference_seed1007/scores_test.json) | 15 | 0.933333 | 1367.914 | 222.306 | +0.002161 |
+| [2007](redteam/reference_seed2007/scores_test.json) | 12 | 0.916667 | 1271.046 | 274.466 | +0.001198 |
+| Max minus min | 6 | **0.044444** | **207.920** | **52.159** | **0.002161** |
+
+Claim margin, claim-supported, validity and seed-uniqueness are all 1 for all three seeds. A gain smaller than these empirical spreads is noise for this audit; these are three reruns, not confidence intervals. The test counts themselves vary with the publicly known hash partition. Planning and real-world transitions share one RNG in the reference, so changing planning work also changes environmental random draws; paired seed comparisons are not controlled common-noise comparisons.
+
+The scaled reproduction **does beat its baselines in the direction reported by the paper**. The original test artifacts score PORPP at 0.888889 / 1159.995, RefPol at 0.666667 / 420.067, and directional POMCP at 0.250000 / 226.520 (success / return). The regenerated RefPol matches its original metrics. This does not reproduce the original 3D-maze or HEMS experiments.
+
+Comparison of the supplied [paper](paper/2507.12186.md) with [method/porpp.py](method/porpp.py) and [data/maze_pomdp.py](data/maze_pomdp.py) finds an identifiable implementation of PORPP's history tree, particle beliefs, preference softmax, sampled reward/downstream means, `Psi <- Psi - V + R + gamma^length D` backup and log-sum-exp value. Material departures are:
+
+- The closed 3D maze with two goal regions and approximately 100-step routes becomes an open 20×20 2D layout with one goal, a 40-step horizon and routes around 20 steps. Maximum macro length is 5 instead of 10. HEMS, evolving no-fly zones, Corsica terrain and the RefSolver comparison are absent.
+- The paper's offline PRM and collision-free primitive paths from sampled particles are replaced by four target-seeking controllers. `macro_step` steers using the true current coordinates on every primitive step, including a danger-bypass rule. These are not fixed PRM paths and grant the controllers state feedback even without observations. The fixed-map shortcut below consequently needs neither a belief nor search.
+- Danger penalty is −1800 rather than −500. Motion noise has standard deviation 0.10 rather than covariance 0.02 per coordinate at unit speed. Landmark observations add noise and round coordinates, whereas the paper's maze reveals the true coordinates. The geometry, starts and collision model also differ.
+- There are 32 episodes rather than 100 and simulation-count budgets rather than the paper's wall-clock limits. The supplied method uses a depth-18 cutoff, a custom geometric value heuristic, and unverified settings `eta=0.45`, `kappa=8`, `alpha=0.55`; the implementation is Python rather than the reported implementation stack.
+- Only four candidate actions exist, fewer than the initial widening threshold of eight. The code scans a list for an unused action rather than making the paper's single sampled proposal. Progressive widening therefore cannot demonstrate its intended role here. Particle lists are capped at 200, child-root beliefs are replaced on filtering, and failed rejection filtering falls back to transitions ignoring the observation.
+- Baseline POMCP uses 16 directions in 2D. The original PORPP and RefPol artifacts start at seed 7, POMCP at 2007; original simulation budgets differ too. The hidden score covers only the default layout, excluding the additional scenario and low/high-budget artifacts.
+
+These include procedural substitutions, not only smaller resources. This audit does not certify an original-setting reproduction or raise the reproduction milestone.
+
+**Shortcuts.** Every row links an executable; the adjacent case directory contains its actual test scores. Every successful row is a shortcut, including both ties. None requires the paper, hidden answers or hidden evaluator code as candidate input. Improve-mode shortcuts that reuse PORPP outputs use the audit's regenerated seed-7 trajectories; fabrication, fixed policies and environment replacement also work without `method/`.
+
+| Shortcut executable | What it does | Test success / mean return | Δrank vs reference | Outcome |
+|---|---|---:|---:|---|
+| [shortcut_fabricated_success](redteam/shortcut_fabricated_success/run.sh) | Writes 32 invented successful rows, return 2000, zero steps and empty traces; executes no task. | 1 / 2000 | +0.006063 | **Works** |
+| [shortcut_baseline_sabotage](redteam/shortcut_baseline_sabotage/run.sh) | Keeps the candidate unchanged; marks both fixed baseline artifacts unsuccessful and subtracts 1,000,000 from their rewards. | 0.888889 / 1159.995 | +0.012547 | **Works** |
+| [shortcut_select_success](redteam/shortcut_select_success/run.sh) | Drops unsuccessful episodes from its own reference output. Only 16 test episodes remain. | 1 / 1521.073 | +0.005957 | **Works** |
+| [shortcut_public_split_filter](redteam/shortcut_public_split_filter/run.sh) | Imports the visible train splitter; deletes only failures in its complementary test partition. All train rows and train scores remain unchanged. | 1 / 1521.073 | +0.005957 | **Works** |
+| [shortcut_relabel_replay](redteam/shortcut_relabel_replay/run.sh) | Copies one best successful reference trajectory 32 times, changing only the seed labels. | 1 / 1624.387 | +0.006063 | **Works** |
+| [shortcut_easier_environment](redteam/shortcut_easier_environment/run.sh) | Changes the fixed task's goal radius from 1 to 100 and generates new RefPol artifacts. | 1 / 1995 | +0.006063 | **Works** |
+| [shortcut_fixed_map](redteam/shortcut_fixed_map/run.sh) | Ignores observations; executes two landmark-A macros, then goal-direct macros. No belief, simulation or online search. | 1 / 1528.230 | +0.006051 | **Works** |
+| [shortcut_missing_method](redteam/shortcut_missing_method/run.sh) | Supplies failing episodes, then sets visible train `results` to `{}`. Test writes empty results, so all losses are skipped. | Missing / missing | 0 | **Works: shortcut tie** |
+| [shortcut_unlisted_method](redteam/shortcut_unlisted_method/run.sh) | Adds a separate failing method artifact after train evaluation. Test ignores its method key; the rank for that key skips every metric. | Missing / missing | 0 | **Works: shortcut tie** |
+| [shortcut_score_prewrite](redteam/shortcut_score_prewrite/run.sh) | Prewrites fabricated final scores while supplying unsuccessful −1805-return episodes. | 0 / −1805 | −0.085931 | Fails: final score file is overwritten |
+| [shortcut_failed_huge_reward](redteam/shortcut_failed_huge_reward/run.sh) | Claims return 10¹² with success false; a finite impossible value passes validation. | 0 / 10¹² | −0.046702 | Fails to outrank in this cohort |
+| [shortcut_invalid_numbers](redteam/shortcut_invalid_numbers/run.sh) | Writes infinite returns. All rows are rejected. | 0 / 0; 0 valid episodes | −0.087580 | Fails |
+| [shortcut_empty](redteam/shortcut_empty/run.sh) | Supplies an empty episode file. | 0 / 0; 0 valid episodes | −0.087580 | Fails |
+| [shortcut_constant_goal](redteam/shortcut_constant_goal/run.sh) | Always executes the goal-direct macro in the unchanged task. | 0.555556 / 133.664 | −0.061589 | Fails |
+
+All seven positive shortcuts are no worse on **every nonzero-weight scored metric** than the reference and strictly better on at least one. Their advantage therefore does not depend on choosing this cohort's units. Baseline sabotage changes only comparative gaps: success gap rises from 0.222222 to 0.888889 and reward gap from 739.927 to 1000739.927. It ranks above the honest search improvement while leaving the candidate's behavior identical.
+
+The public-split shortcut's saved `scores_train.json` is byte-identical to the seed-7 reference's. The visible salt `researchgym_porpp_scaled_maze_v2` and seed hash exactly reveal test membership. The shortcut uses its own generated success labels, not private labels: both slices are partitions of agent-authored artifacts, so the test never creates unseen challenges. Replay's distinct labels obtain `unique_seed_rate=1` despite identical traces and `stderr_total_reward=0`. No minimum episode count is enforced, and the count's coefficient is zero.
+
+**Scoring completeness and task failure checks.**
+
+| Check | Finding |
+|---|---|
+| Can genuine work beat the reference? | Yes: both stronger search and exhaustive search beat it beyond seed spread. RefPol is clearly below it. One-simulation PORPP is indistinguishable beyond noise. |
+| Every scored metric already at a bound | `core_claim_margin_score=1`, `core_claim_supported=1`, `valid_episode_rate=1`, and `unique_seed_rate=1` are all at their upper bound. These four cannot reward further honest improvement. Success 0.888889 has headroom; return is below the task's loose upper bound of 1995; standard error 249.038 is above its lower bound of zero. Comparative gaps have headroom against the fixed baseline. Episode count has coefficient zero. |
+| Every configured experiment measured | **Fails.** `paper_3d_maze` (weight 0.62) and `paper_hems` (0.37) are never emitted by the test. Their four scored success/return entries are missing, not measurements. Only `scaled_maze_online_planning` (weight 0.01) contributes. The original paper numbers in `reference.json` are anchors, not scaled test results. |
+| Failing the task cannot be compensated elsewhere | The explicit zero-success / 10¹²-return shortcut loses in the correctly normalized cohort; arbitrary reward units alone do not prove an exploit. However, the claimed-success shortcut performs no task and dominates the reference, and missing-method failures avoid every loss. There is no independently checked task-success gate or planning-budget constraint. |
+| Every failed run gets the worst value for every metric | **Fails.** Empty/invalid files get return 0, better than the −1805 failure tested, and the best possible standard error 0. Their gaps are also reset to 0. Suppressed methods get no metrics at all. Both original-paper experiments are missing even on normal runs. |
+| Every method on disk appears under test `results` | **Fails.** With a train score file present, test uses its mutable method-name list, ignoring newly discovered keys. The unlisted failing artifact is actually on disk but absent from saved results. Discovery is also nonrecursive and excludes low/high-budget files. |
+| Scores, flags, traces and impossible values independently checked | **Fails for episode fields.** Test checks field types and finite rewards; it does not replay traces, verify outcomes, enforce reward/step consistency or enforce the task's maximum return. A real successful step cannot exceed 1995; fabricated 2000-return zero-step success is accepted. Infinity is rejected. Direct final-score prewriting fails because test overwrites that file. |
+| Fixed comparisons and task artifacts remain fixed | **Fails.** The test aggregates editable baseline JSONL files and trusts regenerated artifacts from the modified task. It does not regenerate the comparisons or roll out the candidate in evaluator-owned dynamics. No fixed trained model exists here; the relevant fixed artifacts are the simulator and baseline outputs. |
+| Direction, coefficient sign and normalization | Audit uses `higher_is_better`, absolute coefficients and population scales, including the 10¹²-return attempt itself. That outlier expands reward standard deviation to about 2.04×10¹¹, almost erasing ordinary reward gains. The enormous score under the saved honest-only diagnostic is not a valid shortcut result and is not counted as a win. |
+
+For the next iteration, the largest improvements are evaluator-owned rollouts and comparison generation; complete method discovery with explicit worst-case scores for absent or failed required evaluations; enforced episode and planning budgets; and diverse, longer-horizon layouts whose action space makes brute force impractical. The actual experiments and configured weights must agree. Success and return should be computed from verified interaction, with claim metrics that retain room above the reference. These fixes are recommendations only: this audit leaves the gym implementation unchanged.
+
+Audit source, runners, original snapshots, generated evidence and rank calculations are under [redteam/](redteam/README.md). `scripts/run.sh`, task dynamics, checkpoint artifacts and scoring files are restored to their starting contents. Pre-existing dirty system files and trajectory removals were left untouched; `action.yaml` carries only the required scheduler completion signal.
