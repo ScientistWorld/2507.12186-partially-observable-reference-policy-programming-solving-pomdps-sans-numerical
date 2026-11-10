@@ -15,8 +15,9 @@ evaluator, interpreter, Python environment, or test process is modified.
 Candidate code in `methods.py` uses only the scientist-visible data, baseline,
 and (for improve-mode reference variants) method. Reuse of generated reference
 trajectories is deliberate for artifact-only shortcuts. `original/` preserves
-the audit's starting artifacts; none are hidden test answers consumed by a
-candidate generator. `runner.py` is the installer/evaluation harness, and
+the audit's starting artifacts. Candidate generators never consume hidden
+test scores; shortcuts reuse only trajectories a scientist can regenerate.
+`runner.py` is the installer/evaluation harness, and
 `analyze.py` reads the resulting scores for reporting only.
 
 The baseline reproduction artifacts contain 32 episodes at seed 7, 700
@@ -26,8 +27,16 @@ those artifact settings for its reference reruns. Better-budget variants use
 change. `bruteforce` enumerates all 256 four-macro-action sequences with belief
 particles before each action; it does not enumerate every stochastic outcome.
 
+The public-split shortcut imports only the visible train splitter; it retains
+every train episode and removes only unsuccessful complementary test episodes.
+The unlisted-method shortcut adds its failing artifact after train evaluation;
+the analysis ranks that missing method key, rather than the unchanged reference
+also left on disk.
+
 Ranks in `summary.json` use the supplied rule and all measured audit attempts
 as a disclosed normalization cohort. A second diagnostic uses only honest
 attempts to establish units. Future rank units cannot be predicted without
-knowing the future comparison population. Raw vectors, per-metric rank
+knowing the future comparison population. The fixed honest-only normalization
+is a diagnostic, not a valid rank for the shortcut cohort and never determines
+whether a shortcut works. Raw vectors, per-metric rank
 contributions, and dominance checks are retained to avoid hiding this fact.

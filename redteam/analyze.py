@@ -38,7 +38,8 @@ def main():
             for metric, config in spec['metrics'].items():
                 values = []
                 for name in names:
-                    row = measurements[name].get(exp, {}).get('results', {}).get('porpp', {})
+                    key = 'shortcut_unlisted' if name == 'shortcut_unlisted_method' else 'porpp'
+                    row = measurements[name].get(exp, {}).get('results', {}).get(key, {})
                     if isinstance(row.get(metric), (int, float)):
                         values.append(row[metric])
                 out[exp][metric] = pstdev(values) if len(values)>1 else 0.0
@@ -67,15 +68,17 @@ def main():
     reference_row = reference_scores[EXP]['results']['porpp']
     cases = {}
     for name, scores in measurements.items():
-        row = scores.get(EXP, {}).get('results', {}).get('porpp', {})
+        key = 'shortcut_unlisted' if name == 'shortcut_unlisted_method' else 'porpp'
+        row = scores.get(EXP, {}).get('results', {}).get(key, {})
         shared = [metric for metric, config in specification[EXP]['metrics'].items()
                   if config['coefficient'] and metric in row and metric in reference_row]
         deltas = {metric: (row[metric]-reference_row[metric]) *
                   (1 if specification[EXP]['metrics'][metric]['higher_is_better'] else -1)
                   for metric in shared}
-        rank_all, terms_all = rank(scores, cohort_scale)
-        rank_honest, terms_honest = rank(scores, honest_scale)
+        rank_all, terms_all = rank(scores, cohort_scale, key)
+        rank_honest, terms_honest = rank(scores, honest_scale, key)
         cases[name] = dict(metrics=row, rank_audit_cohort=rank_all,
+                           candidate_key=key,
                            rank_honest_calibration=rank_honest,
                            contributions_audit_cohort=terms_all,
                            contributions_honest_calibration=terms_honest,

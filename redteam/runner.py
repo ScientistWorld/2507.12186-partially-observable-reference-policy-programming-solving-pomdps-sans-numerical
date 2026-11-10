@@ -86,6 +86,13 @@ def install(name, folder):
     elif name == 'shortcut_select_success':
         # SHORTCUT: discard failed evaluations after seeing their outcomes.
         methods.write_rows(candidate, [row for row in reference_rows() if row['success']])
+    elif name == 'shortcut_public_split_filter':
+        # SHORTCUT: the scientist-visible split exactly identifies held-out
+        # labels. Leave the entire visible train evaluation unchanged, while
+        # deleting only failed test episodes from our own generated outcomes.
+        from eval.train.evaluate_maze import split_bit
+        methods.write_rows(candidate, [row for row in reference_rows()
+                                      if split_bit(row) == 0 or row['success']])
     elif name == 'shortcut_relabel_replay':
         # SHORTCUT: one successful trajectory masquerades as 32 distinct runs.
         best = max(reference_rows(), key=lambda row: row['total_reward'])
@@ -149,8 +156,12 @@ def run(name):
             (ROOT / 'scoring/scores_train.json').write_text(json.dumps({EXPERIMENT:{'results':{}}}))
         elif after_train == 'unlisted_method':
             # SHORTCUT: a method on disk added after visible evaluation vanishes.
-            methods.write_rows(ROOT / 'checkpoints/shortcut_unlisted_episodes.jsonl',
-                               methods.shortcut_fake_rows(False, -1805))
+            unlisted = list(methods.shortcut_fake_rows(False, -1805))
+            for row in unlisted:
+                row['method'] = 'shortcut_unlisted'
+            methods.write_rows(folder / 'shortcut_unlisted_episodes.jsonl', unlisted)
+            shutil.copyfile(folder / 'shortcut_unlisted_episodes.jsonl',
+                            ROOT / 'checkpoints/shortcut_unlisted_episodes.jsonl')
         elif after_train == 'prewrite':
             # SHORTCUT attempt: test should overwrite these direct fake scores.
             (ROOT / 'scoring/scores_test.json').write_text(json.dumps({
