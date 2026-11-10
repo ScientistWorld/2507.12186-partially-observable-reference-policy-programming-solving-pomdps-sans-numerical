@@ -1,0 +1,114 @@
+{
+  "experiments": {
+    "paper_3d_maze": {
+      "description": "Original 3D maze with poor localization, 100 runs, maximum macro action length 10 (Table 1).",
+      "weight": 0.62,
+      "primary_metric": "success_rate",
+      "metrics": {
+        "success_rate": {
+          "higher_is_better": true,
+          "coefficient": 1.0,
+          "description": "Fraction of evaluation episodes that reached the goal."
+        },
+        "mean_total_reward": {
+          "higher_is_better": true,
+          "coefficient": 0.5,
+          "description": "Average discounted return across evaluation episodes."
+        }
+      },
+      "results": {
+        "porpp_15s": {"type": "proposed", "success_rate": 0.94, "mean_total_reward": 983.1},
+        "porpp_10s": {"type": "proposed", "success_rate": 0.88, "mean_total_reward": 873.4},
+        "refpol": {"type": "baseline", "success_rate": 0.29, "mean_total_reward": -572.2},
+        "refsolver_10s": {"type": "baseline", "success_rate": 0.30, "mean_total_reward": -384.0},
+        "pomcp_10s": {"type": "baseline", "success_rate": 0.13, "mean_total_reward": -1897.5}
+      }
+    },
+    "paper_hems": {
+      "description": "Original HEMS mission with evolving no-fly zones, 100 runs, maximum macro action length 15 (Table 2).",
+      "weight": 0.37,
+      "primary_metric": "success_rate",
+      "metrics": {
+        "success_rate": {
+          "higher_is_better": true,
+          "coefficient": 1.0,
+          "description": "Fraction of evaluation missions that completed successfully."
+        },
+        "mean_total_reward": {
+          "higher_is_better": true,
+          "coefficient": 0.5,
+          "description": "Average discounted mission return across evaluation episodes."
+        }
+      },
+      "results": {
+        "porpp_10s": {"type": "proposed", "success_rate": 0.90, "mean_total_reward": 19393.5},
+        "refpol": {"type": "baseline", "success_rate": 0.0, "mean_total_reward": -6584.3},
+        "refsolver_10s": {"type": "baseline", "success_rate": 0.22, "mean_total_reward": 2258.7},
+        "pomcp_10s": {"type": "baseline", "success_rate": 0.0, "mean_total_reward": -839.6}
+      }
+    },
+    "scaled_maze_online_planning": {
+      "description": "Accessible scaled maze substitute used by this reproduction. Raw success and reward rows retain paper Table 1 scale anchors from the original 3D maze; the primary metric is a normalized success-and-reward margin over the available baselines.",
+      "notes": "This experiment is the reproduced gym benchmark because the original 3D maze and HEMS simulators were not released. The reference rows use Table 1 values as scale anchors and should not be read as results from the scaled substitute.",
+      "weight": 0.01,
+      "primary_metric": "core_claim_margin_score",
+      "metrics": {
+        "core_claim_margin_score": {
+          "higher_is_better": true,
+          "coefficient": 1.0,
+          "description": "Normalized minimum margin over the strongest available baseline on success rate and mean total reward, capped at 1."
+        },
+        "core_claim_supported": {
+          "higher_is_better": true,
+          "coefficient": 1.0,
+          "description": "Relational claim check: 1 only when the candidate beats every available baseline on both success rate and reward."
+        },
+        "success_rate": {
+          "higher_is_better": true,
+          "coefficient": 1.0,
+          "description": "Fraction of scaled-maze episodes that reached the goal."
+        },
+        "mean_total_reward": {
+          "higher_is_better": true,
+          "coefficient": 0.5,
+          "description": "Average discounted return across scaled-maze episodes."
+        },
+        "episodes": {
+          "higher_is_better": true,
+          "coefficient": 0.0,
+          "description": "Number of valid episode artifacts scored for this method and slice."
+        },
+        "valid_episode_rate": {
+          "higher_is_better": true,
+          "coefficient": 0.2,
+          "description": "Fraction of selected artifact rows that contain the required episode fields with valid types."
+        },
+        "unique_seed_rate": {
+          "higher_is_better": true,
+          "coefficient": 0.2,
+          "description": "Fraction of selected valid episodes with distinct seeds, discouraging replayed or duplicated rows."
+        },
+        "stderr_total_reward": {
+          "higher_is_better": false,
+          "coefficient": -0.05,
+          "description": "Standard error of discounted return, used to expose noisy or brittle improvements."
+        },
+        "success_gap_vs_refpol": {
+          "higher_is_better": true,
+          "coefficient": 0.6,
+          "description": "Success-rate improvement over the heuristic-only reference policy."
+        },
+        "reward_gap_vs_refpol": {
+          "higher_is_better": true,
+          "coefficient": 0.3,
+          "description": "Mean-return improvement over the heuristic-only reference policy."
+        }
+      },
+      "results": {
+        "porpp": {"type": "proposed", "core_claim_margin_score": 1.0, "core_claim_supported": 1.0, "success_rate": 0.94, "mean_total_reward": 983.1, "episodes": 100, "valid_episode_rate": 1.0, "unique_seed_rate": 1.0, "stderr_total_reward": 168.0, "success_gap_vs_refpol": 0.65, "reward_gap_vs_refpol": 1555.3},
+        "refpol": {"type": "baseline", "core_claim_margin_score": 0.0, "core_claim_supported": 0.0, "success_rate": 0.29, "mean_total_reward": -572.2, "episodes": 100, "valid_episode_rate": 1.0, "unique_seed_rate": 1.0, "stderr_total_reward": 231.1, "success_gap_vs_refpol": 0.0, "reward_gap_vs_refpol": 0.0},
+        "pomcp": {"type": "baseline", "core_claim_margin_score": 0.0, "core_claim_supported": 0.0, "success_rate": 0.13, "mean_total_reward": -1897.5, "episodes": 100, "valid_episode_rate": 1.0, "unique_seed_rate": 1.0, "stderr_total_reward": 240.1, "success_gap_vs_refpol": -0.16, "reward_gap_vs_refpol": -1325.3}
+      }
+    }
+  }
+}
