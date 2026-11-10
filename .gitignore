@@ -1,5 +1,8 @@
 # Large files — do not commit (applies everywhere, including tmp/)
-checkpoints/
+# checkpoints/ holds generated outputs; only the agent registry is tracked.
+checkpoints/*
+!checkpoints/.gitkeep
+!checkpoints/agents/
 *.pt
 *.pth
 *.ckpt

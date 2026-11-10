@@ -1,61 +1,36 @@
-"""Reference-policy baseline from the PORPP paper."""
+"""RefPol baseline (paper Sect. 4.3): no planning.
+
+At every decision it samples one state particle from the current belief and
+executes the macro action returned by the heuristic action sampler for that
+particle (a truncated roadmap path to a random landmark or goal region).
+
+Run as an agent:  python -m baseline.refpol
+"""
 
 from __future__ import annotations
 
-import argparse
-import json
 import random
-from pathlib import Path
 
-from data.maze_pomdp import MazePOMDP, initial_particles, maze_config
-
-
-def run_episode(seed: int, particle_count: int, max_steps: int, scenario: str) -> dict:
-    rng = random.Random(seed)
-    env = MazePOMDP(maze_config(scenario))
-    true_state = env.sample_initial_state(rng)
-    particles = initial_particles(env.config, particle_count, rng)
-    total_reward = 0.0
-    discount = 1.0
-    steps = 0
-    trace = []
-    while steps < max_steps and not true_state.terminal:
-        sampled = rng.choice(particles)
-        action = env.heuristic_actions(sampled, rng)[0]
-        next_state, observation, reward, done = env.macro_step(true_state, action, rng)
-        total_reward += discount * reward
-        discount *= env.config.gamma ** action.length
-        particles = env.resample_particles(particles, action, observation, particle_count, rng)
-        trace.append({"action": action.name, "obs": observation, "reward": reward})
-        true_state = next_state
-        steps += action.length
-        if done:
-            break
-    return {
-        "seed": seed,
-        "method": "refpol",
-        "scenario": scenario,
-        "success": bool(true_state.success),
-        "total_reward": total_reward,
-        "steps": steps,
-        "trace": trace,
-    }
+from data.agent_protocol import run_agent
+from data.maze2d import Maze, Roadmap, update_particles
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--episodes", type=int, default=20)
-    parser.add_argument("--particles", type=int, default=80)
-    parser.add_argument("--max-steps", type=int, default=40)
-    parser.add_argument("--seed", type=int, default=7)
-    parser.add_argument("--scenario", default="default")
-    parser.add_argument("--out", type=Path, default=Path("checkpoints/refpol_episodes.jsonl"))
-    args = parser.parse_args()
-    args.out.parent.mkdir(parents=True, exist_ok=True)
-    with args.out.open("w", encoding="utf-8") as f:
-        for i in range(args.episodes):
-            f.write(json.dumps(run_episode(args.seed + i, args.particles, args.max_steps, args.scenario)) + "\n")
+class RefPol:
+    def __init__(self, instance: dict, seed: int, budget: dict, particles: int = 200):
+        self.maze = Maze(instance)
+        self.roadmap = Roadmap(self.maze)
+        self.rng = random.Random(seed)
+        self.count = particles
+        self.particles = self.maze.initial_particles(particles, self.rng)
+        self.last = None
+
+    def act(self, observations):
+        if self.last is not None and observations is not None:
+            self.particles = update_particles(self.maze, self.particles, self.last, observations, self.count, self.rng)
+        x, y = self.particles[self.rng.randrange(len(self.particles))]
+        self.last = self.roadmap.sample_candidate(x, y, self.rng)[1]
+        return self.last
 
 
 if __name__ == "__main__":
-    main()
+    run_agent(RefPol)

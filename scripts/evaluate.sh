@@ -1,30 +1,18 @@
 #!/bin/bash
-# Evaluation script — the standard way to evaluate work in this environment.
+# Standard evaluation entry point (visible instances): runs every agent
+# registered in checkpoints/agents/*.json through the evaluator-owned maze
+# rollouts in eval/train/ and writes scoring/scores.json.
 #
-# This script must be SELF-CONTAINED using only code in eval/.
-# Do NOT import from method/ — evaluate.sh must work even when the
-# paper's method code is hidden from a scientist agent.
+# An agent is any command speaking the JSON-lines protocol described in
+# briefing/evaluation.md; register it with a manifest
+#   checkpoints/agents/<name>.json  ->  {"command": ["python", "-m", "my.module"]}
 #
-# Design it so that anyone following the same output format can run
-# this script to evaluate their results.
-#
-# OUTPUT CONTRACT: This script MUST write scoring/scores.json containing
-# a JSON dict nested by experiment, e.g.:
-#   {"imagenet_classification": {"top1_accuracy": 82.1, "top5_accuracy": 94.8}}
-# Experiment and metric names must match the keys in scoring/reference.json.
-# This file is read by the system for automated comparison.
-#
-# Example usage:
-#   bash scripts/evaluate.sh                         # score checkpoints/*.jsonl
-#   bash scripts/evaluate.sh checkpoints_alt         # score a different artifact directory
-#   bash scripts/evaluate.sh --porpp path/to/run.jsonl
-#
-# Called from run.sh after training, or independently.
-
+# Examples:
+#   bash scripts/evaluate.sh                       # all registered agents
+#   bash scripts/evaluate.sh --only porpp          # one agent
+#   bash scripts/evaluate.sh --limit 10            # quick smoke run (not a score)
 set -e
-
 cd /home/user
-
+export PYTHONPATH=/home/user
 mkdir -p scoring
-
-python -m eval.evaluate_maze "$@"
+python -m eval.train.evaluate --out scoring/scores.json "$@"

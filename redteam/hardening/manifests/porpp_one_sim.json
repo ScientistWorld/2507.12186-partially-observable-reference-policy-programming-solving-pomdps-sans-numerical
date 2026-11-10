@@ -1,0 +1,1 @@
+{"command": ["python", "-m", "redteam.hardening.agents", "--kind", "porpp_one_sim"]}

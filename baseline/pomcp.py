@@ -1,165 +1,123 @@
-"""POMCP baseline for the scaled maze POMDP.
+"""POMCP baseline (Silver and Veness, 2010) as configured in the paper.
 
-This is the canonical particle Monte Carlo tree-search baseline used by the
-paper, adapted to the finite representative macro actions available in the
-scaled maze. Unlike PORPP it enumerates the available actions at every history
-node and backs up sampled returns with UCB action selection.
+Particle-belief Monte Carlo tree search with UCB1 action selection that
+exhaustively enumerates a fixed set of 16 macro actions made of equally spaced
+directional vectors (each repeated for the maximum macro length), as in the
+paper's benchmark protocol.  It shares the generative model, depth cut-off,
+leaf value estimate, particle filter and per-decision simulation counts with
+the PORPP reference so that the comparison isolates the search scheme.
+
+Run as an agent:  python -m baseline.pomcp
 """
 
 from __future__ import annotations
 
 import argparse
-from dataclasses import dataclass, field
-import json
 import math
 import random
-from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
-from data.maze_pomdp import MacroAction, MazePOMDP, MazeState, initial_particles, maze_config
+from data.agent_protocol import run_agent
+from data.maze2d import NONE, Maze, Roadmap, update_particles
 
-
-@dataclass
-class POMCPAction:
-    action: MacroAction
-    visits: int = 0
-    value: float = 0.0
+SIMULATIONS = {"standard": 300, "tight": 50}
 
 
-@dataclass
-class POMCPNode:
-    particles: List[MazeState] = field(default_factory=list)
-    visits: int = 0
-    actions: Dict[str, POMCPAction] = field(default_factory=dict)
-    children: Dict[tuple, "POMCPNode"] = field(default_factory=dict)
+def obs_key(obs):
+    if obs is None:
+        return None
+    return (int(round(obs[0])), int(round(obs[1])))
 
 
-class POMCPPlanner:
-    def __init__(
-        self,
-        env: MazePOMDP,
-        particles: List[MazeState],
-        rng: random.Random,
-        simulations_per_step: int = 350,
-        max_depth: int = 18,
-        exploration: float = 1400.0,
-    ):
-        self.env = env
-        self.rng = rng
-        self.simulations_per_step = simulations_per_step
+class Node:
+    __slots__ = ("particles", "visits", "counts", "values", "children")
+
+    def __init__(self, particles, n_actions):
+        self.particles = particles
+        self.visits = 0
+        self.counts = [0] * n_actions
+        self.values = [0.0] * n_actions
+        self.children: Dict[tuple, "Node"] = {}
+
+
+class POMCP:
+    def __init__(self, instance: dict, seed: int, budget: dict, particles: int = 200, max_depth: int = 50,
+                 exploration: float = 1000.0, n_directions: int = 16, simulations: int = 0):
+        self.maze = Maze(instance)
+        self.roadmap = Roadmap(self.maze)
+        self.rng = random.Random(seed)
+        self.count = particles
         self.max_depth = max_depth
-        self.exploration = exploration
-        self.root = POMCPNode(list(particles))
+        self.c = exploration
+        self.sims = simulations or SIMULATIONS.get(budget.get("level", "standard"), SIMULATIONS["standard"])
+        L = self.maze.max_macro_len
+        self.actions: List[Tuple[float, ...]] = [
+            tuple(round(2.0 * math.pi * i / n_directions, 4) for _ in range(L)) for i in range(n_directions)
+        ]
+        self.discounts = [self.maze.gamma ** len(a) for a in self.actions]
+        self.root = Node(self.maze.initial_particles(particles, self.rng), len(self.actions))
+        self.last = None
 
-    def plan(self) -> MacroAction:
-        self._ensure_actions(self.root)
-        for _ in range(self.simulations_per_step):
-            if not self.root.particles:
-                break
-            state = self.rng.choice(self.root.particles)
-            self._simulate(self.root, state, 0)
-        return max(self.root.actions.values(), key=lambda stat: stat.value).action
+    def act(self, observations):
+        if self.last is not None and observations is not None:
+            last_obs = None
+            for o in observations:
+                if o is not None:
+                    last_obs = o
+            particles = update_particles(self.maze, self.root.particles, self.actions[self.last], observations, self.count, self.rng)
+            child = self.root.children.get((self.last, obs_key(last_obs)))
+            if child is None:
+                child = Node(particles, len(self.actions))
+            else:
+                child.particles = particles
+            self.root = child
+        rng = self.rng
+        for _ in range(self.sims):
+            x, y = self.root.particles[rng.randrange(len(self.root.particles))]
+            self.simulate(self.root, x, y, 0)
+        best = max(range(len(self.actions)), key=lambda a: (self.root.counts[a] > 0, self.root.values[a]))
+        self.last = best
+        return self.actions[best]
 
-    def update_root(self, action: MacroAction, observation, particle_count: int) -> None:
-        key = (self.env.action_key(action), observation)
-        prior = self.root.particles
-        child = self.root.children.get(key)
-        if child is None:
-            child = POMCPNode()
-        child.particles = self.env.resample_particles(prior, action, observation, particle_count, self.rng)
-        self.root = child
-
-    def _simulate(self, node: POMCPNode, state: MazeState, depth: int) -> float:
-        if depth > self.max_depth or state.terminal:
-            return self.env.value_heuristic(state)
-        node.visits += 1
+    def simulate(self, node: Node, x: float, y: float, depth: int) -> float:
+        if depth > self.max_depth:
+            return self.roadmap.value_estimate(x, y)
+        rng = self.rng
         if depth > 0:
-            node.particles.append(state)
-            if len(node.particles) > 200:
-                node.particles.pop(0)
-        self._ensure_actions(node)
-
-        action_stat = self._select_ucb(node)
-        sampled_state = self.rng.choice(node.particles) if node.particles else state
-        next_state, observation, reward, _ = self.env.macro_step(sampled_state, action_stat.action, self.rng)
-        child_key = (self.env.action_key(action_stat.action), observation)
-        child = node.children.get(child_key)
-        if child is None:
-            child = POMCPNode([next_state])
-            node.children[child_key] = child
-
-        future = self._simulate(child, next_state, depth + action_stat.action.length)
-        total = reward + (self.env.config.gamma ** action_stat.action.length) * future
-        action_stat.visits += 1
-        action_stat.value += (total - action_stat.value) / action_stat.visits
+            node.particles.append((x, y))
+            if len(node.particles) > 64:
+                node.particles[rng.randrange(64)] = node.particles.pop()
+        node.visits += 1
+        untried = [a for a, n in enumerate(node.counts) if n == 0]
+        if untried:
+            a = untried[rng.randrange(len(untried))]
+        else:
+            logn = math.log(node.visits)
+            c = self.c
+            a = max(range(len(self.actions)), key=lambda i: node.values[i] + c * math.sqrt(logn / node.counts[i]))
+        sx, sy = node.particles[rng.randrange(len(node.particles))]
+        nx, ny, reward, event, last_obs, steps = self.maze.macro(sx, sy, self.actions[a], rng)
+        if event == NONE:
+            key = (a, obs_key(last_obs))
+            child = node.children.get(key)
+            if child is None:
+                child = Node([(nx, ny)], len(self.actions))
+                node.children[key] = child
+            total = reward + self.discounts[a] * self.simulate(child, nx, ny, depth + steps)
+        else:
+            total = reward
+        node.counts[a] += 1
+        node.values[a] += (total - node.values[a]) / node.counts[a]
         return total
-
-    def _ensure_actions(self, node: POMCPNode) -> None:
-        if node.actions:
-            return
-        for action in self.env.directional_actions(16):
-            node.actions[self.env.action_key(action)] = POMCPAction(action)
-
-    def _select_ucb(self, node: POMCPNode) -> POMCPAction:
-        unvisited = [a for a in node.actions.values() if a.visits == 0]
-        if unvisited:
-            return self.rng.choice(unvisited)
-        log_n = math.log(max(1, node.visits))
-        return max(
-            node.actions.values(),
-            key=lambda a: a.value + self.exploration * math.sqrt(log_n / a.visits),
-        )
-
-
-def run_episode(seed: int, simulations: int, particle_count: int, max_steps: int, scenario: str) -> dict:
-    rng = random.Random(seed)
-    env = MazePOMDP(maze_config(scenario))
-    true_state = env.sample_initial_state(rng)
-    planner = POMCPPlanner(env, initial_particles(env.config, particle_count, rng), rng, simulations)
-    total_reward = 0.0
-    discount = 1.0
-    steps = 0
-    trace = []
-    while steps < max_steps and not true_state.terminal:
-        action = planner.plan()
-        next_state, observation, reward, done = env.macro_step(true_state, action, rng)
-        total_reward += discount * reward
-        discount *= env.config.gamma ** action.length
-        planner.update_root(action, observation, particle_count)
-        trace.append({"action": action.name, "obs": observation, "reward": reward})
-        true_state = next_state
-        steps += action.length
-        if done:
-            break
-    return {
-        "seed": seed,
-        "method": "pomcp",
-        "scenario": scenario,
-        "simulations": simulations,
-        "success": bool(true_state.success),
-        "total_reward": total_reward,
-        "steps": steps,
-        "trace": trace,
-    }
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--episodes", type=int, default=20)
-    parser.add_argument("--simulations", type=int, default=350)
-    parser.add_argument("--particles", type=int, default=80)
-    parser.add_argument("--max-steps", type=int, default=40)
-    parser.add_argument("--seed", type=int, default=2007)
-    parser.add_argument("--scenario", default="default")
-    parser.add_argument("--out", type=Path, default=Path("checkpoints/pomcp_episodes.jsonl"))
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--simulations", type=int, default=0)
+    parser.add_argument("--exploration", type=float, default=1000.0)
     args = parser.parse_args()
-
-    args.out.parent.mkdir(parents=True, exist_ok=True)
-    with args.out.open("w", encoding="utf-8") as f:
-        for i in range(args.episodes):
-            result = run_episode(args.seed + i, args.simulations, args.particles, args.max_steps, args.scenario)
-            f.write(json.dumps(result) + "\n")
-            f.flush()
+    run_agent(lambda inst, seed, budget: POMCP(inst, seed, budget, simulations=args.simulations,
+                                               exploration=args.exploration))
 
 
 if __name__ == "__main__":

@@ -1,0 +1,1 @@
+{"command": ["python", "-m", "redteam.hardening.agents", "--kind", "goal_direct"]}

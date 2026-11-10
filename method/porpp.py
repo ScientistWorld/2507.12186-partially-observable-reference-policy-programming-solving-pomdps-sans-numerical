@@ -1,202 +1,223 @@
-"""Partially Observable Reference Policy Programming (PORPP).
+"""Partially Observable Reference Policy Programming (PORPP), Algorithms 1-2.
 
-This implements the paper's online asynchronous preference-programming solver:
-tree histories with particle beliefs, progressive widening over macro actions,
-softmax sampling from preferences, and Algorithm 2 style sampled backups.
+Online anytime POMDP planner:
+
+* a history tree whose nodes hold particle beliefs (Alg. 2 line 5);
+* progressive widening |children(h)| < kappa * N(h)^alpha, each widening step
+  asks the heuristic action sampler for ONE candidate macro action from the
+  current particle (Alg. 2 lines 8-13);
+* action selection by sampling the softmax of the preferences (line 14);
+* the state used for the generative step is resampled from b(h) (line 15);
+* sampled running means R(ha), D(ha) and the KL-constrained preference
+  backup  Psi(ha) <- Psi(ha) - V(h) + R(ha) + gamma^|a| D(ha)  followed by
+  V(h) <- (1/eta) log sum_a exp(eta Psi(ha))  (lines 18-23);
+* VALUEHEURISTIC at the depth cut-off (lines 1-3);
+* after planning, execute argmax_a Psi(h0 a), update the root to h0 a o and
+  add resampled particles consistent with the real observation (Alg. 1).
+
+The planning budget is a number of SIMULATE calls per decision ("time
+permitting" in Alg. 1); the evaluator separately enforces a CPU budget.
+
+Run as an agent:  python -m method.porpp   (JSON-lines protocol on stdin/stdout,
+see briefing/evaluation.md).
 """
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
 import argparse
-import json
 import math
 import random
-import time
-from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 
-from data.maze_pomdp import MacroAction, MazePOMDP, MazeState, initial_particles, maze_config
+from data.agent_protocol import run_agent
+from data.maze2d import NONE, Maze, Roadmap, update_particles
+
+Point = Tuple[float, float]
 
 
-@dataclass
 class ActionStats:
-    action: MacroAction
-    visits: int = 0
-    reward_mean: float = 0.0
-    downstream_mean: float = 0.0
-    preference: float = 0.0
+    __slots__ = ("headings", "visits", "reward_mean", "downstream_mean", "preference", "discount")
+
+    def __init__(self, headings, preference: float, gamma: float):
+        self.headings = headings
+        self.visits = 0
+        self.reward_mean = 0.0
+        self.downstream_mean = 0.0
+        self.preference = preference
+        self.discount = gamma ** len(headings)
 
 
-@dataclass
 class Node:
-    particles: List[MazeState]
-    visits: int = 0
-    value: float = 0.0
-    actions: Dict[str, ActionStats] = field(default_factory=dict)
-    children: Dict[tuple, "Node"] = field(default_factory=dict)
+    __slots__ = ("particles", "visits", "value", "actions", "children")
+
+    def __init__(self, particles: List[Point]):
+        self.particles = particles
+        self.visits = 0
+        self.value = 0.0
+        self.actions: Dict[tuple, ActionStats] = {}
+        self.children: Dict[tuple, "Node"] = {}
+
+
+def obs_key(obs) -> Optional[Tuple[int, int]]:
+    """Discretised macro observation used to index history-tree children."""
+    if obs is None:
+        return None
+    return (int(round(obs[0])), int(round(obs[1])))
 
 
 class PORPPPlanner:
     def __init__(
         self,
-        env: MazePOMDP,
-        particles: List[MazeState],
+        maze: Maze,
+        roadmap: Roadmap,
         rng: random.Random,
-        simulations_per_step: int = 250,
-        max_depth: int = 18,
-        eta: float = 0.45,
-        kappa_action: float = 8.0,
-        alpha_action: float = 0.55,
+        simulations: int,
+        particles: int = 200,
+        max_depth: int = 50,
+        eta: float = 0.02,
+        kappa: float = 2.0,
+        alpha: float = 0.5,
+        node_particle_cap: int = 64,
     ):
-        self.env = env
+        self.maze = maze
+        self.roadmap = roadmap
         self.rng = rng
-        self.simulations_per_step = simulations_per_step
+        self.simulations = simulations
+        self.particle_count = particles
         self.max_depth = max_depth
         self.eta = eta
-        self.kappa_action = kappa_action
-        self.alpha_action = alpha_action
-        self.root = Node(list(particles))
+        self.kappa = kappa
+        self.alpha = alpha
+        self.node_particle_cap = node_particle_cap
+        self.root = Node(maze.initial_particles(particles, rng))
 
-    def plan(self) -> MacroAction:
-        for _ in range(self.simulations_per_step):
-            if not self.root.particles:
+    # ------------------------------------------------------------- Algorithm 1
+    def plan(self) -> Tuple[float, ...]:
+        root = self.root
+        rng = self.rng
+        for _ in range(self.simulations):
+            x, y = root.particles[rng.randrange(len(root.particles))]
+            self.simulate(root, x, y, 0)
+        visited = [a for a in root.actions.values() if a.visits > 0]
+        if not visited:
+            x, y = root.particles[rng.randrange(len(root.particles))]
+            return self.roadmap.sample_candidate(x, y, rng)[1]
+        return max(visited, key=lambda a: a.preference).headings
+
+    def update_root(self, headings, observations) -> None:
+        last = None
+        for o in observations:
+            if o is not None:
+                last = o
+        akey = None
+        for key, stats in self.root.actions.items():
+            if stats.headings == tuple(headings):
+                akey = key
                 break
-            state = self.rng.choice(self.root.particles)
-            self.simulate(self.root, state, 0)
-        if not self.root.actions:
-            self._maybe_add_action(self.root, self.rng.choice(self.root.particles))
-        return max(self.root.actions.values(), key=lambda a: a.preference).action
-
-    def update_root(self, action: MacroAction, observation, particle_count: int) -> None:
-        key = (self.env.action_key(action), observation)
-        if key in self.root.children:
-            child = self.root.children[key]
-            child.particles = self.env.resample_particles(self.root.particles, action, observation, particle_count, self.rng)
-            self.root = child
-        else:
-            self.root = Node(self.env.resample_particles(self.root.particles, action, observation, particle_count, self.rng))
-
-    def simulate(self, node: Node, state: MazeState, depth: int) -> float:
-        if depth > self.max_depth or state.terminal:
-            return self.env.value_heuristic(state)
-        if depth > 0:
-            node.particles.append(state)
-            if len(node.particles) > 200:
-                node.particles.pop(0)
-        node.visits += 1
-        self._maybe_add_action(node, state)
-        if not node.actions:
-            self._maybe_add_action(node, state, force=True)
-
-        action_stats = self._sample_preference_softmax(node)
-        sampled_state = self.rng.choice(node.particles) if node.particles else state
-        next_state, observation, reward, _ = self.env.macro_step(sampled_state, action_stats.action, self.rng)
-        child_key = (self.env.action_key(action_stats.action), observation)
-        child = node.children.get(child_key)
+        particles = update_particles(self.maze, self.root.particles, headings, observations, self.particle_count, self.rng)
+        child = self.root.children.get((akey, obs_key(last))) if akey is not None else None
         if child is None:
-            child = Node([next_state])
-            node.children[child_key] = child
+            child = Node(particles)
+        else:
+            child.particles = particles
+        self.root = child
 
-        action_stats.visits += 1
-        n = action_stats.visits
-        downstream = self.simulate(child, next_state, depth + action_stats.action.length)
-        action_stats.reward_mean += (reward - action_stats.reward_mean) / n
-        action_stats.downstream_mean += (downstream - action_stats.downstream_mean) / n
-
-        # Algorithm 2 line 21: Psi <- Psi - V(h) + R(ha) + gamma^|a| D(ha).
-        action_stats.preference = (
-            action_stats.preference
-            - node.value
-            + action_stats.reward_mean
-            + (self.env.config.gamma ** action_stats.action.length) * action_stats.downstream_mean
-        )
-        node.value = self._logsumexp_value(node)
+    # ------------------------------------------------------------- Algorithm 2
+    def simulate(self, node: Node, x: float, y: float, depth: int) -> float:
+        if depth > self.max_depth:
+            return self.roadmap.value_estimate(x, y)
+        rng = self.rng
+        if depth > 0:
+            node.particles.append((x, y))
+            if len(node.particles) > self.node_particle_cap:
+                node.particles[rng.randrange(self.node_particle_cap)] = node.particles.pop()
+        node.visits += 1
+        if len(node.actions) < self.kappa * node.visits ** self.alpha:
+            key, headings = self.roadmap.sample_candidate(x, y, rng)
+            if key not in node.actions:
+                if node.actions:
+                    init = node.value
+                else:
+                    init = self.roadmap.value_estimate(x, y)
+                    node.value = init
+                node.actions[key] = ActionStats(headings, init, self.maze.gamma)
+        key, stats = self._sample_softmax(node)
+        sx, sy = node.particles[rng.randrange(len(node.particles))]
+        nx, ny, reward, event, last_obs, steps = self.maze.macro(sx, sy, stats.headings, rng)
+        stats.visits += 1
+        n = stats.visits
+        stats.reward_mean += (reward - stats.reward_mean) / n
+        if event == NONE:
+            ckey = (key, obs_key(last_obs))
+            child = node.children.get(ckey)
+            if child is None:
+                child = Node([(nx, ny)])
+                node.children[ckey] = child
+            downstream = self.simulate(child, nx, ny, depth + steps)
+        else:
+            downstream = 0.0
+        stats.downstream_mean += (downstream - stats.downstream_mean) / n
+        stats.preference = stats.preference - node.value + stats.reward_mean + stats.discount * stats.downstream_mean
+        node.value = self._log_sum_exp(node)
         return node.value
 
-    def _maybe_add_action(self, node: Node, state: MazeState, force: bool = False) -> None:
-        threshold = self.kappa_action * (max(1, node.visits) ** self.alpha_action)
-        if not force and len(node.actions) >= threshold:
-            return
-        for action in self.env.heuristic_actions(state, self.rng):
-            key = self.env.action_key(action)
-            if key not in node.actions:
-                node.actions[key] = ActionStats(action=action)
-                return
-
-    def _sample_preference_softmax(self, node: Node) -> ActionStats:
-        actions = list(node.actions.values())
-        if len(actions) == 1:
-            return actions[0]
-        max_pref = max(a.preference for a in actions)
-        weights = [math.exp(self.eta * (a.preference - max_pref)) for a in actions]
-        total = sum(weights)
-        draw = self.rng.random() * total
+    def _sample_softmax(self, node: Node):
+        items = list(node.actions.items())
+        if len(items) == 1:
+            return items[0]
+        eta = self.eta
+        top = max(s.preference for _, s in items)
+        weights = [math.exp(eta * (s.preference - top)) for _, s in items]
+        draw = self.rng.random() * sum(weights)
         acc = 0.0
-        for action, weight in zip(actions, weights):
+        for item, weight in zip(items, weights):
             acc += weight
             if draw <= acc:
-                return action
-        return actions[-1]
+                return item
+        return items[-1]
 
-    def _logsumexp_value(self, node: Node) -> float:
-        if not node.actions:
-            return 0.0
-        prefs = [a.preference for a in node.actions.values()]
-        max_pref = max(prefs)
-        return max_pref + math.log(sum(math.exp(self.eta * (p - max_pref)) for p in prefs)) / self.eta
+    def _log_sum_exp(self, node: Node) -> float:
+        eta = self.eta
+        prefs = [s.preference for s in node.actions.values()]
+        top = max(prefs)
+        return top + math.log(sum(math.exp(eta * (p - top)) for p in prefs)) / eta
 
 
-def run_episode(seed: int, simulations: int, particle_count: int, max_steps: int, scenario: str) -> dict:
-    rng = random.Random(seed)
-    env = MazePOMDP(maze_config(scenario))
-    true_state = env.sample_initial_state(rng)
-    planner = PORPPPlanner(env, initial_particles(env.config, particle_count, rng), rng, simulations_per_step=simulations)
-    total_reward = 0.0
-    discount = 1.0
-    steps = 0
-    trace = []
-    while steps < max_steps and not true_state.terminal:
-        action = planner.plan()
-        next_state, observation, reward, done = env.macro_step(true_state, action, rng)
-        total_reward += discount * reward
-        discount *= env.config.gamma ** action.length
-        planner.update_root(action, observation, particle_count)
-        trace.append({"action": action.name, "obs": observation, "reward": reward})
-        true_state = next_state
-        steps += action.length
-        if done:
-            break
-    return {
-        "seed": seed,
-        "method": "porpp",
-        "scenario": scenario,
-        "simulations": simulations,
-        "particles": particle_count,
-        "success": bool(true_state.success),
-        "total_reward": total_reward,
-        "steps": steps,
-        "trace": trace,
-    }
+# ------------------------------------------------------------------ agent loop
+# SIMULATE calls per decision for each budget level announced by the evaluator.
+BUDGET_SIMULATIONS = {"standard": 300, "tight": 50}
+
+
+class PORPPAgent:
+    def __init__(self, instance: dict, seed: int, budget: dict, args):
+        maze = Maze(instance)
+        level = budget.get("level", "standard")
+        sims = args.simulations or BUDGET_SIMULATIONS.get(level, BUDGET_SIMULATIONS["standard"])
+        sims = max(1, int(round(sims * args.simulation_scale)))
+        self.planner = PORPPPlanner(maze, Roadmap(maze), random.Random(seed + args.seed_offset), sims,
+                                    particles=args.particles, max_depth=args.max_depth, eta=args.eta,
+                                    kappa=args.kappa, alpha=args.alpha)
+        self.last = None
+
+    def act(self, observations):
+        if self.last is not None and observations is not None:
+            self.planner.update_root(self.last, observations)
+        self.last = tuple(self.planner.plan())
+        return self.last
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--episodes", type=int, default=20)
-    parser.add_argument("--simulations", type=int, default=250)
-    parser.add_argument("--particles", type=int, default=80)
-    parser.add_argument("--max-steps", type=int, default=40)
-    parser.add_argument("--seed", type=int, default=7)
-    parser.add_argument("--scenario", default="default")
-    parser.add_argument("--out", type=Path, default=Path("checkpoints/porpp_episodes.jsonl"))
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--simulations", type=int, default=0, help="override SIMULATE calls per decision")
+    parser.add_argument("--simulation-scale", type=float, default=1.0)
+    parser.add_argument("--particles", type=int, default=200)
+    parser.add_argument("--max-depth", type=int, default=50)
+    parser.add_argument("--eta", type=float, default=0.02)
+    parser.add_argument("--kappa", type=float, default=2.0)
+    parser.add_argument("--alpha", type=float, default=0.5)
+    parser.add_argument("--seed-offset", type=int, default=0)
     args = parser.parse_args()
-
-    args.out.parent.mkdir(parents=True, exist_ok=True)
-    with args.out.open("w", encoding="utf-8") as f:
-        for i in range(args.episodes):
-            result = run_episode(args.seed + i, args.simulations, args.particles, args.max_steps, args.scenario)
-            f.write(json.dumps(result) + "\n")
-            f.flush()
+    run_agent(lambda instance, seed, budget: PORPPAgent(instance, seed, budget, args))
 
 
 if __name__ == "__main__":

@@ -1,13 +1,11 @@
 #!/bin/bash
-# Evaluate the held-out test slice of the scaled maze benchmark.
-#
-# The test pass scores the same method entries found in scores_train.json when
-# that file exists, using the complementary held-out episode partition.
-
+# Held-out evaluation: runs every agent registered in checkpoints/agents/*.json
+# on the hidden maze instances in eval/test/ (evaluator-owned rollouts under an
+# enforced CPU planning budget) and writes scoring/scores_test.json.
+# Takes no arguments; optional evaluator flags (e.g. --episodes-out FILE) are
+# passed through.
 set -e
-
 cd /home/user
-
+export PYTHONPATH=/home/user
 mkdir -p scoring
-
-python -m eval.test.evaluate_maze "$@" --out scoring/scores_test.json
+python -m eval.test.evaluate "$@"
