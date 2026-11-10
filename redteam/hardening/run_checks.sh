@@ -23,7 +23,7 @@ for k in shortcut_crash shortcut_fabricate shortcut_nan_output shortcut_huge_mac
   run_case "$k" "$M"
 done
 # honest variants (full hidden test)
-for k in porpp_one_sim porpp_seed1 porpp_seed2 porpp_safe_sampler porpp_mixed_sampler ucb_candidates porpp_deep \
+for k in porpp_one_sim porpp_seed1 porpp_seed2 porpp_safe_sampler porpp_mixed_sampler ucb_candidates porpp_deep porpp_eta_greedy porpp_eta_soft \
          bruteforce_sequences porpp_more_sims_1_8x shortcut_easier_model porpp_private_search_4x; do
   run_case "$k" "$M"
 done

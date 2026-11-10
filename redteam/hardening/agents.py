@@ -303,6 +303,8 @@ KINDS = {
     "porpp_safe_sampler": lambda a: (lambda i, s, b: PlannerAgent(i, s, b, clearances=(1.4,))),
     "porpp_mixed_sampler": lambda a: (lambda i, s, b: PlannerAgent(i, s, b, clearances=(0.7, 1.6))),
     "porpp_deep": lambda a: (lambda i, s, b: PlannerAgent(i, s, b, scale=0.6, max_depth=90)),
+    "porpp_eta_greedy": lambda a: (lambda i, s, b: PlannerAgent(i, s, b, eta=0.1)),
+    "porpp_eta_soft": lambda a: (lambda i, s, b: PlannerAgent(i, s, b, eta=0.005)),
     "ucb_candidates": lambda a: (lambda i, s, b: PlannerAgent(i, s, b, planner_cls=UCBCandidatePlanner)),
     "bruteforce_sequences": lambda a: BruteForce,
     "localise_then_goal": lambda a: LocaliseThenGoal,
