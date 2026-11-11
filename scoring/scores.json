@@ -1,0 +1,110 @@
+{
+  "maze_standard_budget": {
+    "results": {
+      "pomcp": {
+        "success_rate": 0.02,
+        "mean_return": -420.5241373791897,
+        "collision_rate": 0.01
+      },
+      "porpp": {
+        "success_rate": 0.84,
+        "mean_return": 742.6573529763754,
+        "collision_rate": 0.15
+      },
+      "refpol": {
+        "success_rate": 0.21,
+        "mean_return": -252.29609181305955,
+        "collision_rate": 0.78
+      }
+    },
+    "_diagnostics": {
+      "pomcp": {
+        "episodes": 100,
+        "failed_episodes": 0,
+        "failure_reasons": {},
+        "mean_steps": 197.07,
+        "mean_decisions": 19.72,
+        "mean_budget_fraction": 0.4513776956637662,
+        "max_budget_fraction": 0.5792994659077532,
+        "machine_unit_seconds": 0.0016841839999999983,
+        "wall_seconds": 324.7
+      },
+      "porpp": {
+        "episodes": 100,
+        "failed_episodes": 0,
+        "failure_reasons": {},
+        "mean_steps": 52.16,
+        "mean_decisions": 7.35,
+        "mean_budget_fraction": 0.5747258918911232,
+        "max_budget_fraction": 0.8970633733410311,
+        "machine_unit_seconds": 0.0018091799999999992,
+        "wall_seconds": 157.2
+      },
+      "refpol": {
+        "episodes": 100,
+        "failed_episodes": 0,
+        "failure_reasons": {},
+        "mean_steps": 57.36,
+        "mean_decisions": 6.64,
+        "mean_budget_fraction": 0.034325826161282456,
+        "max_budget_fraction": 0.11536665368407173,
+        "machine_unit_seconds": 0.0017398785000000139,
+        "wall_seconds": 52.3
+      }
+    }
+  },
+  "maze_tight_budget": {
+    "results": {
+      "pomcp": {
+        "success_rate": 0.01,
+        "mean_return": -421.75162182843576,
+        "collision_rate": 0.05
+      },
+      "porpp": {
+        "success_rate": 0.75,
+        "mean_return": 590.8402194556887,
+        "collision_rate": 0.25
+      },
+      "refpol": {
+        "success_rate": 0.22,
+        "mean_return": -218.52515690594305,
+        "collision_rate": 0.74
+      }
+    },
+    "_diagnostics": {
+      "pomcp": {
+        "episodes": 100,
+        "failed_episodes": 0,
+        "failure_reasons": {},
+        "mean_steps": 193.43,
+        "mean_decisions": 19.36,
+        "mean_budget_fraction": 0.49759211407802595,
+        "max_budget_fraction": 0.626862119338826,
+        "machine_unit_seconds": 0.0016882544999999973,
+        "wall_seconds": 120.7
+      },
+      "porpp": {
+        "episodes": 100,
+        "failed_episodes": 0,
+        "failure_reasons": {},
+        "mean_steps": 50.54,
+        "mean_decisions": 6.61,
+        "mean_budget_fraction": 0.5426601233437625,
+        "max_budget_fraction": 0.9161258012623609,
+        "machine_unit_seconds": 0.0016737825000000092,
+        "wall_seconds": 73.7
+      },
+      "refpol": {
+        "episodes": 100,
+        "failed_episodes": 0,
+        "failure_reasons": {},
+        "mean_steps": 53.73,
+        "mean_decisions": 6.26,
+        "mean_budget_fraction": 0.13318405383074386,
+        "max_budget_fraction": 0.42560065412815246,
+        "machine_unit_seconds": 0.0017524985000000105,
+        "wall_seconds": 47.1
+      }
+    }
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "maze_standard_budget": {
+    "results": {
+      "porpp_more_sims_1_8x": {
+        "success_rate": 0.515,
+        "mean_return": 302.2606448094973,
+        "collision_rate": 0.485
+      }
+    },
+    "_diagnostics": {
+      "porpp_more_sims_1_8x": {
+        "episodes": 200,
+        "failed_episodes": 76,
+        "failure_reasons": {
+          "planning budget exceeded": 76
+        },
+        "mean_steps": 47.785,
+        "mean_decisions": 7.135,
+        "mean_budget_fraction": 0.8517806992039358,
+        "max_budget_fraction": 0.9996609150176249,
+        "machine_unit_seconds": 0.0019237700000000026,
+        "wall_seconds": 506.8
+      }
+    }
+  },
+  "maze_tight_budget": {
+    "results": {
+      "porpp_more_sims_1_8x": {
+        "success_rate": 0.695,
+        "mean_return": 557.2123993565779,
+        "collision_rate": 0.305
+      }
+    },
+    "_diagnostics": {
+      "porpp_more_sims_1_8x": {
+        "episodes": 200,
+        "failed_episodes": 21,
+        "failure_reasons": {
+          "planning budget exceeded": 21
+        },
+        "mean_steps": 47.835,
+        "mean_decisions": 6.48,
+        "mean_budget_fraction": 0.7359501893080806,
+        "max_budget_fraction": 0.9828153134205154,
+        "machine_unit_seconds": 0.001724670000000006,
+        "wall_seconds": 202.4
+      }
+    }
+  }
+}

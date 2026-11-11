@@ -1,0 +1,120 @@
+{
+  "maze_standard_budget": {
+    "results": {
+      "pomcp": {
+        "success_rate": 0.0,
+        "mean_return": -500.0,
+        "collision_rate": 1.0
+      },
+      "porpp": {
+        "success_rate": 0.835,
+        "mean_return": 761.1494706219545,
+        "collision_rate": 0.165
+      },
+      "refpol": {
+        "success_rate": 0.0,
+        "mean_return": -500.0,
+        "collision_rate": 1.0
+      }
+    },
+    "_diagnostics": {
+      "pomcp": {
+        "episodes": 200,
+        "failed_episodes": 200,
+        "failure_reasons": {
+          "agent exited": 200
+        },
+        "mean_steps": 0.0,
+        "mean_decisions": 0.0,
+        "mean_budget_fraction": null,
+        "max_budget_fraction": null,
+        "machine_unit_seconds": 0.001665142,
+        "wall_seconds": 102.1
+      },
+      "porpp": {
+        "episodes": 200,
+        "failed_episodes": 3,
+        "failure_reasons": {
+          "planning budget exceeded": 3
+        },
+        "mean_steps": 50.295,
+        "mean_decisions": 7.42,
+        "mean_budget_fraction": 0.5864124495807586,
+        "max_budget_fraction": 0.9422301443885852,
+        "machine_unit_seconds": 0.0016735094999999977,
+        "wall_seconds": 260.0
+      },
+      "refpol": {
+        "episodes": 200,
+        "failed_episodes": 200,
+        "failure_reasons": {
+          "agent exited": 200
+        },
+        "mean_steps": 0.0,
+        "mean_decisions": 0.0,
+        "mean_budget_fraction": null,
+        "max_budget_fraction": null,
+        "machine_unit_seconds": 0.0019198095000000138,
+        "wall_seconds": 110.8
+      }
+    }
+  },
+  "maze_tight_budget": {
+    "results": {
+      "pomcp": {
+        "success_rate": 0.0,
+        "mean_return": -500.0,
+        "collision_rate": 1.0
+      },
+      "porpp": {
+        "success_rate": 0.7,
+        "mean_return": 510.18186268772297,
+        "collision_rate": 0.3
+      },
+      "refpol": {
+        "success_rate": 0.0,
+        "mean_return": -500.0,
+        "collision_rate": 1.0
+      }
+    },
+    "_diagnostics": {
+      "pomcp": {
+        "episodes": 200,
+        "failed_episodes": 200,
+        "failure_reasons": {
+          "agent exited": 200
+        },
+        "mean_steps": 0.0,
+        "mean_decisions": 0.0,
+        "mean_budget_fraction": null,
+        "max_budget_fraction": null,
+        "machine_unit_seconds": 0.0017205694999999966,
+        "wall_seconds": 105.3
+      },
+      "porpp": {
+        "episodes": 200,
+        "failed_episodes": 0,
+        "failure_reasons": {},
+        "mean_steps": 48.91,
+        "mean_decisions": 6.38,
+        "mean_budget_fraction": 0.47383534264071253,
+        "max_budget_fraction": 0.8547889491038315,
+        "machine_unit_seconds": 0.0018653644999999997,
+        "wall_seconds": 148.4
+      },
+      "refpol": {
+        "episodes": 200,
+        "failed_episodes": 200,
+        "failure_reasons": {
+          "agent exited": 200
+        },
+        "mean_steps": 0.0,
+        "mean_decisions": 0.0,
+        "mean_budget_fraction": null,
+        "max_budget_fraction": null,
+        "machine_unit_seconds": 0.001869298999999991,
+        "wall_seconds": 111.7
+      }
+    }
+  }
+}
