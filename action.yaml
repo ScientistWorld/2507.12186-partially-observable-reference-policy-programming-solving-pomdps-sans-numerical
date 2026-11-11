@@ -2,4 +2,4 @@ action: submit
 gpus: 0
 test: false
 milestone: core_claim
-notes: "Hardened gym verification: reference (PORPP, RefPol, POMCP) on train+hidden test with evaluator-owned rollouts, then honest variants and shortcuts through the hidden-test evaluator (redteam/hardening/run_checks.sh). CPU only, ~1.5 h."
+notes: "Verification job 2: reference agents (PORPP/POMCP now plan to 75% of the evaluator's CPU allowance, Alg. 1 'while time permitting') on train + 300 hidden test instances with persistent agent processes; then candidate improvements, reference seeds, weaker policies, brute force, private search and shortcuts through the hidden-test evaluator. CPU only, ~2 h."

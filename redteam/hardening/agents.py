@@ -17,7 +17,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from data.agent_protocol import run_agent
+from data.agent_protocol import PlanningClock, run_agent
 from data.maze2d import NONE, Maze, Roadmap, update_particles
 from method.porpp import BUDGET_SIMULATIONS, ActionStats, Node, PORPPPlanner, obs_key
 
@@ -29,41 +29,150 @@ def level_sims(budget, scale=1.0):
 
 
 # ------------------------------------------------------------ honest variants
-class PlannerAgent:
-    """PORPP with configurable sampler / depth / budget (honest variants)."""
+class FastModel:
+    """Same generative model as data.maze2d.Maze.macro, written for speed:
+    cached heading velocities, inlined collision/event tests and a pool of
+    pre-drawn Gaussian noise read from a random offset."""
 
-    def __init__(self, instance, seed, budget, scale=1.0, sims=None, clearances=(0.7,), max_depth=50, eta=0.02,
-                 planner_cls=PORPPPlanner):
+    def __init__(self, maze: Maze):
+        self._maze = maze
+        self._vel = {}
+        pool_rng = random.Random(12345)
+        self._pool = [pool_rng.gauss(0.0, maze.noise) for _ in range(1 << 16)]
+
+    def __getattr__(self, name):
+        return getattr(self._maze, name)
+
+    def macro(self, x, y, headings, rng):
+        vel = self._vel.get(headings)
+        if vel is None:
+            v = self._maze.step_size
+            vel = self._vel[headings] = [(v * math.cos(h), v * math.sin(h)) for h in headings]
+        m = self._maze
+        W, H, blocked = m.width, m.height, m.blocked
+        dangers, goals, lands = m._danger_r2, m._goal_r2, m._land_r2
+        gamma, sp = m.gamma, m.step_penalty
+        pool = self._pool
+        k = rng.getrandbits(16)
+        disc, total, last, n = 1.0, 0.0, None, 0
+        for vx, vy in vel:
+            n += 1
+            dx = vx + pool[k]
+            dy = vy + pool[(k + 1) & 0xFFFF]
+            k = (k + 2) & 0xFFFF
+            nx, ny = x + dx, y + dy
+            mx, my = x + 0.5 * dx, y + 0.5 * dy
+            if (0.0 <= nx < W and 0.0 <= ny < H and not blocked[int(ny) * W + int(nx)]
+                    and 0.0 <= mx < W and 0.0 <= my < H and not blocked[int(my) * W + int(mx)]):
+                x, y = nx, ny
+            elif (0.0 <= nx < W and not blocked[int(y) * W + int(nx)]
+                  and 0.0 <= mx < W and not blocked[int(y) * W + int(mx)]):
+                x = nx
+            elif (0.0 <= ny < H and not blocked[int(ny) * W + int(x)]
+                  and 0.0 <= my < H and not blocked[int(my) * W + int(x)]):
+                y = ny
+            for cx, cy, r2 in dangers:
+                if (x - cx) * (x - cx) + (y - cy) * (y - cy) <= r2:
+                    return x, y, total + disc * m.danger_penalty, 1, last, n
+            for cx, cy, r2 in goals:
+                if (x - cx) * (x - cx) + (y - cy) * (y - cy) <= r2:
+                    return x, y, total + disc * m.goal_reward, 2, last, n
+            total += disc * sp
+            disc *= gamma
+            for cx, cy, r2 in lands:
+                if (x - cx) * (x - cx) + (y - cy) * (y - cy) <= r2:
+                    last = (x, y)
+                    break
+        return x, y, total, NONE, last, n
+
+
+def split_clusters(parts):
+    """Two groups of root particles along the axis of largest spread, split
+    at the largest gap (median when the belief is unimodal)."""
+    xs = [p[0] for p in parts]
+    ys = [p[1] for p in parts]
+    ax = 0 if (max(xs) - min(xs)) >= (max(ys) - min(ys)) else 1
+    srt = sorted(parts, key=lambda p: p[ax])
+    if len(srt) < 2:
+        return [srt, srt]
+    gap, i = max((srt[j + 1][ax] - srt[j][ax], j) for j in range(len(srt) - 1))
+    if gap < 1.0:
+        i = len(srt) // 2 - 1
+    a, b = srt[: i + 1], srt[i + 1:]
+    return [a or b, b or a]
+
+
+class StratifiedPORPPPlanner(PORPPPlanner):
+    """PORPP with stratified root sampling: the state for the k-th simulation
+    of a root action comes alternately from the two clusters of the root
+    belief, so every candidate is evaluated under both start hypotheses.
+    Preference backups are unchanged."""
+
+    def plan(self, deadline=None):
+        self._clusters = split_clusters(self.root.particles)
+        return super().plan(deadline)
+
+    def simulate(self, node, x, y, depth):
+        if depth != 0:
+            return super().simulate(node, x, y, depth)
+        rng = self.rng
+        node.visits += 1
+        if len(node.actions) < self.kappa * node.visits ** self.alpha:
+            key, target = self.roadmap.sample_key(x, y, rng)
+            if key not in node.actions:
+                headings = self.roadmap.path_headings(x, y, target, self.maze.max_macro_len)
+                if node.actions:
+                    init = node.value
+                else:
+                    init = self.roadmap.value_estimate(x, y)
+                    node.value = init
+                node.actions[key] = ActionStats(headings, init, self.maze.gamma)
+        key, stats = self._sample_softmax(node)
+        cluster = self._clusters[stats.visits % 2]
+        sx, sy = cluster[rng.randrange(len(cluster))]
+        nx, ny, reward, event, last_obs, steps = self.maze.macro(sx, sy, stats.headings, rng)
+        stats.visits += 1
+        n = stats.visits
+        stats.reward_mean += (reward - stats.reward_mean) / n
+        if event == NONE:
+            ckey = (key, obs_key(last_obs))
+            child = node.children.get(ckey)
+            if child is None:
+                child = Node([(nx, ny)])
+                node.children[ckey] = child
+            downstream = self.simulate(child, nx, ny, depth + steps)
+        else:
+            downstream = 0.0
+        stats.downstream_mean += (downstream - stats.downstream_mean) / n
+        stats.preference = stats.preference - node.value + stats.reward_mean + stats.discount * stats.downstream_mean
+        node.value = self._log_sum_exp(node)
+        return node.value
+
+
+class PlannerAgent:
+    """PORPP-family agent.  By default it plans against the evaluator's CPU
+    allowance exactly like the reference (PlanningClock, fraction 0.75)."""
+
+    def __init__(self, instance, seed, budget, fixed=False, sims=None, fraction=0.75, max_depth=50, eta=0.02,
+                 planner_cls=PORPPPlanner, fast_model=False, clearance=0.7, particles=200):
         self.maze = Maze(instance)
-        roadmaps = [Roadmap(self.maze, clearance=c) for c in clearances]
-        roadmap = roadmaps[0] if len(roadmaps) == 1 else MixedRoadmap(roadmaps)
-        n = sims if sims is not None else level_sims(budget, scale)
-        self.planner = planner_cls(self.maze, roadmap, random.Random(seed), n, max_depth=max_depth, eta=eta)
+        model = FastModel(self.maze) if fast_model else self.maze
+        n = sims if sims is not None else level_sims(budget)
+        self.planner = planner_cls(model, Roadmap(self.maze, clearance=clearance), random.Random(seed), n,
+                                   max_depth=max_depth, eta=eta, particles=particles)
+        self.clock = None if (fixed or sims is not None) else PlanningClock(budget, fraction=fraction)
+        if self.clock is not None and not self.clock.active:
+            self.clock = None
         self.last = None
 
     def act(self, observations):
         if self.last is not None and observations is not None:
             self.planner.update_root(self.last, observations)
-        self.last = tuple(self.planner.plan())
+        deadline = self.clock.deadline() if self.clock else None
+        self.last = tuple(self.planner.plan(deadline))
+        if self.clock:
+            self.clock.commit(len(self.last))
         return self.last
-
-
-class MixedRoadmap:
-    """Heuristic sampler that draws each candidate from one of several roadmaps
-    (different danger clearances), so the planner can trade path length for
-    safety margin."""
-
-    def __init__(self, roadmaps):
-        self.roadmaps = roadmaps
-        self.base = roadmaps[0]
-
-    def sample_candidate(self, x, y, rng, length=None):
-        i = rng.randrange(len(self.roadmaps))
-        key, headings = self.roadmaps[i].sample_candidate(x, y, rng, length)
-        return (i,) + key, headings
-
-    def value_estimate(self, x, y):
-        return self.base.value_estimate(x, y)
 
 
 class UCBCandidatePlanner(PORPPPlanner):
@@ -82,8 +191,9 @@ class UCBCandidatePlanner(PORPPPlanner):
                 node.particles[rng.randrange(self.node_particle_cap)] = node.particles.pop()
         node.visits += 1
         if len(node.actions) < self.kappa * node.visits ** self.alpha:
-            key, headings = self.roadmap.sample_candidate(x, y, rng)
+            key, target = self.roadmap.sample_key(x, y, rng)
             if key not in node.actions:
+                headings = self.roadmap.path_headings(x, y, target, self.maze.max_macro_len)
                 node.actions[key] = ActionStats(headings, 0.0, self.maze.gamma)
         untried = [kv for kv in node.actions.items() if kv[1].visits == 0]
         if untried:
@@ -239,8 +349,8 @@ class HugeMacro:
 
 
 class ResetPrecompute(PlannerAgent):
-    """Plans 20x the standard budget during reset (before the clock for
-    decisions starts) and keeps the tree."""
+    """Runs 20x the fixed per-decision simulations during reset (before the
+    planning clock starts) and keeps the tree."""
 
     def __init__(self, instance, seed, budget):
         super().__init__(instance, seed, budget)
@@ -261,13 +371,13 @@ class EasierModel(PlannerAgent):
 
 
 def offload_main():
-    """Child process used by OffloadAgent: runs PORPP with 4x simulations."""
+    """Child process used by OffloadAgent: plans to 4x the reference's share of the allowance."""
     planner = None
     last = None
     for line in sys.stdin:
         msg = json.loads(line)
         if msg["type"] == "reset":
-            agent = PlannerAgent(msg["instance"], msg["seed"], msg["budget"], scale=4.0)
+            agent = PlannerAgent(msg["instance"], msg["seed"], msg["budget"], fraction=3.0)
             planner = agent
         else:
             obs = msg.get("observations")
@@ -277,14 +387,22 @@ def offload_main():
             sys.stdout.flush()
 
 
+_OFFLOAD_CHILD = None
+
+
 class OffloadAgent:
-    """Delegates planning (4x simulations) to a separate worker process,
-    hoping the planning budget only counts the agent process itself."""
+    """Delegates planning (4x the reference's CPU) to a separate worker
+    process, hoping the planning budget only counts the agent process."""
 
     def __init__(self, instance, seed, budget):
+        global _OFFLOAD_CHILD
+        if _OFFLOAD_CHILD is not None:
+            _OFFLOAD_CHILD.kill()
+            _OFFLOAD_CHILD.wait()
         env = dict(os.environ)
         self.child = subprocess.Popen([sys.executable, "-m", "redteam.hardening.agents", "--kind", "_offload_child"],
                                       stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True, cwd=str(ROOT), env=env)
+        _OFFLOAD_CHILD = self.child
         self.child.stdin.write(json.dumps({"type": "reset", "instance": instance, "seed": seed, "budget": budget}) + "\n")
         self.child.stdin.flush()
 
@@ -295,20 +413,31 @@ class OffloadAgent:
 
 
 KINDS = {
+    # reference noise: same agent, different planning seeds
     "porpp_seed1": lambda a: (lambda i, s, b: PlannerAgent(i, s + 1000003, b)),
     "porpp_seed2": lambda a: (lambda i, s, b: PlannerAgent(i, s + 2000003, b)),
-    "porpp_more_sims_1_8x": lambda a: (lambda i, s, b: PlannerAgent(i, s, b, scale=1.8)),
-    "porpp_private_search_4x": lambda a: (lambda i, s, b: PlannerAgent(i, s, b, scale=4.0)),
+    # previous reference: fixed 300 / 50 SIMULATE calls per decision, ignores the allowance
+    "porpp_fixed_sims": lambda a: (lambda i, s, b: PlannerAgent(i, s, b, fixed=True)),
+    # weaker: one simulation per decision
     "porpp_one_sim": lambda a: (lambda i, s, b: PlannerAgent(i, s, b, sims=1)),
-    "porpp_safe_sampler": lambda a: (lambda i, s, b: PlannerAgent(i, s, b, clearances=(1.4,))),
-    "porpp_mixed_sampler": lambda a: (lambda i, s, b: PlannerAgent(i, s, b, clearances=(0.7, 1.6))),
-    "porpp_deep": lambda a: (lambda i, s, b: PlannerAgent(i, s, b, scale=0.6, max_depth=90)),
+    # private search beyond the allowance (3x the reference's CPU)
+    "porpp_private_search_3x": lambda a: (lambda i, s, b: PlannerAgent(i, s, b, fraction=2.25)),
+    # candidate improvements at the same allowance
+    "porpp_stratified": lambda a: (lambda i, s, b: PlannerAgent(i, s, b, planner_cls=StratifiedPORPPPlanner)),
+    "porpp_depth30": lambda a: (lambda i, s, b: PlannerAgent(i, s, b, max_depth=30)),
+    "porpp_plus": lambda a: (lambda i, s, b: PlannerAgent(i, s, b, planner_cls=StratifiedPORPPPlanner, max_depth=30,
+                                                          fast_model=True, particles=100)),
+    "ucb_candidates": lambda a: (lambda i, s, b: PlannerAgent(i, s, b, planner_cls=UCBCandidatePlanner)),
+    # variants measured in the first verification job (fixed simulation counts then)
+    "porpp_safe_sampler": lambda a: (lambda i, s, b: PlannerAgent(i, s, b, clearance=1.4)),
+    "porpp_deep": lambda a: (lambda i, s, b: PlannerAgent(i, s, b, max_depth=90)),
     "porpp_eta_greedy": lambda a: (lambda i, s, b: PlannerAgent(i, s, b, eta=0.1)),
     "porpp_eta_soft": lambda a: (lambda i, s, b: PlannerAgent(i, s, b, eta=0.005)),
-    "ucb_candidates": lambda a: (lambda i, s, b: PlannerAgent(i, s, b, planner_cls=UCBCandidatePlanner)),
+    # search-free policies and exhaustive enumeration
     "bruteforce_sequences": lambda a: BruteForce,
     "localise_then_goal": lambda a: LocaliseThenGoal,
     "goal_direct": lambda a: GoalDirect,
+    # shortcuts
     "shortcut_nan_output": lambda a: NanAgent,
     "shortcut_huge_macro": lambda a: HugeMacro,
     "shortcut_reset_precompute": lambda a: ResetPrecompute,

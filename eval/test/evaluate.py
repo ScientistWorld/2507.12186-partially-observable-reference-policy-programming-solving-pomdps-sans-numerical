@@ -1,8 +1,8 @@
 """Held-out (test) evaluator for the partially observable maze benchmark.
 
 The evaluator owns the environment.  For every agent registered under
-``checkpoints/agents/<name>.json`` it starts the agent's command once per
-episode, sends it the public description of a maze instance it has never seen,
+``checkpoints/agents/<name>.json`` it starts the agent's command (one process
+per method and experiment, restarted after any failure), sends it the public description of a maze instance it has never seen,
 executes the macro actions it returns in its own copy of the dynamics with its
 own noise stream, and computes every scored number (success, discounted
 return, danger collisions) itself.  Nothing an agent writes to disk is read.
@@ -274,92 +274,122 @@ def failed(reason: str, **extra) -> dict:
     return record
 
 
-def run_episode(command: List[str], instance: dict, experiment: str, unit: float) -> dict:
+def budget_for(experiment: str, unit: float) -> dict:
     cfg = EXPERIMENTS[experiment]
-    maze = TrueMaze(instance)
-    per_step_cap = cfg["units_per_step"] * unit
-    reset_cap = RESET_UNITS * unit
-    startup_cap = STARTUP_UNITS * unit
-    public = {k: instance[k] for k in PUBLIC_KEYS}
-    budget = {"level": cfg["level"], "cpu_seconds_per_step": per_step_cap, "units_per_step": cfg["units_per_step"],
-              "machine_unit_seconds": unit, "reset_cpu_seconds": reset_cap, "startup_cpu_seconds": startup_cap}
-    env = dict(os.environ)
-    env["PYTHONPATH"] = str(ROOT) + (os.pathsep + env["PYTHONPATH"] if env.get("PYTHONPATH") else "")
-    env["PYTHONHASHSEED"] = "0"
-    err = tempfile.TemporaryFile()
-    try:
-        proc = subprocess.Popen(command, cwd=str(ROOT), stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=err,
-                                env=env, start_new_session=True)
-    except (OSError, ValueError) as exc:
-        err.close()
-        return failed(f"could not start agent: {exc}")
-    chan = Channel(proc)
-    rng = random.Random(int(instance["env_seed"]))
-    x, y = maze.starts[int(instance["true_start"])]
-    total, disc, t, decisions = 0.0, 1.0, 0, 0
-    allowed = BUDGET_SLACK_SECONDS
-    cpu_ready = cpu_start = 0.0
-    outcome = NONE
-    try:
-        chan.send({"type": "hello"})
-        msg = chan.recv(RESET_TIMEOUT)
-        if msg.get("type") != "hello":
-            raise AgentError("expected hello")
-        cpu_start = descendants_cpu()
-        if cpu_start > startup_cap:
-            return failed("start-up over budget", cpu_startup=cpu_start, startup_cap=startup_cap)
-        chan.send({"type": "reset", "instance": public, "seed": agent_seed(instance["id"], experiment), "budget": budget})
-        msg = chan.recv(RESET_TIMEOUT)
-        if msg.get("type") != "ready":
-            raise AgentError("expected ready")
-        cpu_ready = descendants_cpu()
-        if cpu_ready - cpu_start > reset_cap:
-            return failed("reset over budget", cpu_reset=cpu_ready - cpu_start, reset_cap=reset_cap)
-        observations = None
-        while t < maze.horizon:
-            chan.send({"type": "act", "step": t, "observations": observations})
-            msg = chan.recv(max(ACT_TIMEOUT_MIN, 50.0 * per_step_cap * maze.max_macro_len))
-            headings = parse_headings(msg, maze.max_macro_len)
-            decisions += 1
-            allowed += per_step_cap * len(headings)
-            observations = []
-            for heading in headings:
-                ex = rng.gauss(0.0, maze.noise)
-                ey = rng.gauss(0.0, maze.noise)
-                x, y, reward, outcome, obs = maze.step(x, y, heading, ex, ey)
-                total += disc * reward
-                disc *= maze.gamma
-                t += 1
-                observations.append(list(obs) if obs is not None else None)
-                if outcome != NONE or t >= maze.horizon:
-                    break
-            if outcome != NONE:
-                break
-        cpu_used = descendants_cpu() - cpu_ready
+    return {
+        "level": cfg["level"],
+        "cpu_seconds_per_step": cfg["units_per_step"] * unit,
+        "units_per_step": cfg["units_per_step"],
+        "machine_unit_seconds": unit,
+        "slack_seconds": BUDGET_SLACK_SECONDS,
+        "reset_cpu_seconds": RESET_UNITS * unit,
+        "startup_cpu_seconds": STARTUP_UNITS * unit,
+        "rule": "CPU of the agent process tree from 'ready' to its last action <= slack_seconds + "
+                "cpu_seconds_per_step * (sum of lengths of the macro actions returned); "
+                "'reset' -> 'ready' <= reset_cpu_seconds; process start -> 'hello' <= startup_cpu_seconds",
+    }
+
+
+class Agent:
+    """One agent process, reused for consecutive episodes of a method/experiment."""
+
+    def __init__(self, command: List[str], unit: float):
+        env = dict(os.environ)
+        env["PYTHONPATH"] = str(ROOT) + (os.pathsep + env["PYTHONPATH"] if env.get("PYTHONPATH") else "")
+        env["PYTHONHASHSEED"] = "0"
+        self.err = tempfile.TemporaryFile()
         try:
-            chan.send({"type": "end"})
+            self.proc = subprocess.Popen(command, cwd=str(ROOT), stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                                         stderr=self.err, env=env, start_new_session=True)
+        except (OSError, ValueError) as exc:
+            self.err.close()
+            raise AgentError(f"could not start agent: {exc}")
+        self.chan = Channel(self.proc)
+        try:
+            self.chan.send({"type": "hello"})
+            msg = self.chan.recv(RESET_TIMEOUT)
+            if msg.get("type") != "hello":
+                raise AgentError("expected hello")
+            if descendants_cpu() > STARTUP_UNITS * unit:
+                raise AgentError("start-up over budget")
+        except AgentError:
+            self.close()
+            raise
+
+    def alive(self) -> bool:
+        return self.proc.poll() is None
+
+    def stderr_tail(self) -> str:
+        try:
+            self.err.seek(0)
+            return self.err.read()[-400:].decode("utf-8", "replace")
+        except (OSError, ValueError):
+            return ""
+
+    def close(self) -> None:
+        try:
+            self.chan.send({"type": "shutdown"})
         except AgentError:
             pass
-    except AgentError as exc:
-        tail = b""
-        try:
-            err.seek(0)
-            tail = err.read()[-400:]
-        except OSError:
-            pass
-        return failed(str(exc), stderr_tail=tail.decode("utf-8", "replace"), decisions=decisions, steps=t)
-    finally:
         _kill_descendants()
         try:
-            proc.wait(timeout=5)
+            self.proc.wait(timeout=5)
         except Exception:
             pass
-        for stream in (proc.stdin, proc.stdout):
+        for stream in (self.proc.stdin, self.proc.stdout):
             try:
                 stream.close()
             except Exception:
                 pass
-        err.close()
+        try:
+            self.err.close()
+        except Exception:
+            pass
+
+
+def run_episode(agent: Agent, instance: dict, experiment: str, unit: float) -> dict:
+    """Run one episode on the evaluator's own copy of the dynamics.  Raises
+    AgentError on protocol failures (the caller discards the process)."""
+    maze = TrueMaze(instance)
+    budget = budget_for(experiment, unit)
+    per_step_cap = budget["cpu_seconds_per_step"]
+    public = {k: instance[k] for k in PUBLIC_KEYS}
+    chan = agent.chan
+    rng = random.Random(int(instance["env_seed"]))
+    x, y = maze.starts[int(instance["true_start"])]
+    total, disc, t, decisions = 0.0, 1.0, 0, 0
+    allowed = BUDGET_SLACK_SECONDS
+    outcome = NONE
+    cpu_before = descendants_cpu()
+    chan.send({"type": "reset", "instance": public, "seed": agent_seed(instance["id"], experiment), "budget": budget})
+    msg = chan.recv(RESET_TIMEOUT)
+    if msg.get("type") != "ready":
+        raise AgentError("expected ready")
+    cpu_ready = descendants_cpu()
+    if cpu_ready - cpu_before > budget["reset_cpu_seconds"]:
+        raise AgentError("reset over budget")
+    observations = None
+    while t < maze.horizon:
+        chan.send({"type": "act", "step": t, "observations": observations})
+        msg = chan.recv(max(ACT_TIMEOUT_MIN, 50.0 * per_step_cap * maze.max_macro_len))
+        headings = parse_headings(msg, maze.max_macro_len)
+        decisions += 1
+        allowed += per_step_cap * len(headings)
+        observations = []
+        for heading in headings:
+            ex = rng.gauss(0.0, maze.noise)
+            ey = rng.gauss(0.0, maze.noise)
+            x, y, reward, outcome, obs = maze.step(x, y, heading, ex, ey)
+            total += disc * reward
+            disc *= maze.gamma
+            t += 1
+            observations.append(list(obs) if obs is not None else None)
+            if outcome != NONE or t >= maze.horizon:
+                break
+        if outcome != NONE:
+            break
+    cpu_used = descendants_cpu() - cpu_ready
+    chan.send({"type": "end"})
     if cpu_used > allowed:
         # The would-be outcome is kept for diagnostics only; the episode scores as failed.
         return failed("planning budget exceeded", cpu_used=cpu_used, cpu_allowed=allowed, decisions=decisions, steps=t,
@@ -373,9 +403,39 @@ def run_episode(command: List[str], instance: dict, experiment: str, unit: float
         "decisions": decisions,
         "cpu_used": cpu_used,
         "cpu_allowed": allowed,
-        "cpu_reset": cpu_ready - cpu_start,
-        "cpu_startup": cpu_start,
+        "cpu_reset": cpu_ready - cpu_before,
     }
+
+
+def run_method(command: Optional[List[str]], instances: List[dict], experiment: str, unit: float) -> List[dict]:
+    records: List[dict] = []
+    agent: Optional[Agent] = None
+    timeouts = 0
+    for inst in instances:
+        if command is None:
+            rec = failed("missing or invalid manifest")
+        elif timeouts >= MAX_CONSECUTIVE_TIMEOUTS:
+            rec = failed("skipped after repeated timeouts")
+        else:
+            try:
+                if agent is not None and not agent.alive():
+                    agent.close()  # exited between episodes: start a fresh process, no penalty
+                    agent = None
+                if agent is None:
+                    agent = Agent(command, unit)
+                rec = run_episode(agent, inst, experiment, unit)
+            except AgentError as exc:
+                rec = failed(str(exc), stderr_tail=agent.stderr_tail() if agent is not None else "")
+                if agent is not None:
+                    agent.close()
+                agent = None
+            timeouts = timeouts + 1 if rec.get("reason") == "timeout" else 0
+        rec["instance"] = inst["id"]
+        records.append(rec)
+    if agent is not None:
+        agent.close()
+    _kill_descendants()
+    return records
 
 
 # ------------------------------------------------------------------- scoring
@@ -478,19 +538,8 @@ def main() -> None:
     for name, command in sorted(methods.items()):
         for exp in EXPERIMENTS:
             unit = machine_unit()
-            records = []
             started = time.time()
-            timeouts = 0
-            for inst in instances:
-                if command is None:
-                    rec = failed("missing or invalid manifest")
-                elif timeouts >= MAX_CONSECUTIVE_TIMEOUTS:
-                    rec = failed("skipped after repeated timeouts")
-                else:
-                    rec = run_episode(command, inst, exp, unit)
-                    timeouts = timeouts + 1 if rec.get("reason") == "timeout" else 0
-                rec["instance"] = inst["id"]
-                records.append(rec)
+            records = run_method(command, instances, exp, unit)
             scores[exp]["results"][name] = summarize(records, len(instances))
             diag = diagnostics(records)
             diag["machine_unit_seconds"] = unit

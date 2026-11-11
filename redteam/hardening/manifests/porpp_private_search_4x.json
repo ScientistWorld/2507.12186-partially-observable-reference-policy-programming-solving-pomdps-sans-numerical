@@ -1,1 +1,0 @@
-{"command": ["python", "-m", "redteam.hardening.agents", "--kind", "porpp_private_search_4x"]}

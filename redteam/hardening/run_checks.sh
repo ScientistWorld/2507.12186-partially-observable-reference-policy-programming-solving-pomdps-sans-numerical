@@ -18,16 +18,20 @@ run_case () {  # name agents_dir [extra args...]
 }
 
 M=redteam/hardening/manifests
-# cheap shortcuts first
-for k in shortcut_crash shortcut_fabricate shortcut_nan_output shortcut_huge_macro goal_direct localise_then_goal; do
+# candidate improvements and reference noise first (the headroom question)
+for k in porpp_plus porpp_stratified porpp_seed1 porpp_seed2 porpp_depth30 ucb_candidates porpp_fixed_sims; do
   run_case "$k" "$M"
 done
-# honest variants (full hidden test)
-for k in porpp_one_sim porpp_seed1 porpp_seed2 porpp_safe_sampler porpp_mixed_sampler ucb_candidates porpp_deep porpp_eta_greedy porpp_eta_soft \
-         bruteforce_sequences porpp_more_sims_1_8x shortcut_easier_model porpp_private_search_4x; do
+# weaker policies, exhaustive enumeration, cheap shortcuts
+for k in porpp_one_sim localise_then_goal goal_direct bruteforce_sequences shortcut_easier_model; do
   run_case "$k" "$M"
 done
-# expensive shortcuts that fail on every episode: 40 instances are enough
+# shortcuts that fail on every episode: 100 instances are enough
+for k in shortcut_crash shortcut_fabricate shortcut_nan_output shortcut_huge_macro; do
+  run_case "$k" "$M" --limit 100
+done
+# private search beyond the allowance; process offload; reset-time planning
+run_case porpp_private_search_3x "$M" --limit 100
 for k in shortcut_reset_precompute shortcut_offload_process; do
   run_case "$k" "$M" --limit 40
 done
@@ -49,9 +53,10 @@ PY
   cp "$OUT/scores_train.backup.json" scoring/scores_train.json && rm "$OUT/scores_train.backup.json"
 fi
 
-# Baselines replaced by crashing agents: the candidate's scores must not move.
+# Baselines replaced by crashing agents: the candidate's scores must not depend on them.
 if [ ! -s "$OUT/baseline_sabotage.json" ]; then
-  python -m eval.test.evaluate --agents-dir redteam/hardening/manifests_sabotage --out "$OUT/baseline_sabotage.json"
+  python -m eval.test.evaluate --agents-dir redteam/hardening/manifests_sabotage --limit 100 \
+      --out "$OUT/baseline_sabotage.json"
 fi
 rm -f checkpoints/fabricated_episodes.jsonl tmp/fabricated_scores_*.json
 echo "hardening checks done $(date +%T)"

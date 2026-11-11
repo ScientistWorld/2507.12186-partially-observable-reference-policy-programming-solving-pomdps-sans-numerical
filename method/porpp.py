@@ -15,8 +15,10 @@ Online anytime POMDP planner:
 * after planning, execute argmax_a Psi(h0 a), update the root to h0 a o and
   add resampled particles consistent with the real observation (Alg. 1).
 
-The planning budget is a number of SIMULATE calls per decision ("time
-permitting" in Alg. 1); the evaluator separately enforces a CPU budget.
+Planning time: Alg. 1 plans "while time permitting".  The agent plans until a
+fixed fraction of the evaluator's announced CPU allowance is used
+(data.agent_protocol.PlanningClock); ``--fixed-simulations`` instead runs a
+fixed number of SIMULATE calls per decision (deterministic, for diagnostics).
 
 Run as an agent:  python -m method.porpp   (JSON-lines protocol on stdin/stdout,
 see briefing/evaluation.md).
@@ -29,7 +31,9 @@ import math
 import random
 from typing import Dict, List, Optional, Tuple
 
-from data.agent_protocol import run_agent
+import time
+
+from data.agent_protocol import PlanningClock, run_agent
 from data.maze2d import NONE, Maze, Roadmap, update_particles
 
 Point = Tuple[float, float]
@@ -92,12 +96,23 @@ class PORPPPlanner:
         self.root = Node(maze.initial_particles(particles, rng))
 
     # ------------------------------------------------------------- Algorithm 1
-    def plan(self) -> Tuple[float, ...]:
+    def plan(self, deadline: Optional[float] = None) -> Tuple[float, ...]:
+        """Run SIMULATE from the root until ``deadline`` (process CPU time) or,
+        without a deadline, for ``self.simulations`` calls."""
         root = self.root
         rng = self.rng
-        for _ in range(self.simulations):
+        clock = time.process_time
+        n = 0
+        while True:
+            if deadline is None:
+                if n >= self.simulations:
+                    break
+            elif n >= 1 and clock() >= deadline:
+                break
             x, y = root.particles[rng.randrange(len(root.particles))]
             self.simulate(root, x, y, 0)
+            n += 1
+        self.last_simulations = n
         visited = [a for a in root.actions.values() if a.visits > 0]
         if not visited:
             x, y = root.particles[rng.randrange(len(root.particles))]
@@ -133,8 +148,9 @@ class PORPPPlanner:
                 node.particles[rng.randrange(self.node_particle_cap)] = node.particles.pop()
         node.visits += 1
         if len(node.actions) < self.kappa * node.visits ** self.alpha:
-            key, headings = self.roadmap.sample_candidate(x, y, rng)
+            key, target = self.roadmap.sample_key(x, y, rng)
             if key not in node.actions:
+                headings = self.roadmap.path_headings(x, y, target, self.maze.max_macro_len)
                 if node.actions:
                     init = node.value
                 else:
@@ -184,7 +200,7 @@ class PORPPPlanner:
 
 
 # ------------------------------------------------------------------ agent loop
-# SIMULATE calls per decision for each budget level announced by the evaluator.
+# Fixed SIMULATE calls per decision per budget level (only with --fixed-simulations).
 BUDGET_SIMULATIONS = {"standard": 300, "tight": 50}
 
 
@@ -193,23 +209,32 @@ class PORPPAgent:
         maze = Maze(instance)
         level = budget.get("level", "standard")
         sims = args.simulations or BUDGET_SIMULATIONS.get(level, BUDGET_SIMULATIONS["standard"])
-        sims = max(1, int(round(sims * args.simulation_scale)))
         self.planner = PORPPPlanner(maze, Roadmap(maze), random.Random(seed + args.seed_offset), sims,
                                     particles=args.particles, max_depth=args.max_depth, eta=args.eta,
                                     kappa=args.kappa, alpha=args.alpha)
         self.last = None
+        fixed = args.fixed_simulations or args.simulations
+        self.clock = None if fixed else PlanningClock(budget, fraction=args.budget_fraction)
+        if self.clock is not None and not self.clock.active:
+            self.clock = None
 
     def act(self, observations):
         if self.last is not None and observations is not None:
             self.planner.update_root(self.last, observations)
-        self.last = tuple(self.planner.plan())
+        deadline = self.clock.deadline() if self.clock else None
+        self.last = tuple(self.planner.plan(deadline))
+        if self.clock:
+            self.clock.commit(len(self.last))
         return self.last
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--simulations", type=int, default=0, help="override SIMULATE calls per decision")
-    parser.add_argument("--simulation-scale", type=float, default=1.0)
+    parser.add_argument("--budget-fraction", type=float, default=0.75,
+                        help="fraction of the evaluator's CPU allowance to plan for")
+    parser.add_argument("--fixed-simulations", action="store_true",
+                        help="ignore the CPU allowance; run BUDGET_SIMULATIONS[level] SIMULATE calls per decision")
+    parser.add_argument("--simulations", type=int, default=0, help="fixed SIMULATE calls per decision")
     parser.add_argument("--particles", type=int, default=200)
     parser.add_argument("--max-depth", type=int, default=50)
     parser.add_argument("--eta", type=float, default=0.02)

@@ -4,8 +4,9 @@ Particle-belief Monte Carlo tree search with UCB1 action selection that
 exhaustively enumerates a fixed set of 16 macro actions made of equally spaced
 directional vectors (each repeated for the maximum macro length), as in the
 paper's benchmark protocol.  It shares the generative model, depth cut-off,
-leaf value estimate, particle filter and per-decision simulation counts with
-the PORPP reference so that the comparison isolates the search scheme.
+leaf value estimate, particle filter and CPU planning allowance (planning until
+the same fraction of the evaluator's budget is used) with the PORPP reference,
+so that the comparison isolates the search scheme.
 
 Run as an agent:  python -m baseline.pomcp
 """
@@ -15,11 +16,13 @@ from __future__ import annotations
 import argparse
 import math
 import random
+import time
 from typing import Dict, List, Tuple
 
-from data.agent_protocol import run_agent
+from data.agent_protocol import PlanningClock, run_agent
 from data.maze2d import NONE, Maze, Roadmap, update_particles
 
+# Fixed SIMULATE calls per decision, used only with --simulations / when no CPU budget is announced.
 SIMULATIONS = {"standard": 300, "tight": 50}
 
 
@@ -42,7 +45,8 @@ class Node:
 
 class POMCP:
     def __init__(self, instance: dict, seed: int, budget: dict, particles: int = 200, max_depth: int = 50,
-                 exploration: float = 1000.0, n_directions: int = 16, simulations: int = 0):
+                 exploration: float = 1000.0, n_directions: int = 16, simulations: int = 0,
+                 budget_fraction: float = 0.75):
         self.maze = Maze(instance)
         self.roadmap = Roadmap(self.maze)
         self.rng = random.Random(seed)
@@ -57,6 +61,9 @@ class POMCP:
         self.discounts = [self.maze.gamma ** len(a) for a in self.actions]
         self.root = Node(self.maze.initial_particles(particles, self.rng), len(self.actions))
         self.last = None
+        self.clock = None if simulations else PlanningClock(budget, fraction=budget_fraction)
+        if self.clock is not None and not self.clock.active:
+            self.clock = None
 
     def act(self, observations):
         if self.last is not None and observations is not None:
@@ -72,11 +79,16 @@ class POMCP:
                 child.particles = particles
             self.root = child
         rng = self.rng
-        for _ in range(self.sims):
+        deadline = self.clock.deadline() if self.clock else None
+        n = 0
+        while (n < self.sims) if deadline is None else (n < 1 or time.process_time() < deadline):
             x, y = self.root.particles[rng.randrange(len(self.root.particles))]
             self.simulate(self.root, x, y, 0)
+            n += 1
         best = max(range(len(self.actions)), key=lambda a: (self.root.counts[a] > 0, self.root.values[a]))
         self.last = best
+        if self.clock:
+            self.clock.commit(len(self.actions[best]))
         return self.actions[best]
 
     def simulate(self, node: Node, x: float, y: float, depth: int) -> float:

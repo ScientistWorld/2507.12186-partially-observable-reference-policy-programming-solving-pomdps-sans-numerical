@@ -344,6 +344,12 @@ class Roadmap:
             return rng.choice(self.goal_ids)
         return rng.choice(self.landmark_ids)
 
+    def sample_key(self, x: float, y: float, rng: random.Random):
+        """First half of ``sample_candidate``: the sampled target and the
+        candidate key (target, start cell), without building the path."""
+        target = self.sample_target(rng)
+        return (target, self.cell(x, y)), target
+
     def sample_candidate(self, x: float, y: float, rng: random.Random, length: Optional[int] = None):
         """The paper's heuristic action sampler: pick a random landmark or goal
         region and return the truncated roadmap path from the particle.
