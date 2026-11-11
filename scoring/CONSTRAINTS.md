@@ -1,27 +1,32 @@
 # Scientist Constraints
 
-## Environment
+## Task and evaluation
 
-Use the provided scaled maze POMDP in `data/maze_pomdp.py` without changing the
-reward values, start distribution, observation process, transition noise,
-danger region, goal region, episode horizon, or macro-action definitions.
-Changing the environment would make scores incomparable.
+The evaluator (`eval/train/`, `eval/test/`) owns the dynamics, the noise, the layouts and the scoring. Do not modify `eval/`, and do not read `eval/test/` (hidden layouts, starts and noise seeds) from your method.
 
-## Evaluation
+`data/maze2d.py` is a public model of the same task for planning. Editing it does not change how episodes are scored; it only changes your agent's model.
 
-Evaluate by writing JSONL episode artifacts with the same fields used by the
-current method and baseline, then run `scripts/evaluate.sh`. Do not edit
-`eval/` to favor a method.
+## Interface
 
-## Resources
+Submit a method as an agent registered in `checkpoints/agents/<name>.json` that speaks the JSON-lines protocol in `briefing/evaluation.md`. Agents must:
+- return 1–10 finite headings per decision;
+- keep stdout for protocol messages.
 
-Use the same episode budget and random seed protocol as `scripts/reproduce.sh`
-unless explicitly reporting an additional experiment. Improvements should come
-from planning methodology, not from evaluating on easier seeds.
+## Compute
 
-## Compliance Checklist
+Planning is limited by the CPU allowance the evaluator announces in each `reset`. It is measured on the agent's whole process tree:
+- per primitive step of the macro actions returned;
+- separate allowances for start-up and per-instance preparation.
 
-- [ ] `data/maze_pomdp.py` task dynamics and rewards are unchanged
-- [ ] `scripts/evaluate.sh` is used to produce `scoring/scores.json`
-- [ ] Episode artifacts include both success and total reward
-- [ ] RefPol remains the heuristic-only baseline for comparison
+Offloading work to other processes, threads or reset-time precomputation is counted. Exceeding the allowance fails the episode. No GPU is available; there is one CPU per job.
+
+## Data
+
+There are no training sets beyond the public layouts in `eval/train/`. Methods may also generate their own layouts with `data/maze2d.generate_instance` for development or offline learning.
+
+## Compliance checklist
+
+- [ ] The agent is registered in `checkpoints/agents/` and runs through `scripts/evaluate_train.sh` without failures.
+- [ ] `eval/` is unchanged, and the method never opens files under `eval/test/`.
+- [ ] Episodes stay within the announced CPU allowance (see `_diagnostics.max_budget_fraction` in the score files).
+- [ ] Results are compared with the reference on both experiments, using paired per-layout differences.

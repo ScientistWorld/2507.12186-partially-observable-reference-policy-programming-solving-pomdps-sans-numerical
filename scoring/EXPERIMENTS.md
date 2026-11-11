@@ -1,20 +1,27 @@
 # Experiment Overview
 
-## scaled_maze_online_planning
+Both experiments use the same task and the same 300 hidden maze layouts; train uses 100 public layouts. The evaluator runs each agent itself and computes every number from its own rollouts. Every agent faces the same hidden start and noise on each layout.
 
-This experiment tests whether a planner improves over a heuristic-only policy
-on a partially observable navigation task with sparse observations, delayed
-goal reward, and unsafe routes. It is the accessible reproduction benchmark for
-the paper's central claim: online planning should turn useful but imperfect
-candidate actions into a stronger policy than executing those candidates
-directly.
+## maze_standard_budget (weight 0.6)
 
-The official reproduction script also records a POMCP-style tree-search
-baseline with fixed directional macro actions on the same episode format. This
-gives future agents a second comparison point in addition to the heuristic-only
-reference policy.
+**Question.** With a practical per-step planning budget, can an online planner turn an imperfect domain heuristic into a reliable policy for a long-horizon navigation task with very poor localisation?
 
-The primary metric is a relational claim check: a run scores 1 only if the
-planner beats every available baseline on both success rate and mean total
-reward. Raw success, reward, standard error, and baseline-gap metrics remain in
-`scores.json` for diagnosis and optimization.
+**Setting.**
+- The robot does not know which of two starts it is at.
+- It observes its position only at landmarks.
+- Acting on the wrong hypothesis can lead it into a danger zone.
+
+**Scoring.** Success rate is the headline. Discounted return also rewards shorter routes. Collision rate is the safety side.
+
+**Expected order.** The paper's reference planner should clearly beat:
+- executing the heuristic directly;
+- an exhaustively enumerating tree search over fixed directional moves;
+- hand-coded or exhaustive-enumeration policies.
+
+## maze_tight_budget (weight 0.4)
+
+**Question.** The same question with about a fifth of the planning computation per step. This is the anytime regime: the paper's own study shows its planner is weakest here (71% success at its shortest time against 94% at its longest).
+
+**What it shows.**
+- How much performance a method keeps when computation is scarce.
+- Where better use of a fixed budget pays off most.

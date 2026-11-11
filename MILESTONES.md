@@ -4,6 +4,21 @@
 
 ## Progress Log
 
+### [2026-11-11 00:30] - core_claim (hardening, final iteration)
+- Replaced the artifact-reading evaluator with evaluator-owned online rollouts.
+  Agents speak a JSON-lines protocol; the evaluator owns the dynamics and noise
+  and runs on 300 hidden procedurally generated mazes, with an enforced and
+  calibrated CPU planning budget. Failures score worst.
+- Restored the paper's 3D-maze settings where dimension-free: two goals,
+  -500 danger, true-position landmark observations, open-loop roadmap-path
+  macros of length 10, noise covariance 0.02I.
+- PORPP plans "while time permitting" against the CPU allowance.
+- Scored experiments: `maze_standard_budget` (0.6), `maze_tight_budget` (0.4).
+- Reference on the hidden test: success 0.850 / 0.703, against RefPol
+  0.233 / 0.270 and POMCP 0.010 / 0.027.
+- All tested shortcuts score worst; a better-search variant beats the
+  reference beyond seed noise. See HARDENING.md.
+
 ### [2026-06-11 22:51] - core_claim
 - Completed final verification after the optional mirrored-setting setup.
 - Removed the unverified mirrored setting from official scoring targets and

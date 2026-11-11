@@ -1,144 +1,36 @@
 # Progress
 
-## What Works
+## Current state (final hardening iteration)
 
-Documentation has been drafted from `paper/2507.12186.md` for the problem statement, method summary, evaluation protocol, scoring targets, experiment descriptions, scientist constraints, and research direction.
+The gym evaluates **online planners as agents**. `eval/train/evaluate.py` and `eval/test/evaluate.py` are independent copies with their own dynamics (`maze_env.py`) and instance files. Each one:
+- starts every agent registered in `checkpoints/agents/*.json`;
+- sends it public maze layouts;
+- executes its macro actions with evaluator-owned noise;
+- enforces a calibrated CPU planning budget;
+- computes `success_rate`, `mean_return` and `collision_rate` for `maze_standard_budget` (weight 0.6) and `maze_tight_budget` (weight 0.4).
 
-Implemented a scaled continuous maze POMDP and the paper's PORPP online planner
-with particle tree histories, progressive widening, preference-softmax action
-selection, and sampled log-sum-exp preference backups. Implemented RefPol as
-the heuristic-only baseline and an evaluator that reads saved episode JSONL
-artifacts.
+Test results (300 hidden layouts):
 
-Added a POMCP-style baseline in `baseline/pomcp.py` that enumerates fixed
-directional macro actions at each history node, uses particle Monte Carlo tree
-search with UCB selection, and writes the same episode JSONL artifact format as
-the other methods.
+| Agent | Standard success / return / collision | Tight success / return / collision |
+|---|---|---|
+| PORPP (`method/porpp.py`) | 0.850 / 781.3 / 0.150 | 0.703 / 538.9 / 0.297 |
+| RefPol (`baseline/refpol.py`) | 0.233 / −215.8 / 0.747 | 0.270 / −194.6 / 0.713 |
+| POMCP (`baseline/pomcp.py`) | 0.010 / −426.9 / 0.000 | 0.027 / −414.2 / 0.043 |
 
-## Results
+On train (100 public layouts) PORPP scores 0.91 / 0.67 in `scores_train.json`. A second, time-based pass for `scores.json` gave 0.88 / 0.70.
 
-Paper reference numbers are recorded in `scoring/reference.json` for the two
-original benchmark tables. The file also includes a supplemental
-`scaled_maze_online_planning` schema because the local validator requires
-scored experiments to appear in the reference file; its numeric rows are
-derived from the paper's original 3D-maze Table 1 values, not from this
-reproduction's scaled-maze scores. The final revised CPU job on the accessible
-scaled maze with 32 episodes produced:
+Verification of variants and shortcuts: `HARDENING.md` and `redteam/hardening/`.
 
-- PORPP: success rate 0.875, mean total reward 1135.4.
-- RefPol: success rate 0.6875, mean total reward 495.2.
-- Directional POMCP: success rate 0.28125, mean total reward 239.7.
-- PORPP gaps: +0.1875 success rate and +640.2 mean total reward vs RefPol.
+## Reproduce
 
-The job ran `scripts/run.sh`, wrote `scoring/scores.json`, and passed
-`python validate.py --compare`.
+- `bash scripts/run.sh` (= `scripts/reproduce.sh`; CPU only, about 65 min on one core).
+- `bash redteam/hardening/run_checks.sh` reruns the hardening cases.
+- `python -m redteam.hardening.analyze` summarises them.
 
-The corrected POMCP follow-up job (`2c2a8d2f-ba9`) completed successfully
-after replacing the unfair heuristic-target macro actions with fixed
-directional macro actions. Its `validate.py --compare` output passed all
-scoring and structure checks, including method/eval import separation,
-artifact-based evaluation, and no committed `shared/` references.
+## Deviations from the paper
 
-The job also tested an anytime-budget extension on the same scaled maze. The
-first CPU run completed successfully, but the 150-simulation "low" budget was
-already strong on the selected seeds:
-
-- PORPP low budget: success rate 0.9167, mean total reward 1270.9.
-- PORPP high budget: success rate 0.8750, mean total reward 1123.3.
-
-This did not support `core_claim_plus`; the low-budget setting was reduced to
-25 simulations. The immediate rerun still used 150 simulations because the
-script's command-line `--simulations` default remained stale even though the
-inline environment assignment had been reduced. That bug was fixed, and PORPP
-episode artifacts now include the `simulations` field so future logs expose the
-actual planning budget used.
-
-The corrected low/high run completed with 25 vs 700 simulations:
-
-- PORPP low budget: success rate 0.875, mean total reward 1121.6.
-- PORPP high budget: success rate 0.875, mean total reward 1123.3.
-
-The high-budget reward gain was only +1.7 with reward standard errors around
-225 and no success-rate improvement, so this axis is documented as an
-inconclusive extension attempt rather than included as an official scoring
-target.
-
-Final validation after cleaning the scoring contract:
-
-- `scripts/evaluate.sh` writes `scoring/scores.json` for
-  `scaled_maze_online_planning`.
-- `python validate.py --compare` passes with reference/scores structure,
-  method/eval import separation, artifact-based evaluation, and no committed
-  `shared/` references.
-
-Current turn update:
-
-- Added optional POMCP artifact support to `eval/evaluate_maze.py`.
-- Updated `scripts/reproduce.sh` to run RefPol, POMCP, PORPP, and then the
-  evaluator. The previous low/high anytime artifacts were removed from the
-  official reproduction path because that extension was inconclusive and is not
-  an official scoring target.
-- Lightweight checks passed: Python bytecode compilation, a one-episode POMCP
-  smoke run, a smoke evaluator run, and `python validate.py --compare`.
-- Audit fix: replaced the circular scaled-maze reference rows with paper
-  Table 1-derived scale anchors. This keeps `reference.json` from copying the
-  reproduced `scores.json` values.
-- Post-job fix: the first POMCP run used the domain-specific target macro
-  actions, which made it an unfairly strong baseline relative to the paper's
-  POMCP protocol. POMCP now enumerates fixed directional macro actions instead.
-- Final job review: the corrected POMCP run passed validation and supports the
-  packaged `core_claim` milestone. PORPP outperformed both RefPol and the
-  corrected directional POMCP baseline on the official scaled-maze score.
-- Validation fix: the supplemental scaled-maze experiment now uses
-  `core_claim_supported` as its primary metric. This is computed from
-  evaluation artifacts and checks the paper's relational claim directly,
-  avoiding an invalid numerical comparison between substitute-environment
-  baseline success rates and the unreleased original 3D-maze simulator.
-- Packaging fix: `scripts/run.sh` now regenerates RefPol, POMCP, and PORPP
-  artifacts via `scripts/reproduce.sh` before writing full, train-slice, and
-  held-out test scores. This avoids relying on gitignored checkpoint artifacts
-  from earlier jobs.
-- Scoring hygiene: `eval/evaluate_maze.py` now reports `valid_episode_rate`
-  and `unique_seed_rate` in the default `scores.json`, matching the scoring
-  contract used by `reference.json` and the train/test evaluators.
-- Repository hygiene: generated `jobs/` outputs were removed from the git
-  index; future job outputs remain ignored.
-- Lightweight local validation passed after these changes:
-  `python -m compileall -q method baseline data eval`, `bash scripts/evaluate.sh`,
-  and `python validate.py --compare`.
-- Final verification: the optional `mirrored_danger` extension had only smoke
-  artifacts and no completed scored job, so it was removed from the official
-  scoring targets and from the default reproduction path. The implementation
-  can still carry scenario metadata, but the validated gym benchmark remains
-  the completed `scaled_maze_online_planning` experiment.
-- Final verification also softened method-specific wording in the
-  method-safe research-direction document and rechecked that the official
-  method-agnostic files describe the problem and evaluation without exposing
-  implementation details.
-
-## Remaining
-
-- No job is pending. The validated package stops at `core_claim`.
-- Higher milestones would require completing and scoring an additional setting,
-  implementing additional original-paper settings or another paper baseline
-  such as RefSolver, or reproducing the original 3D/Corsica environments if
-  they become available.
-- The exact 3D maze and HEMS simulators remain unavailable, so this environment stops at the accessible scaled core-claim reproduction.
-
-## Issues
-
-The paper markdown appears to be OCR-derived in places, so some equations and pseudocode text are noisy. The high-level documentation is based on the readable sections and reported tables.
-
-The paper does not provide the exact 3D maze/Corsica simulators or a
-paper-specific code repository in the workspace.
-
-## Deviations from Paper
-
-The original unreleased 3D maze and HEMS simulators are replaced by a small
-continuous maze analogue in `data/maze_pomdp.py`. The substitute preserves the
-core evaluation phenomenon needed for the method: partial observability, sparse
-landmark localization, macro actions, delayed goal reward, and a heuristic
-candidate sampler that is useful but insufficient. The PORPP algorithm itself
-is not replaced. The danger penalty in the substitute is larger than the
-paper's 3D maze penalty so that direct heuristic routes remain clearly unsafe
-at the smaller scale.
+- The original 3D-maze and HEMS simulators are unreleased. The gym uses a 2D, procedurally generated stand-in for the 3D maze (44×30 cells, routes of 30–60 steps, 200-step horizon). The paper's dimension-free settings are kept.
+- The probabilistic roadmap is a lattice roadmap with 0.7 units of danger clearance.
+- Wall-clock planning time is replaced by a calibrated CPU allowance per primitive step. PORPP plans until 75% of it is used.
+- PORPP settings the paper leaves open: η = 0.02, κ = 2, α = 0.5, D_max = 50, 200 root particles, new-child preference = node value.
+- RefSolver and the HEMS experiment are not implemented.

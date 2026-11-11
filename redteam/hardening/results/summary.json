@@ -1,0 +1,758 @@
+{
+  "rank_scales_population_std": {
+    "maze_standard_budget.success_rate": 0.3732886596729851,
+    "maze_standard_budget.mean_return": 567.0868582830334,
+    "maze_standard_budget.collision_rate": 0.38236289864916295,
+    "maze_tight_budget.success_rate": 0.31574039570432083,
+    "maze_tight_budget.mean_return": 469.56512884879197,
+    "maze_tight_budget.collision_rate": 0.3309767992955362
+  },
+  "seed_spread": {
+    "maze_standard_budget.success_rate": 0.026666666666666727,
+    "maze_standard_budget.mean_return": 31.70512699048379,
+    "maze_standard_budget.collision_rate": 0.03,
+    "maze_tight_budget.success_rate": 0.020000000000000018,
+    "maze_tight_budget.mean_return": 35.65226210929018,
+    "maze_tight_budget.collision_rate": 0.020000000000000018,
+    "rank": 0.051123135245305706
+  },
+  "cases": {
+    "porpp_depth30": {
+      "delta_rank": 0.2667087653318661,
+      "scores": {
+        "maze_standard_budget": {
+          "success_rate": 0.8933333333333333,
+          "mean_return": 861.4700576013606,
+          "collision_rate": 0.10666666666666667
+        },
+        "maze_tight_budget": {
+          "success_rate": 0.7633333333333333,
+          "mean_return": 641.0022688280625,
+          "collision_rate": 0.23666666666666666
+        }
+      },
+      "paired_vs_reference": {
+        "maze_standard_budget": {
+          "n": 300,
+          "success_diff": 0.043333333333333335,
+          "success_diff_se": 0.0237124794079612,
+          "return_diff": 80.19641830080305,
+          "return_diff_se": 36.57790937743976
+        },
+        "maze_tight_budget": {
+          "n": 300,
+          "success_diff": 0.06,
+          "success_diff_se": 0.030768673350580745,
+          "return_diff": 102.11298517019259,
+          "return_diff_se": 46.20769032360718
+        }
+      }
+    },
+    "porpp_plus": {
+      "delta_rank": 0.19605373539434093,
+      "scores": {
+        "maze_standard_budget": {
+          "success_rate": 0.8833333333333333,
+          "mean_return": 822.2537414087586,
+          "collision_rate": 0.11666666666666667
+        },
+        "maze_tight_budget": {
+          "success_rate": 0.7566666666666667,
+          "mean_return": 595.3311651580526,
+          "collision_rate": 0.24333333333333335
+        }
+      },
+      "paired_vs_reference": {
+        "maze_standard_budget": {
+          "n": 300,
+          "success_diff": 0.03333333333333333,
+          "success_diff_se": 0.023530777934850543,
+          "return_diff": 40.98010210820162,
+          "return_diff_se": 36.26647998125528
+        },
+        "maze_tight_budget": {
+          "n": 300,
+          "success_diff": 0.05333333333333334,
+          "success_diff_se": 0.03290923070547473,
+          "return_diff": 56.44188150018284,
+          "return_diff_se": 49.24067051419665
+        }
+      }
+    },
+    "porpp": {
+      "delta_rank": 0.0,
+      "scores": {
+        "maze_standard_budget": {
+          "success_rate": 0.85,
+          "mean_return": 781.2736393005575,
+          "collision_rate": 0.15
+        },
+        "maze_tight_budget": {
+          "success_rate": 0.7033333333333334,
+          "mean_return": 538.8892836578697,
+          "collision_rate": 0.2966666666666667
+        }
+      },
+      "paired_vs_reference": {
+        "maze_standard_budget": {
+          "n": 300,
+          "success_diff": 0.0,
+          "success_diff_se": 0.0,
+          "return_diff": 0.0,
+          "return_diff_se": 0.0
+        },
+        "maze_tight_budget": {
+          "n": 300,
+          "success_diff": 0.0,
+          "success_diff_se": 0.0,
+          "return_diff": 0.0,
+          "return_diff_se": 0.0
+        }
+      }
+    },
+    "porpp_fixed_sims": {
+      "delta_rank": -0.016519252838165886,
+      "scores": {
+        "maze_standard_budget": {
+          "success_rate": 0.8466666666666667,
+          "mean_return": 772.7550339317504,
+          "collision_rate": 0.15333333333333332
+        },
+        "maze_tight_budget": {
+          "success_rate": 0.7033333333333334,
+          "mean_return": 526.3347500780818,
+          "collision_rate": 0.2966666666666667
+        }
+      },
+      "paired_vs_reference": {
+        "maze_standard_budget": {
+          "n": 300,
+          "success_diff": -0.0033333333333333335,
+          "success_diff_se": 0.022889552724586468,
+          "return_diff": -8.518605368806611,
+          "return_diff_se": 34.40300796185046
+        },
+        "maze_tight_budget": {
+          "n": 300,
+          "success_diff": 0.0,
+          "success_diff_se": 0.030963710913487128,
+          "return_diff": -12.554533579788293,
+          "return_diff_se": 46.703836064185346
+        }
+      }
+    },
+    "porpp_seed2": {
+      "delta_rank": -0.026284525392038682,
+      "scores": {
+        "maze_standard_budget": {
+          "success_rate": 0.8533333333333334,
+          "mean_return": 787.9094481345753,
+          "collision_rate": 0.14333333333333334
+        },
+        "maze_tight_budget": {
+          "success_rate": 0.6866666666666666,
+          "mean_return": 511.61199689181444,
+          "collision_rate": 0.31333333333333335
+        }
+      },
+      "paired_vs_reference": {
+        "maze_standard_budget": {
+          "n": 300,
+          "success_diff": 0.0033333333333333335,
+          "success_diff_se": 0.02337152472491468,
+          "return_diff": 6.635808834017619,
+          "return_diff_se": 37.17278737826867
+        },
+        "maze_tight_budget": {
+          "n": 300,
+          "success_diff": -0.016666666666666666,
+          "success_diff_se": 0.03484584088920951,
+          "return_diff": -27.277286766055354,
+          "return_diff_se": 51.20829782158997
+        }
+      }
+    },
+    "porpp_seed1": {
+      "delta_rank": -0.051123135245305706,
+      "scores": {
+        "maze_standard_budget": {
+          "success_rate": 0.8266666666666667,
+          "mean_return": 756.2043211440915,
+          "collision_rate": 0.17333333333333334
+        },
+        "maze_tight_budget": {
+          "success_rate": 0.7066666666666667,
+          "mean_return": 547.2642590011046,
+          "collision_rate": 0.29333333333333333
+        }
+      },
+      "paired_vs_reference": {
+        "maze_standard_budget": {
+          "n": 300,
+          "success_diff": -0.023333333333333334,
+          "success_diff_se": 0.025172020590074656,
+          "return_diff": -25.06931815646579,
+          "return_diff_se": 38.74686531539748
+        },
+        "maze_tight_budget": {
+          "n": 300,
+          "success_diff": 0.0033333333333333335,
+          "success_diff_se": 0.03485863578853212,
+          "return_diff": 8.374975343234997,
+          "return_diff_se": 52.54408719879146
+        }
+      }
+    },
+    "ucb_candidates": {
+      "delta_rank": -0.10433639561973047,
+      "scores": {
+        "maze_standard_budget": {
+          "success_rate": 0.8333333333333334,
+          "mean_return": 790.3789299150122,
+          "collision_rate": 0.16666666666666666
+        },
+        "maze_tight_budget": {
+          "success_rate": 0.6666666666666666,
+          "mean_return": 495.93328329442437,
+          "collision_rate": 0.3333333333333333
+        }
+      },
+      "paired_vs_reference": {
+        "maze_standard_budget": {
+          "n": 300,
+          "success_diff": -0.016666666666666666,
+          "success_diff_se": 0.02428846216369452,
+          "return_diff": 9.105290614455056,
+          "return_diff_se": 37.936449118294405
+        },
+        "maze_tight_budget": {
+          "n": 300,
+          "success_diff": -0.03666666666666667,
+          "success_diff_se": 0.03281593996850236,
+          "return_diff": -42.956000363445625,
+          "return_diff_se": 48.811242208727926
+        }
+      },
+      "unscored_if_budget_ignored": {
+        "maze_standard_budget": null,
+        "maze_tight_budget": {
+          "would_be_success_rate": 0.67,
+          "would_be_mean_return": 499.97487804670874,
+          "budget_violations": 1
+        }
+      }
+    },
+    "porpp_stratified": {
+      "delta_rank": -0.11558025532132703,
+      "scores": {
+        "maze_standard_budget": {
+          "success_rate": 0.82,
+          "mean_return": 723.2033520572268,
+          "collision_rate": 0.18
+        },
+        "maze_tight_budget": {
+          "success_rate": 0.6966666666666667,
+          "mean_return": 502.6903092703606,
+          "collision_rate": 0.3
+        }
+      },
+      "paired_vs_reference": {
+        "maze_standard_budget": {
+          "n": 300,
+          "success_diff": -0.03,
+          "success_diff_se": 0.02514838904526304,
+          "return_diff": -58.070287243329595,
+          "return_diff_se": 38.55619888558633
+        },
+        "maze_tight_budget": {
+          "n": 300,
+          "success_diff": -0.006666666666666667,
+          "success_diff_se": 0.03437394638769081,
+          "return_diff": -36.19897438750924,
+          "return_diff_se": 51.62682842127465
+        }
+      }
+    },
+    "localise_then_goal": {
+      "delta_rank": -1.1010981830098356,
+      "scores": {
+        "maze_standard_budget": {
+          "success_rate": 0.5566666666666666,
+          "mean_return": 329.4545657899981,
+          "collision_rate": 0.44333333333333336
+        },
+        "maze_tight_budget": {
+          "success_rate": 0.5766666666666667,
+          "mean_return": 358.6273861004414,
+          "collision_rate": 0.42333333333333334
+        }
+      },
+      "paired_vs_reference": {
+        "maze_standard_budget": {
+          "n": 300,
+          "success_diff": -0.29333333333333333,
+          "success_diff_se": 0.03472886967211983,
+          "return_diff": -451.8190735105579,
+          "return_diff_se": 52.84202993748111
+        },
+        "maze_tight_budget": {
+          "n": 300,
+          "success_diff": -0.12666666666666668,
+          "success_diff_se": 0.037357931058964136,
+          "return_diff": -180.26189755742809,
+          "return_diff_se": 56.45945919779151
+        }
+      }
+    },
+    "bruteforce_sequences": {
+      "delta_rank": -1.115936021362414,
+      "scores": {
+        "maze_standard_budget": {
+          "success_rate": 0.5666666666666667,
+          "mean_return": 414.58200651309727,
+          "collision_rate": 0.43333333333333335
+        },
+        "maze_tight_budget": {
+          "success_rate": 0.5266666666666666,
+          "mean_return": 355.29755079021504,
+          "collision_rate": 0.47333333333333333
+        }
+      },
+      "paired_vs_reference": {
+        "maze_standard_budget": {
+          "n": 300,
+          "success_diff": -0.2833333333333333,
+          "success_diff_se": 0.034199993263226765,
+          "return_diff": -366.6916327874586,
+          "return_diff_se": 53.820576459075475
+        },
+        "maze_tight_budget": {
+          "n": 300,
+          "success_diff": -0.17666666666666667,
+          "success_diff_se": 0.03682443003419055,
+          "return_diff": -183.59173286765454,
+          "return_diff_se": 58.382523302851865
+        }
+      }
+    },
+    "goal_direct": {
+      "delta_rank": -1.7585355217295247,
+      "scores": {
+        "maze_standard_budget": {
+          "success_rate": 0.39666666666666667,
+          "mean_return": 152.15343038351074,
+          "collision_rate": 0.6033333333333334
+        },
+        "maze_tight_budget": {
+          "success_rate": 0.4533333333333333,
+          "mean_return": 240.7890477239599,
+          "collision_rate": 0.5466666666666666
+        }
+      },
+      "paired_vs_reference": {
+        "maze_standard_budget": {
+          "n": 300,
+          "success_diff": -0.4533333333333333,
+          "success_diff_se": 0.0337785209877359,
+          "return_diff": -629.1202089170455,
+          "return_diff_se": 54.56739546936122
+        },
+        "maze_tight_budget": {
+          "n": 300,
+          "success_diff": -0.25,
+          "success_diff_se": 0.0375162543739637,
+          "return_diff": -298.10023593390974,
+          "return_diff_se": 59.12951413608199
+        }
+      }
+    },
+    "porpp_one_sim": {
+      "delta_rank": -2.4308432043630854,
+      "scores": {
+        "maze_standard_budget": {
+          "success_rate": 0.31666666666666665,
+          "mean_return": -125.16576000402053,
+          "collision_rate": 0.6766666666666666
+        },
+        "maze_tight_budget": {
+          "success_rate": 0.31333333333333335,
+          "mean_return": -117.52124965566504,
+          "collision_rate": 0.6733333333333333
+        }
+      },
+      "paired_vs_reference": {
+        "maze_standard_budget": {
+          "n": 300,
+          "success_diff": -0.5333333333333333,
+          "success_diff_se": 0.032486454885412235,
+          "return_diff": -906.4393993045766,
+          "return_diff_se": 44.541895566080015
+        },
+        "maze_tight_budget": {
+          "n": 300,
+          "success_diff": -0.39,
+          "success_diff_se": 0.03647970985039808,
+          "return_diff": -656.4105333135348,
+          "return_diff_se": 50.39529113246873
+        }
+      }
+    },
+    "refpol": {
+      "delta_rank": -2.7400229869161756,
+      "scores": {
+        "maze_standard_budget": {
+          "success_rate": 0.23333333333333334,
+          "mean_return": -215.81506466619646,
+          "collision_rate": 0.7466666666666667
+        },
+        "maze_tight_budget": {
+          "success_rate": 0.27,
+          "mean_return": -194.61504185364242,
+          "collision_rate": 0.7133333333333334
+        }
+      },
+      "paired_vs_reference": {
+        "maze_standard_budget": {
+          "n": 300,
+          "success_diff": -0.6166666666666667,
+          "success_diff_se": 0.03183651568490238,
+          "return_diff": -997.0887039667525,
+          "return_diff_se": 44.89243017316687
+        },
+        "maze_tight_budget": {
+          "n": 300,
+          "success_diff": -0.43333333333333335,
+          "success_diff_se": 0.03590937848802882,
+          "return_diff": -733.5043255115122,
+          "return_diff_se": 47.9968667626803
+        }
+      }
+    },
+    "pomcp": {
+      "delta_rank": -3.117124812109701,
+      "scores": {
+        "maze_standard_budget": {
+          "success_rate": 0.01,
+          "mean_return": -426.91495121452704,
+          "collision_rate": 0.0
+        },
+        "maze_tight_budget": {
+          "success_rate": 0.02666666666666667,
+          "mean_return": -414.20897977771676,
+          "collision_rate": 0.043333333333333335
+        }
+      },
+      "paired_vs_reference": {
+        "maze_standard_budget": {
+          "n": 300,
+          "success_diff": -0.84,
+          "success_diff_se": 0.021201375610068258,
+          "return_diff": -1208.1885905150818,
+          "return_diff_se": 32.35269586036001
+        },
+        "maze_tight_budget": {
+          "n": 300,
+          "success_diff": -0.6766666666666666,
+          "success_diff_se": 0.027459642357098978,
+          "return_diff": -953.0982634355853,
+          "return_diff_se": 40.407712255108756
+        }
+      }
+    },
+    "shortcut_easier_model": {
+      "delta_rank": -3.257469954435038,
+      "scores": {
+        "maze_standard_budget": {
+          "success_rate": 0.16333333333333333,
+          "mean_return": -284.94659625282253,
+          "collision_rate": 0.81
+        },
+        "maze_tight_budget": {
+          "success_rate": 0.10333333333333333,
+          "mean_return": -380.0810290895169,
+          "collision_rate": 0.89
+        }
+      },
+      "paired_vs_reference": {
+        "maze_standard_budget": {
+          "n": 300,
+          "success_diff": -0.6866666666666666,
+          "success_diff_se": 0.030335667030176497,
+          "return_diff": -1066.2202355533786,
+          "return_diff_se": 44.11377580234592
+        },
+        "maze_tight_budget": {
+          "n": 300,
+          "success_diff": -0.6,
+          "success_diff_se": 0.029864054671577645,
+          "return_diff": -918.9703127473864,
+          "return_diff_se": 43.19878334160799
+        }
+      },
+      "unscored_if_budget_ignored": {
+        "maze_standard_budget": null,
+        "maze_tight_budget": {
+          "would_be_success_rate": 0.12,
+          "would_be_mean_return": -361.41836347501606,
+          "budget_violations": 28
+        }
+      }
+    },
+    "porpp_private_search_3x": {
+      "delta_rank": -3.9235261317822223,
+      "scores": {
+        "maze_standard_budget": {
+          "success_rate": 0.0,
+          "mean_return": -500.0,
+          "collision_rate": 1.0
+        },
+        "maze_tight_budget": {
+          "success_rate": 0.0,
+          "mean_return": -500.0,
+          "collision_rate": 1.0
+        }
+      },
+      "paired_vs_reference": {
+        "maze_standard_budget": {
+          "n": 100,
+          "success_diff": -0.85,
+          "success_diff_se": 0.03588702812826367,
+          "return_diff": -1290.8875947028316,
+          "return_diff_se": 56.34721439663291
+        },
+        "maze_tight_budget": {
+          "n": 100,
+          "success_diff": -0.69,
+          "success_diff_se": 0.046482319871173176,
+          "return_diff": -1037.5383413053025,
+          "return_diff_se": 71.21036562750132
+        }
+      },
+      "unscored_if_budget_ignored": {
+        "maze_standard_budget": {
+          "would_be_success_rate": 0.88,
+          "would_be_mean_return": 839.7022872532539,
+          "budget_violations": 98
+        },
+        "maze_tight_budget": {
+          "would_be_success_rate": 0.79,
+          "would_be_mean_return": 682.5687439008211,
+          "budget_violations": 91
+        }
+      }
+    },
+    "shortcut_crash": {
+      "delta_rank": -3.9235261317822223,
+      "scores": {
+        "maze_standard_budget": {
+          "success_rate": 0.0,
+          "mean_return": -500.0,
+          "collision_rate": 1.0
+        },
+        "maze_tight_budget": {
+          "success_rate": 0.0,
+          "mean_return": -500.0,
+          "collision_rate": 1.0
+        }
+      },
+      "paired_vs_reference": {
+        "maze_standard_budget": {
+          "n": 100,
+          "success_diff": -0.85,
+          "success_diff_se": 0.03588702812826367,
+          "return_diff": -1290.8875947028316,
+          "return_diff_se": 56.34721439663291
+        },
+        "maze_tight_budget": {
+          "n": 100,
+          "success_diff": -0.69,
+          "success_diff_se": 0.046482319871173176,
+          "return_diff": -1037.5383413053025,
+          "return_diff_se": 71.21036562750132
+        }
+      }
+    },
+    "shortcut_fabricate": {
+      "delta_rank": -3.9235261317822223,
+      "scores": {
+        "maze_standard_budget": {
+          "success_rate": 0.0,
+          "mean_return": -500.0,
+          "collision_rate": 1.0
+        },
+        "maze_tight_budget": {
+          "success_rate": 0.0,
+          "mean_return": -500.0,
+          "collision_rate": 1.0
+        }
+      },
+      "paired_vs_reference": {
+        "maze_standard_budget": {
+          "n": 100,
+          "success_diff": -0.85,
+          "success_diff_se": 0.03588702812826367,
+          "return_diff": -1290.8875947028316,
+          "return_diff_se": 56.34721439663291
+        },
+        "maze_tight_budget": {
+          "n": 100,
+          "success_diff": -0.69,
+          "success_diff_se": 0.046482319871173176,
+          "return_diff": -1037.5383413053025,
+          "return_diff_se": 71.21036562750132
+        }
+      }
+    },
+    "shortcut_huge_macro": {
+      "delta_rank": -3.9235261317822223,
+      "scores": {
+        "maze_standard_budget": {
+          "success_rate": 0.0,
+          "mean_return": -500.0,
+          "collision_rate": 1.0
+        },
+        "maze_tight_budget": {
+          "success_rate": 0.0,
+          "mean_return": -500.0,
+          "collision_rate": 1.0
+        }
+      },
+      "paired_vs_reference": {
+        "maze_standard_budget": {
+          "n": 100,
+          "success_diff": -0.85,
+          "success_diff_se": 0.03588702812826367,
+          "return_diff": -1290.8875947028316,
+          "return_diff_se": 56.34721439663291
+        },
+        "maze_tight_budget": {
+          "n": 100,
+          "success_diff": -0.69,
+          "success_diff_se": 0.046482319871173176,
+          "return_diff": -1037.5383413053025,
+          "return_diff_se": 71.21036562750132
+        }
+      }
+    },
+    "shortcut_missing_method": {
+      "delta_rank": -3.9235261317822223,
+      "scores": {
+        "maze_standard_budget": {
+          "success_rate": 0.0,
+          "mean_return": -500.0,
+          "collision_rate": 1.0
+        },
+        "maze_tight_budget": {
+          "success_rate": 0.0,
+          "mean_return": -500.0,
+          "collision_rate": 1.0
+        }
+      }
+    },
+    "shortcut_nan_output": {
+      "delta_rank": -3.9235261317822223,
+      "scores": {
+        "maze_standard_budget": {
+          "success_rate": 0.0,
+          "mean_return": -500.0,
+          "collision_rate": 1.0
+        },
+        "maze_tight_budget": {
+          "success_rate": 0.0,
+          "mean_return": -500.0,
+          "collision_rate": 1.0
+        }
+      },
+      "paired_vs_reference": {
+        "maze_standard_budget": {
+          "n": 100,
+          "success_diff": -0.85,
+          "success_diff_se": 0.03588702812826367,
+          "return_diff": -1290.8875947028316,
+          "return_diff_se": 56.34721439663291
+        },
+        "maze_tight_budget": {
+          "n": 100,
+          "success_diff": -0.69,
+          "success_diff_se": 0.046482319871173176,
+          "return_diff": -1037.5383413053025,
+          "return_diff_se": 71.21036562750132
+        }
+      }
+    },
+    "shortcut_offload_process": {
+      "delta_rank": -3.9235261317822223,
+      "scores": {
+        "maze_standard_budget": {
+          "success_rate": 0.0,
+          "mean_return": -500.0,
+          "collision_rate": 1.0
+        },
+        "maze_tight_budget": {
+          "success_rate": 0.0,
+          "mean_return": -500.0,
+          "collision_rate": 1.0
+        }
+      },
+      "paired_vs_reference": {
+        "maze_standard_budget": {
+          "n": 40,
+          "success_diff": -0.825,
+          "success_diff_se": 0.06084343084444759,
+          "return_diff": -1254.6797564767942,
+          "return_diff_se": 95.98688407588014
+        },
+        "maze_tight_budget": {
+          "n": 40,
+          "success_diff": -0.675,
+          "success_diff_se": 0.075,
+          "return_diff": -1035.8294733317532,
+          "return_diff_se": 116.50387667235235
+        }
+      },
+      "unscored_if_budget_ignored": {
+        "maze_standard_budget": {
+          "would_be_success_rate": 0.775,
+          "would_be_mean_return": 728.848519319112,
+          "budget_violations": 40
+        },
+        "maze_tight_budget": {
+          "would_be_success_rate": 0.775,
+          "would_be_mean_return": 674.3865551423482,
+          "budget_violations": 40
+        }
+      }
+    },
+    "shortcut_reset_precompute": {
+      "delta_rank": -3.9235261317822223,
+      "scores": {
+        "maze_standard_budget": {
+          "success_rate": 0.0,
+          "mean_return": -500.0,
+          "collision_rate": 1.0
+        },
+        "maze_tight_budget": {
+          "success_rate": 0.0,
+          "mean_return": -500.0,
+          "collision_rate": 1.0
+        }
+      },
+      "paired_vs_reference": {
+        "maze_standard_budget": {
+          "n": 40,
+          "success_diff": -0.825,
+          "success_diff_se": 0.06084343084444759,
+          "return_diff": -1254.6797564767942,
+          "return_diff_se": 95.98688407588014
+        },
+        "maze_tight_budget": {
+          "n": 40,
+          "success_diff": -0.675,
+          "success_diff_se": 0.075,
+          "return_diff": -1035.8294733317532,
+          "return_diff_se": 116.50387667235235
+        }
+      }
+    }
+  }
+}

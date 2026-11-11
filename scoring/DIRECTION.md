@@ -1,30 +1,29 @@
 # Research Direction
 
-## Research Problem
+## Research problem
 
-The benchmark studies online planning for long-horizon POMDP navigation with
-continuous states, macro actions, sparse observations, delayed rewards, and
-limited planning computation per executed action.
+Online planning for long-horizon POMDP navigation, with continuous states, macro actions, very sparse localisation, delayed rewards and a hard per-step computation budget.
 
-## Core Contribution
+## Core contribution sought
 
-Work should improve online belief-space planning that evaluates candidate
-macro actions with simulated futures before each executed action. The point is
-to make imperfect domain heuristics useful without simply executing them
-directly.
+Better online belief-space planning: deciding, before each executed macro action, which candidate actions to explore and how to estimate their long-term value under an uncertain belief. The goal is to turn a useful but unreliable domain heuristic into a reliable policy, especially when computation is scarce.
 
-## Approach Scope
+## In scope
 
-In-bounds changes include better tree search rules, belief-state management,
-candidate-action generation, rollout/value estimation, and planning-time
-allocation, provided the planner remains an online POMDP planner using the same
-environment and evaluation artifacts.
+- Search and selection rules.
+- Value backups and value estimates.
+- Belief representation and update.
+- Candidate-action generation.
+- Allocation of the planning budget across decisions.
+- Variance reduction.
+- Learned components trained on self-generated layouts.
+- More efficient implementations.
 
-## Out of Bounds
+All of these must stay within the evaluator's CPU allowance on unseen layouts.
 
-- Replacing the task with a fully observable shortest-path problem.
-- Hardcoding action sequences for the fixed map or seed set.
-- Using external training data or offline supervised policies tailored to the
-  evaluation episodes.
-- Changing the reward function, observation model, or transition model to make
-  the task easier.
+## Out of scope
+
+- Reading hidden evaluation files, or otherwise obtaining the true start or noise.
+- Exceeding or evading the compute allowance (other processes, reset-time planning).
+- Changing the evaluator, the task constants or the scoring.
+- Hard-coding behaviour for specific evaluation layouts.

@@ -1,5 +1,3 @@
-action: submit
-gpus: 0
-test: false
+action: done
 milestone: core_claim
-notes: "Verification job 2: reference agents (PORPP/POMCP now plan to 75% of the evaluator's CPU allowance, Alg. 1 'while time permitting') on train + 300 hidden test instances with persistent agent processes; then candidate improvements, reference seeds, weaker policies, brute force, private search and shortcuts through the hidden-test evaluator. CPU only, ~2 h."
+notes: "Hardened: evaluator-owned online rollouts of registered agents on 300 hidden mazes with an enforced, calibrated CPU budget; worst values for any failure; PORPP 0.850/0.703 success vs RefPol 0.233/0.270, POMCP 0.010/0.027; a better-search variant beats the reference beyond seed noise; all tested shortcuts score worst. See HARDENING.md."

@@ -1,47 +1,92 @@
 # Evaluation
 
-Evaluation measures online planner performance on the two benchmark POMDP scenarios described in the paper. This document specifies the task metrics and comparison protocol without assuming any particular solution method.
+## How a method is evaluated
 
-## Metrics
+A method is an **agent**: any command registered by a manifest `checkpoints/agents/<name>.json` of the form
 
-- **Expected total reward:** mean cumulative discounted reward over independent evaluation episodes. Higher is better. Report the mean and uncertainty estimate in the same form as the paper.
-- **Success rate:** percentage of evaluation episodes in which the agent completes the mission objective before terminating unsuccessfully or exhausting the episode budget. Higher is better.
-- **Planning-time response:** change in expected total reward and success rate as the allowed online planning time per decision increases. Better planners should show a non-negative trend across practical time budgets.
-- **Baseline gap:** difference in reward and success rate relative to the reference-policy-only baseline, the reference-based online solver baseline, and the POMCP baseline under matched task and timing conditions.
+```json
+{"command": ["python", "-m", "my_package.my_agent"]}
+```
 
-## Baselines and Targets
+The evaluator runs the agent inside its own rollouts. It never reads files the agent writes.
 
-The paper reports 100-run averages for each setting.
+**Process and messages.** The evaluator starts the command with the workspace root as the working directory and on `PYTHONPATH`. One process serves consecutive episodes, and is restarted after any failure. The evaluator and the agent exchange one JSON object per line over stdin/stdout. Stdout is reserved for protocol messages; log to stderr.
 
-### 3D Maze with Poor Localisation
+```
+evaluator -> {"type": "hello"}                                    agent -> {"type": "hello"}
+evaluator -> {"type": "reset", "instance": {...}, "seed": int, "budget": {...}}
+                                                                  agent -> {"type": "ready"}
+evaluator -> {"type": "act", "step": t, "observations": null | [null | [x, y], ...]}
+                                                                  agent -> {"type": "action", "headings": [h1, ..., hk]}   (1 <= k <= 10)
+... until the episode ends ...
+evaluator -> {"type": "end"}        (then another reset, or {"type": "shutdown"})
+```
 
-Maximum macro-action length is 10. The reported target system reaches:
+**What the agent receives:**
+- `instance` is the public layout: `grid` (rows of `#`/`.`, row index = y), `starts`, `goals`, `dangers` and `landmarks` (each `[x, y, radius]`), and the task constants (`gamma`, rewards, `motion_noise_std`, `step_size`, `max_macro_len`, `horizon`).
+- `observations` lists, for every primitive step of the previous macro action, either `null` or the observed position.
+- `seed` is a fixed per-instance seed for the agent's own randomness.
 
-- 1 second: 71% success, 570.3 +/- 183.5 expected total reward.
-- 2 seconds: 75% success, 628.9 +/- 191.3 expected total reward.
-- 3 seconds: 80% success, 625.0 +/- 215.2 expected total reward.
-- 5 seconds: 81% success, 688.3 +/- 200.1 expected total reward.
-- 10 seconds: 88% success, 873.4 +/- 172.1 expected total reward.
-- 15 seconds: 94% success, 983.1 +/- 168.0 expected total reward.
+**Helpers.** `data/agent_protocol.py` (`run_agent`, `PlanningClock`) implements the protocol loop and the budget arithmetic. `data/maze2d.py` provides a generative model of the task. Using them is optional.
 
-The comparison baselines are RefPol, RefSolver, and POMCP. RefPol reports 29% success and -572.2 +/- 231.1 reward. At 10 seconds, RefSolver reports 30% success and -384.0 +/- 213.3 reward, while POMCP reports 13% success and -1897.5 +/- 240.1 reward.
+**Who computes the outcome.** The evaluator executes the headings in its own copy of the dynamics, with its own noise stream, and decides success, return and collisions itself. On a given instance, every agent faces the same true start and the same per-step noise.
 
-### HEMS Mission with Evolving No-Fly Zones
+## Planning budget (enforced)
 
-Maximum macro-action length is 15. The reported target system reaches:
+Like the paper, which compares planners at matched planning time, the evaluator limits computation. CPU time is measured on the agent's whole process tree, including threads and child processes.
 
-- 1 second: 58% success, 11393.5 +/- 1588.4 expected total reward.
-- 2 seconds: 75% success, 15408.8 +/- 1399.3 expected total reward.
-- 3 seconds: 78% success, 16207.7 +/- 1316.7 expected total reward.
-- 5 seconds: 78% success, 16231.6 +/- 1320.2 expected total reward.
-- 10 seconds: 90% success, 19393.5 +/- 967.9 expected total reward.
+| Phase | CPU allowance |
+|---|---|
+| Process start → `hello` | `startup_cpu_seconds` (imports only; the instance is not known yet) |
+| `reset` → `ready` | `reset_cpu_seconds` (per-instance preparation) |
+| `ready` → last action of the episode | `slack_seconds` + `cpu_seconds_per_step` × (sum of the lengths of the macro actions returned) |
 
-The comparison baselines are RefPol, RefSolver, and POMCP. RefPol reports 0% success and -6584.3 +/- 379.5 reward. At 10 seconds, RefSolver reports 22% success and 2258.7 +/- 2809.2 reward, while POMCP reports 0% success and -839.6 +/- 227.4 reward.
+All values are sent in `budget`. `cpu_seconds_per_step` is `units_per_step` times a machine unit, which the evaluator measures on the running machine. Exceeding any allowance, or not answering within the wall-clock safety timeouts, fails the episode.
 
-## Evaluation Protocol
+## Experiments and metrics
 
-Run each planner for 100 independent episodes per environment and time budget, using the same environment dynamics, reward rules, discount factor, macro-action length limit, and online planning-time limit used by the paper. Report results separately for each environment and time budget rather than pooling tasks.
+Each experiment runs every registered agent on 300 hidden layouts (`eval/test/`, test) or 100 public layouts (`eval/train/`, train).
 
-Use fixed random seeds or a recorded seed list so that different planners face the same initial-state uncertainty, transition noise, observation noise, and environment-change schedule. The discount factor is 0.99 in both environments. For fair comparison, all planners must use the same generative model, reward function, termination rules, and macro-action execution semantics.
+| Experiment | Budget | Weight |
+|---|---|---:|
+| `maze_standard_budget` | 8 units per primitive step | 0.6 |
+| `maze_tight_budget` | 1.6 units per primitive step | 0.4 |
 
-The 3D maze evaluation should include the poor-localisation initial belief, landmark-only localisation observations, danger-zone termination penalty, goal reward, and step penalty. The HEMS evaluation should include the Corsica terrain, two unordered objectives, evolving no-fly-zone penalties, collision termination penalty, mission-completion bonus, noisy transitions, noisy state readings, and step penalty.
+Scored metrics, per experiment and agent:
+
+| Metric | Direction | Coefficient | Meaning |
+|---|---|---:|---|
+| `success_rate` (primary) | higher | 1.0 | fraction of episodes that reach a goal within the horizon |
+| `mean_return` | higher | 0.5 | mean discounted return, in [−500, 2000) |
+| `collision_rate` | lower | 0.25 | fraction of episodes that end in a danger zone |
+
+**Failures.** A failed episode counts as unsuccessful, return −500 (the lowest possible), collision 1. Failures include a crash, malformed or non-finite output, a macro outside 1–10 steps, a timeout, or a budget violation. A registered agent that never runs gets these worst values on every episode.
+
+**Ranking.** Methods are ranked by the coefficient-weighted improvement over the reference, with each metric normalised by its spread across attempts. `_diagnostics` in the score files (failure reasons, budget use) is not scored.
+
+**Commands:**
+- `bash scripts/evaluate.sh`: visible layouts → `scoring/scores.json`.
+- `bash scripts/evaluate_train.sh`: visible layouts → `scoring/scores_train.json`.
+- `bash scripts/evaluate_test.sh`: hidden layouts → `scoring/scores_test.json`.
+
+Options for development runs:
+- `--only <name>`: score a single agent.
+- `--limit N`: quick partial run (not a valid score).
+- `--episodes-out FILE`: write per-episode records.
+
+## Paper reference numbers
+
+The paper (100 runs per setting, planning time per decision in seconds) reports, for its 3D maze:
+
+| Planner | Success | Expected total reward |
+|---|---:|---:|
+| Proposed planner, 1 s | 71% | 570.3 ± 183.5 |
+| Proposed planner, 10 s | 88% | 873.4 ± 172.1 |
+| Proposed planner, 15 s | 94% | 983.1 ± 168.0 |
+| RefPol | 29% | −572.2 ± 231.1 |
+| RefSolver, 10 s | 30% | −384.0 |
+| POMCP, 10 s | 13% | −1897.5 |
+
+For HEMS, the proposed planner reaches 90% success at 10 s; all baselines are at or below 28%.
+
+These numbers come from different simulators. Success rates here are only loose anchors, and returns are not on this maze's scale. `scoring/reference.json` keeps the full tables under `_paper_*` keys.

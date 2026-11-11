@@ -1,20 +1,39 @@
 # Evaluation Targets
 
-## Primary: scaled_maze_online_planning
+Both experiments are scored on 300 hidden layouts (`bash scripts/evaluate_test.sh`). The same metrics are reported on 100 public layouts (`bash scripts/evaluate_train.sh`).
 
-Tests whether an online planner can solve a poor-localization navigation POMDP
-where a feasible-action heuristic alone is not reliable.
+## Primary: maze_standard_budget (weight 0.6)
 
-- **Primary metric:** `core_claim_margin_score` (higher is better) is a
-  normalized margin over the strongest available baseline on both success rate
-  and mean total reward.
-- **Claim check:** `core_claim_supported` is 1 only when the planner beats
-  every available baseline on both success rate and mean total reward.
-- **Metric:** `success_rate` (higher is better)
-- **Metric:** `mean_total_reward` (higher is better)
-- **Constraint metric:** `success_gap_vs_refpol` (higher is better) measures improvement over the heuristic-only policy.
-- **Constraint metric:** `reward_gap_vs_refpol` (higher is better) measures reward improvement over the heuristic-only policy.
-- **Constraint metric:** `episodes` records the number of evaluated episodes and must remain comparable across methods.
-- **Constraint metric:** `stderr_total_reward` should be reported so improvements are judged against run variability.
-- **Baseline:** `pomcp` is a particle Monte Carlo tree-search baseline that enumerates fixed directional macro actions, matching the paper's POMCP protocol more closely than the domain-specific candidate sampler.
-- **Run:** execute `scripts/reproduce.sh`, which writes episode artifacts for RefPol, POMCP, and the submitted planner, then run `scripts/evaluate.sh`.
+**Budget:** 8 calibration units of CPU per primitive step.
+
+| Kind | Metric | Direction | Coefficient | Reference (test) |
+|---|---|---|---:|---:|
+| Primary | `success_rate` | higher | 1.0 | 0.850 |
+| Metric | `mean_return` (discounted; range [−500, 2000)) | higher | 0.5 | 781.3 |
+| Constraint | `collision_rate` (episodes ending in a danger zone) | lower | 0.25 | 0.150 |
+| Constraint | planning budget (enforced, not a metric) | — | — | — |
+
+Over-budget episodes are scored as failures with the worst value of every metric.
+
+**Baselines** (test, success): RefPol 0.233, POMCP 0.010.
+
+## Secondary: maze_tight_budget (weight 0.4)
+
+**Budget:** 1.6 calibration units of CPU per primitive step, the anytime regime.
+
+| Kind | Metric | Direction | Coefficient | Reference (test) |
+|---|---|---|---:|---:|
+| Primary | `success_rate` | higher | 1.0 | 0.703 |
+| Metric | `mean_return` | higher | 0.5 | 538.9 |
+| Constraint | `collision_rate` | lower | 0.25 | 0.297 |
+| Constraint | planning budget (enforced, as above) | — | — | — |
+
+**Baselines** (test, success): RefPol 0.270, POMCP 0.027.
+
+## Noise
+
+Across three seeds of the reference, test success varies by 0.027 (standard) and 0.020 (tight). Compare methods with paired per-layout differences; `--episodes-out` writes per-episode records.
+
+## Paper anchors
+
+The paper's tables (3D maze and HEMS, 100 runs each) are stored unchanged under `_paper_*` keys in `scoring/reference.json`. The reference rows hold the paper's success rates at the analogous planning times. Returns are not on this maze's scale.
