@@ -1,0 +1,46 @@
+{
+  "maze_standard_budget": {
+    "results": {
+      "goal_direct": {
+        "success_rate": 0.39666666666666667,
+        "mean_return": 152.15343038351074,
+        "collision_rate": 0.6033333333333334
+      }
+    },
+    "_diagnostics": {
+      "goal_direct": {
+        "episodes": 300,
+        "failed_episodes": 0,
+        "failure_reasons": {},
+        "mean_steps": 27.3,
+        "mean_decisions": 3.37,
+        "mean_budget_fraction": 0.02890877684498374,
+        "max_budget_fraction": 0.09909593064806899,
+        "machine_unit_seconds": 0.001693518000000001,
+        "wall_seconds": 22.1
+      }
+    }
+  },
+  "maze_tight_budget": {
+    "results": {
+      "goal_direct": {
+        "success_rate": 0.4533333333333333,
+        "mean_return": 240.7890477239599,
+        "collision_rate": 0.5466666666666666
+      }
+    },
+    "_diagnostics": {
+      "goal_direct": {
+        "episodes": 300,
+        "failed_episodes": 0,
+        "failure_reasons": {},
+        "mean_steps": 29.486666666666668,
+        "mean_decisions": 3.6266666666666665,
+        "mean_budget_fraction": 0.11651494069553772,
+        "max_budget_fraction": 0.5008518463159557,
+        "machine_unit_seconds": 0.001758459499999998,
+        "wall_seconds": 19.1
+      }
+    }
+  }
+}

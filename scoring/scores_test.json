@@ -2,112 +2,108 @@
   "maze_standard_budget": {
     "results": {
       "pomcp": {
-        "success_rate": 0.03,
-        "mean_return": -413.43997547041477,
+        "success_rate": 0.01,
+        "mean_return": -426.91495121452704,
         "collision_rate": 0.0
       },
       "porpp": {
-        "success_rate": 0.835,
-        "mean_return": 755.7761536344303,
-        "collision_rate": 0.165
+        "success_rate": 0.85,
+        "mean_return": 781.2736393005575,
+        "collision_rate": 0.15
       },
       "refpol": {
-        "success_rate": 0.225,
-        "mean_return": -235.0226611626213,
-        "collision_rate": 0.755
+        "success_rate": 0.23333333333333334,
+        "mean_return": -215.81506466619646,
+        "collision_rate": 0.7466666666666667
       }
     },
     "_diagnostics": {
       "pomcp": {
-        "episodes": 200,
+        "episodes": 300,
         "failed_episodes": 0,
         "failure_reasons": {},
-        "mean_steps": 197.91,
-        "mean_decisions": 19.805,
-        "mean_budget_fraction": 0.41023730660697066,
-        "max_budget_fraction": 0.5443445076908205,
-        "machine_unit_seconds": 0.0018402669999999983,
-        "wall_seconds": 665.9
+        "mean_steps": 199.32666666666665,
+        "mean_decisions": 19.936666666666667,
+        "mean_budget_fraction": 0.7178330352300106,
+        "max_budget_fraction": 0.7229230094987035,
+        "machine_unit_seconds": 0.0016891959999999998,
+        "wall_seconds": 1455.1
       },
       "porpp": {
-        "episodes": 200,
-        "failed_episodes": 4,
-        "failure_reasons": {
-          "planning budget exceeded": 4
-        },
-        "mean_steps": 50.295,
-        "mean_decisions": 7.42,
-        "mean_budget_fraction": 0.6150892763958877,
-        "max_budget_fraction": 0.9778743161927617,
-        "machine_unit_seconds": 0.0016954924999999844,
-        "wall_seconds": 319.1
-      },
-      "refpol": {
-        "episodes": 200,
+        "episodes": 300,
         "failed_episodes": 0,
         "failure_reasons": {},
-        "mean_steps": 50.145,
-        "mean_decisions": 5.86,
-        "mean_budget_fraction": 0.030881151953072748,
-        "max_budget_fraction": 0.09504186245554216,
-        "machine_unit_seconds": 0.0017188910000000223,
-        "wall_seconds": 95.5
+        "mean_steps": 48.06666666666667,
+        "mean_decisions": 6.993333333333333,
+        "mean_budget_fraction": 0.6925496756836597,
+        "max_budget_fraction": 0.7814258818723911,
+        "machine_unit_seconds": 0.0017161864999999832,
+        "wall_seconds": 344.5
+      },
+      "refpol": {
+        "episodes": 300,
+        "failed_episodes": 0,
+        "failure_reasons": {},
+        "mean_steps": 48.843333333333334,
+        "mean_decisions": 5.716666666666667,
+        "mean_budget_fraction": 0.028672622723259877,
+        "max_budget_fraction": 0.08809711974484084,
+        "machine_unit_seconds": 0.0017415704999999893,
+        "wall_seconds": 27.0
       }
     }
   },
   "maze_tight_budget": {
     "results": {
       "pomcp": {
-        "success_rate": 0.035,
-        "mean_return": -411.27461850411305,
-        "collision_rate": 0.11
+        "success_rate": 0.02666666666666667,
+        "mean_return": -414.20897977771676,
+        "collision_rate": 0.043333333333333335
       },
       "porpp": {
-        "success_rate": 0.695,
-        "mean_return": 502.9899283130113,
-        "collision_rate": 0.305
+        "success_rate": 0.7033333333333334,
+        "mean_return": 538.8892836578697,
+        "collision_rate": 0.2966666666666667
       },
       "refpol": {
-        "success_rate": 0.285,
-        "mean_return": -180.6918965662512,
-        "collision_rate": 0.71
+        "success_rate": 0.27,
+        "mean_return": -194.61504185364242,
+        "collision_rate": 0.7133333333333334
       }
     },
     "_diagnostics": {
       "pomcp": {
-        "episodes": 200,
+        "episodes": 300,
         "failed_episodes": 0,
         "failure_reasons": {},
-        "mean_steps": 183.63,
-        "mean_decisions": 18.425,
-        "mean_budget_fraction": 0.46357258512581107,
-        "max_budget_fraction": 0.607746727431704,
-        "machine_unit_seconds": 0.001746269499999997,
-        "wall_seconds": 229.0
+        "mean_steps": 191.38666666666666,
+        "mean_decisions": 19.163333333333334,
+        "mean_budget_fraction": 0.6575704883297964,
+        "max_budget_fraction": 0.6861812600350002,
+        "machine_unit_seconds": 0.0017109680000000015,
+        "wall_seconds": 385.2
       },
       "porpp": {
-        "episodes": 200,
-        "failed_episodes": 1,
-        "failure_reasons": {
-          "planning budget exceeded": 1
-        },
-        "mean_steps": 48.91,
-        "mean_decisions": 6.38,
-        "mean_budget_fraction": 0.4864628881338633,
-        "max_budget_fraction": 0.923679612606784,
-        "machine_unit_seconds": 0.0017739359999999983,
-        "wall_seconds": 149.0
-      },
-      "refpol": {
-        "episodes": 200,
+        "episodes": 300,
         "failed_episodes": 0,
         "failure_reasons": {},
-        "mean_steps": 52.705,
-        "mean_decisions": 6.215,
-        "mean_budget_fraction": 0.13083755952271633,
-        "max_budget_fraction": 0.383574210777649,
-        "machine_unit_seconds": 0.001722343000000004,
-        "wall_seconds": 96.6
+        "mean_steps": 48.0,
+        "mean_decisions": 6.1866666666666665,
+        "mean_budget_fraction": 0.5173195619690485,
+        "max_budget_fraction": 0.7511780553744579,
+        "machine_unit_seconds": 0.0018134830000000157,
+        "wall_seconds": 94.5
+      },
+      "refpol": {
+        "episodes": 300,
+        "failed_episodes": 0,
+        "failure_reasons": {},
+        "mean_steps": 54.47,
+        "mean_decisions": 6.466666666666667,
+        "mean_budget_fraction": 0.12067287888153497,
+        "max_budget_fraction": 0.470910407449024,
+        "machine_unit_seconds": 0.0017779994999999715,
+        "wall_seconds": 29.6
       }
     }
   }

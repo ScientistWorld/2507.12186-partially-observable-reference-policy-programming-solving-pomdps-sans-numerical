@@ -2,14 +2,14 @@
   "maze_standard_budget": {
     "results": {
       "pomcp": {
-        "success_rate": 0.02,
-        "mean_return": -420.5241373791897,
-        "collision_rate": 0.01
+        "success_rate": 0.03,
+        "mean_return": -414.42397461298845,
+        "collision_rate": 0.0
       },
       "porpp": {
-        "success_rate": 0.84,
-        "mean_return": 742.6573529763754,
-        "collision_rate": 0.15
+        "success_rate": 0.88,
+        "mean_return": 797.067116655594,
+        "collision_rate": 0.12
       },
       "refpol": {
         "success_rate": 0.21,
@@ -22,23 +22,23 @@
         "episodes": 100,
         "failed_episodes": 0,
         "failure_reasons": {},
-        "mean_steps": 197.07,
-        "mean_decisions": 19.72,
-        "mean_budget_fraction": 0.4513776956637662,
-        "max_budget_fraction": 0.5792994659077532,
-        "machine_unit_seconds": 0.0016841839999999983,
-        "wall_seconds": 324.7
+        "mean_steps": 197.89,
+        "mean_decisions": 19.8,
+        "mean_budget_fraction": 0.7181061234885334,
+        "max_budget_fraction": 0.7205998076908018,
+        "machine_unit_seconds": 0.0017554559999999994,
+        "wall_seconds": 483.8
       },
       "porpp": {
         "episodes": 100,
         "failed_episodes": 0,
         "failure_reasons": {},
-        "mean_steps": 52.16,
-        "mean_decisions": 7.35,
-        "mean_budget_fraction": 0.5747258918911232,
-        "max_budget_fraction": 0.8970633733410311,
-        "machine_unit_seconds": 0.0018091799999999992,
-        "wall_seconds": 157.2
+        "mean_steps": 51.55,
+        "mean_decisions": 7.5,
+        "mean_budget_fraction": 0.6964366609507928,
+        "max_budget_fraction": 0.7699541384516994,
+        "machine_unit_seconds": 0.0017616980000000006,
+        "wall_seconds": 135.7
       },
       "refpol": {
         "episodes": 100,
@@ -46,24 +46,24 @@
         "failure_reasons": {},
         "mean_steps": 57.36,
         "mean_decisions": 6.64,
-        "mean_budget_fraction": 0.034325826161282456,
-        "max_budget_fraction": 0.11536665368407173,
-        "machine_unit_seconds": 0.0017398785000000139,
-        "wall_seconds": 52.3
+        "mean_budget_fraction": 0.032348358645280614,
+        "max_budget_fraction": 0.10362556848986816,
+        "machine_unit_seconds": 0.0016531489999999983,
+        "wall_seconds": 18.1
       }
     }
   },
   "maze_tight_budget": {
     "results": {
       "pomcp": {
-        "success_rate": 0.01,
-        "mean_return": -421.75162182843576,
-        "collision_rate": 0.05
+        "success_rate": 0.02,
+        "mean_return": -421.2000339689302,
+        "collision_rate": 0.0
       },
       "porpp": {
-        "success_rate": 0.75,
-        "mean_return": 590.8402194556887,
-        "collision_rate": 0.25
+        "success_rate": 0.7,
+        "mean_return": 516.6332408646072,
+        "collision_rate": 0.3
       },
       "refpol": {
         "success_rate": 0.22,
@@ -76,23 +76,23 @@
         "episodes": 100,
         "failed_episodes": 0,
         "failure_reasons": {},
-        "mean_steps": 193.43,
-        "mean_decisions": 19.36,
-        "mean_budget_fraction": 0.49759211407802595,
-        "max_budget_fraction": 0.626862119338826,
-        "machine_unit_seconds": 0.0016882544999999973,
-        "wall_seconds": 120.7
+        "mean_steps": 198.74,
+        "mean_decisions": 19.89,
+        "mean_budget_fraction": 0.671413854838391,
+        "max_budget_fraction": 0.6849313281327295,
+        "machine_unit_seconds": 0.0017600004999999974,
+        "wall_seconds": 111.8
       },
       "porpp": {
         "episodes": 100,
         "failed_episodes": 0,
         "failure_reasons": {},
-        "mean_steps": 50.54,
-        "mean_decisions": 6.61,
-        "mean_budget_fraction": 0.5426601233437625,
-        "max_budget_fraction": 0.9161258012623609,
-        "machine_unit_seconds": 0.0016737825000000092,
-        "wall_seconds": 73.7
+        "mean_steps": 47.36,
+        "mean_decisions": 6.22,
+        "mean_budget_fraction": 0.5131126854822295,
+        "max_budget_fraction": 0.6724468975055585,
+        "machine_unit_seconds": 0.0016900449999999957,
+        "wall_seconds": 41.9
       },
       "refpol": {
         "episodes": 100,
@@ -100,10 +100,10 @@
         "failure_reasons": {},
         "mean_steps": 53.73,
         "mean_decisions": 6.26,
-        "mean_budget_fraction": 0.13318405383074386,
-        "max_budget_fraction": 0.42560065412815246,
-        "machine_unit_seconds": 0.0017524985000000105,
-        "wall_seconds": 47.1
+        "mean_budget_fraction": 0.1231342056247775,
+        "max_budget_fraction": 0.38946148381709617,
+        "machine_unit_seconds": 0.0016955999999999972,
+        "wall_seconds": 12.0
       }
     }
   }

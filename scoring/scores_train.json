@@ -3,13 +3,13 @@
     "results": {
       "pomcp": {
         "success_rate": 0.02,
-        "mean_return": -420.5241373791897,
-        "collision_rate": 0.01
+        "mean_return": -424.29449479103016,
+        "collision_rate": 0.0
       },
       "porpp": {
-        "success_rate": 0.84,
-        "mean_return": 742.6573529763754,
-        "collision_rate": 0.15
+        "success_rate": 0.91,
+        "mean_return": 855.704048261697,
+        "collision_rate": 0.09
       },
       "refpol": {
         "success_rate": 0.21,
@@ -22,23 +22,23 @@
         "episodes": 100,
         "failed_episodes": 0,
         "failure_reasons": {},
-        "mean_steps": 197.07,
-        "mean_decisions": 19.72,
-        "mean_budget_fraction": 0.4316820498813372,
-        "max_budget_fraction": 0.5347578331327397,
-        "machine_unit_seconds": 0.0017218800000000005,
-        "wall_seconds": 301.3
+        "mean_steps": 199.26,
+        "mean_decisions": 19.94,
+        "mean_budget_fraction": 0.7178399698298447,
+        "max_budget_fraction": 0.7225140555943316,
+        "machine_unit_seconds": 0.0017074704999999995,
+        "wall_seconds": 427.5
       },
       "porpp": {
         "episodes": 100,
         "failed_episodes": 0,
         "failure_reasons": {},
-        "mean_steps": 52.16,
-        "mean_decisions": 7.35,
-        "mean_budget_fraction": 0.554553297849952,
-        "max_budget_fraction": 0.8450650747123887,
-        "machine_unit_seconds": 0.001831821499999997,
-        "wall_seconds": 166.0
+        "mean_steps": 51.13,
+        "mean_decisions": 7.17,
+        "mean_budget_fraction": 0.6995329992735985,
+        "max_budget_fraction": 0.7704829291117383,
+        "machine_unit_seconds": 0.0016689039999999934,
+        "wall_seconds": 124.3
       },
       "refpol": {
         "episodes": 100,
@@ -46,24 +46,24 @@
         "failure_reasons": {},
         "mean_steps": 57.36,
         "mean_decisions": 6.64,
-        "mean_budget_fraction": 0.033766786208416756,
-        "max_budget_fraction": 0.10003563936378466,
-        "machine_unit_seconds": 0.0017180819999999875,
-        "wall_seconds": 50.6
+        "mean_budget_fraction": 0.03360840473383471,
+        "max_budget_fraction": 0.10131476850521158,
+        "machine_unit_seconds": 0.0016944179999999864,
+        "wall_seconds": 17.2
       }
     }
   },
   "maze_tight_budget": {
     "results": {
       "pomcp": {
-        "success_rate": 0.01,
-        "mean_return": -421.75162182843576,
-        "collision_rate": 0.05
+        "success_rate": 0.03,
+        "mean_return": -420.7480552664601,
+        "collision_rate": 0.01
       },
       "porpp": {
-        "success_rate": 0.75,
-        "mean_return": 590.8402194556887,
-        "collision_rate": 0.25
+        "success_rate": 0.67,
+        "mean_return": 472.62849371182557,
+        "collision_rate": 0.32
       },
       "refpol": {
         "success_rate": 0.22,
@@ -76,23 +76,23 @@
         "episodes": 100,
         "failed_episodes": 0,
         "failure_reasons": {},
-        "mean_steps": 193.43,
-        "mean_decisions": 19.36,
-        "mean_budget_fraction": 0.48228867597146385,
-        "max_budget_fraction": 0.5877849816705141,
-        "machine_unit_seconds": 0.0017045494999999968,
-        "wall_seconds": 120.5
+        "mean_steps": 197.34,
+        "mean_decisions": 19.75,
+        "mean_budget_fraction": 0.6646320540129761,
+        "max_budget_fraction": 0.6812588825677381,
+        "machine_unit_seconds": 0.0016327175000000024,
+        "wall_seconds": 84.3
       },
       "porpp": {
         "episodes": 100,
         "failed_episodes": 0,
         "failure_reasons": {},
-        "mean_steps": 50.54,
-        "mean_decisions": 6.61,
-        "mean_budget_fraction": 0.535348636561312,
-        "max_budget_fraction": 0.8714705177877785,
-        "machine_unit_seconds": 0.0017088035000000002,
-        "wall_seconds": 76.7
+        "mean_steps": 53.0,
+        "mean_decisions": 6.95,
+        "mean_budget_fraction": 0.533894826245388,
+        "max_budget_fraction": 0.6863255849158728,
+        "machine_unit_seconds": 0.0017381560000000018,
+        "wall_seconds": 44.0
       },
       "refpol": {
         "episodes": 100,
@@ -100,10 +100,10 @@
         "failure_reasons": {},
         "mean_steps": 53.73,
         "mean_decisions": 6.26,
-        "mean_budget_fraction": 0.13483228907858164,
-        "max_budget_fraction": 0.4576208549943307,
-        "machine_unit_seconds": 0.001716122500000017,
-        "wall_seconds": 50.5
+        "mean_budget_fraction": 0.12284711724550883,
+        "max_budget_fraction": 0.37804311023302556,
+        "machine_unit_seconds": 0.0017539105,
+        "wall_seconds": 8.5
       }
     }
   }
