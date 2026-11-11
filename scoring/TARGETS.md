@@ -36,4 +36,4 @@ Across three seeds of the reference, test success varies by 0.027 (standard) and
 
 ## Paper anchors
 
-The paper's tables (3D maze and HEMS, 100 runs each) are stored unchanged under `_paper_*` keys in `scoring/reference.json`. The reference rows hold the paper's success rates at the analogous planning times. Returns are not on this maze's scale.
+The paper's tables (3D maze and HEMS, 100 runs each) are stored unchanged under `_paper_*` keys in `scoring/reference.json`. The `porpp` reference row holds the paper's success rate at the analogous planning time (10 s for standard, 1 s for tight). Baseline rows carry no target values. Absolute baseline success is environment-specific even in the paper (RefPol 29% in its maze vs 0% in HEMS), so the paper's baseline rates are kept for reference only, under `_paper_*` keys. Returns are not on this maze's scale.

@@ -1,3 +1,3 @@
 action: done
 milestone: core_claim
-notes: "Hardened: evaluator-owned online rollouts of registered agents on 300 hidden mazes with an enforced, calibrated CPU budget; worst values for any failure; PORPP 0.850/0.703 success vs RefPol 0.233/0.270, POMCP 0.010/0.027; a better-search variant beats the reference beyond seed noise; all tested shortcuts score worst. See HARDENING.md."
+notes: "Hardened: evaluator-owned online rollouts of registered agents on 300 hidden mazes with an enforced, calibrated CPU budget; worst values for any failure; PORPP 0.850/0.703 success vs RefPol 0.233/0.270, POMCP 0.010/0.027; a better-search variant beats the reference beyond seed noise; all tested shortcuts score worst; paper baseline rates (not on this scale) moved under _ keys. See HARDENING.md."

@@ -89,4 +89,4 @@ The paper (100 runs per setting, planning time per decision in seconds) reports,
 
 For HEMS, the proposed planner reaches 90% success at 10 s; all baselines are at or below 28%.
 
-These numbers come from different simulators. Success rates here are only loose anchors, and returns are not on this maze's scale. `scoring/reference.json` keeps the full tables under `_paper_*` keys.
+These numbers come from different simulators. Success rates here are only loose anchors, and returns are not on this maze's scale. `scoring/reference.json` keeps the full tables under `_paper_*` keys. Only the proposed planner's success rate is used as a reference row.

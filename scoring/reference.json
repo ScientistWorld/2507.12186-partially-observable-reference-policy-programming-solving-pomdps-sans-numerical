@@ -2,7 +2,7 @@
   "experiments": {
     "maze_standard_budget": {
       "description": "Online planning on hidden poor-localisation mazes at the standard per-step CPU planning budget (8 calibration units per primitive step).",
-      "notes": "Scaled stand-in for the paper's 3D Maze with Poor Localisation: 2D closed mazes (44x30) with two equally likely starts, landmark-only localisation, danger zones (-500), two goal regions (+2000), -5 per step, gamma 0.99, motion noise covariance 0.02*I, open-loop macro actions of at most 10 steps, 200-step horizon. Layouts are procedurally generated; the test uses 200 hidden layouts (eval/test/instances.json), train 100 public ones. The evaluator runs each agent online and enforces a CPU planning budget instead of the paper's wall-clock time per decision. Reference rows hold the paper's success rates for the analogous planning budget; returns are not on this maze's scale and stay in _paper_3d_maze / _paper_hems. Standard budget is compared with the paper's larger planning times (PORPP at 10 s per decision; baselines at 10 s).",
+      "notes": "Scaled stand-in for the paper's 3D Maze with Poor Localisation: 2D closed mazes (44x30) with two equally likely starts, landmark-only localisation, danger zones (-500), two goal regions (+2000), -5 per step, gamma 0.99, motion noise covariance 0.02*I, open-loop macro actions of at most 10 steps, 200-step horizon. Layouts are procedurally generated; the test uses 200 hidden layouts (eval/test/instances.json), train 100 public ones. The evaluator runs each agent online and enforces a CPU planning budget instead of the paper's wall-clock time per decision. Reference rows hold the paper's success rates for the analogous planning budget; returns are not on this maze's scale and stay in _paper_3d_maze / _paper_hems. Standard budget is compared with the paper's larger planning times (PORPP at 10 s per decision; baselines at 10 s). Baseline rows carry no target values: absolute baseline success is environment-specific in the paper itself (RefPol 29% in the 3D maze vs 0% in HEMS; POMCP 13% vs 0%), so the paper's baseline rates are kept only for reference under _paper_baseline_success_not_on_this_scale and in _paper_tables_full.",
       "weight": 0.6,
       "primary_metric": "success_rate",
       "metrics": {
@@ -28,18 +28,24 @@
           "success_rate": 0.88
         },
         "refpol": {
-          "type": "baseline",
-          "success_rate": 0.29
+          "type": "baseline"
         },
         "pomcp": {
-          "type": "baseline",
+          "type": "baseline"
+        }
+      },
+      "_paper_baseline_success_not_on_this_scale": {
+        "refpol": {
+          "success_rate": 0.29
+        },
+        "pomcp_10s": {
           "success_rate": 0.13
         }
       }
     },
     "maze_tight_budget": {
       "description": "The same hidden mazes at a tight per-step CPU planning budget (1.6 calibration units per primitive step), the anytime regime where the paper's method is weakest.",
-      "notes": "Scaled stand-in for the paper's 3D Maze with Poor Localisation: 2D closed mazes (44x30) with two equally likely starts, landmark-only localisation, danger zones (-500), two goal regions (+2000), -5 per step, gamma 0.99, motion noise covariance 0.02*I, open-loop macro actions of at most 10 steps, 200-step horizon. Layouts are procedurally generated; the test uses 200 hidden layouts (eval/test/instances.json), train 100 public ones. The evaluator runs each agent online and enforces a CPU planning budget instead of the paper's wall-clock time per decision. Reference rows hold the paper's success rates for the analogous planning budget; returns are not on this maze's scale and stay in _paper_3d_maze / _paper_hems. Tight budget is compared with the paper's smallest planning times (PORPP at 1 s; POMCP at 2 s, its smallest reported).",
+      "notes": "Scaled stand-in for the paper's 3D Maze with Poor Localisation: 2D closed mazes (44x30) with two equally likely starts, landmark-only localisation, danger zones (-500), two goal regions (+2000), -5 per step, gamma 0.99, motion noise covariance 0.02*I, open-loop macro actions of at most 10 steps, 200-step horizon. Layouts are procedurally generated; the test uses 200 hidden layouts (eval/test/instances.json), train 100 public ones. The evaluator runs each agent online and enforces a CPU planning budget instead of the paper's wall-clock time per decision. Reference rows hold the paper's success rates for the analogous planning budget; returns are not on this maze's scale and stay in _paper_3d_maze / _paper_hems. Tight budget is compared with the paper's smallest planning times (PORPP at 1 s; POMCP at 2 s, its smallest reported). Baseline rows carry no target values: absolute baseline success is environment-specific in the paper itself (RefPol 29% in the 3D maze vs 0% in HEMS; POMCP 13% vs 0%), so the paper's baseline rates are kept only for reference under _paper_baseline_success_not_on_this_scale and in _paper_tables_full.",
       "weight": 0.4,
       "primary_metric": "success_rate",
       "metrics": {
@@ -65,11 +71,17 @@
           "success_rate": 0.71
         },
         "refpol": {
-          "type": "baseline",
-          "success_rate": 0.29
+          "type": "baseline"
         },
         "pomcp": {
-          "type": "baseline",
+          "type": "baseline"
+        }
+      },
+      "_paper_baseline_success_not_on_this_scale": {
+        "refpol": {
+          "success_rate": 0.29
+        },
+        "pomcp_2s": {
           "success_rate": 0.1
         }
       }
